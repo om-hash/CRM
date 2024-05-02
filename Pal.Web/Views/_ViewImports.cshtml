@@ -1,0 +1,14 @@
+@using Pal.Web
+@using Pal.Web.Extensions
+@using Pal.Web.Models
+@using Pal.Core.Domains.Languages
+@using Pal.Data.VMs.Pagination
+
+@inject Pal.Services.WebWorkContext.IWebWorkContext webWorkContext
+@inject Pal.Services.Configurations.IConfigurationService ConfigrationService
+@inject Pal.Services.Caching.ICacheService<List<Language>> CacheService
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inherits CustomBaseViewPage<TModel>
+
+@addTagHelper *, Syncfusion.EJ2

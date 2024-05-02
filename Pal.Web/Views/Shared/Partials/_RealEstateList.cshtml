@@ -1,0 +1,67 @@
+﻿@using Pal.Data.DTOs.RealEstate
+@model List<RealEstateCardViewModel>
+@{
+
+
+}
+@foreach (var item in Model)
+{
+        var fullAddress = item.RegionName + " - " + item.CityName;
+    <div class="col-lg-6 col-md-6">
+
+
+        <div class="property shadow-hover">
+            <a asp-controller="RealEstates" asp-action="RealEstate" asp-route-id="@item.Id" class="property-img">
+                <div class="img-fade"></div>
+                @if (item.IsFeatured)
+                {
+                    <div class="property-tag button status">@T("model.RealEstate.IsFeatured")</div>
+                }
+                <div class="property-price">@item.Price.ToString("n0")<i class="fa fa-dollar"></i></div>
+                <div class="property-color-bar"></div>
+                @if (item.MainImgUrl == null)
+                {
+                    <img src="~/img/project-default.webp" alt="" />
+                }
+                else
+                {
+                    <img src="@item.MainImgUrl" alt="" />
+                }
+            </a>
+            <div class="property-content">
+                <div class="property-title">
+                    <h4><a asp-controller="RealEstates" asp-action="RealEstate" asp-route-id="@item.Id">@item.Title</a></h4>
+                    <p class="property-address"><i class="fa fa-map-marker icon"></i>@fullAddress</p>
+                </div>
+                <table class="property-details">
+                    <tr>
+                        <td>@T("model.RealEstate.RoomsCountId") (@item.RoomCount)</td>
+                        <td>@T("model.RealEstate.AreaTotal")  (@item.AreaTotal) &#13217;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="property-footer">
+                @if (User.FindFirst(Pal.Core.Enums.Account.PalClaimType.UserType.ToString())?.Value == Pal.Core.Enums.Account.UserType.Customers.ToString())
+                {
+                    @if (item.IsAddedToFavorite)
+                    {
+                        <span class="right">
+                            <i style="color:#e8792f;" class="fas fa-heart icon"></i>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="right">
+                            <i style="color:#e8792f;" class="fa fa-heart-o icon"></i>
+                        </span>
+                    }
+
+                }
+
+                <div class="clear"></div>
+            </div>
+
+        </div>
+    </div>
+}

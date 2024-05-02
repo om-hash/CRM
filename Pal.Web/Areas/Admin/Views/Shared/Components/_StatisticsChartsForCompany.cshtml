@@ -1,0 +1,140 @@
+﻿@using Pal.Data.DTOs.Statistics;
+@model StatisticsDTO;
+
+
+@{ var isRtl = LanguageService.IsLayoutRtl();}
+<div class="row">
+    <div class="col-lg-12 ">
+        <section class="content">
+            <!-- Small boxes (Stat box) -->
+            <div class="row" style="margin-top:20px">
+   
+                <div class="col-lg-6 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>@Model?.ReaEstateCount</h3>
+
+                            <p>@T("cp.views.Dashboard.card.addedrealestate.title")</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-bag"></i>
+                        </div>
+                        @*<a href="#" class="small-box-footer">@T("global.moreInfo")<i class="fas fa-arrow-circle-right"></i></a>*@
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-6 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>@Model?.ProjectsCount</h3>
+
+                            <p>@T("cp.views.Dashboard.card.addedProject.title")</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                        @*<a href="#" class="small-box-footer">@T("global.moreInfo")<i class="fas fa-arrow-circle-right"></i></a>*@
+                    </div>
+                </div>
+                <!-- ./col -->
+        
+                <!-- ./col -->
+           
+                <!-- ./col -->
+            </div>
+
+
+        </section>
+    </div>
+</div>
+<div class="row" style="display:flex; ">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="control-section">
+            <div id="container" align='center'>
+                <ejs-chart id="lineContainer" title="@T("cp.views.Dashboard.chart.realestate.title")" pointClick="chartCustomPointClick" enableRtl="isRtl" height='420'>
+                    <e-chart-tooltipsettings enable="true">
+                    </e-chart-tooltipsettings>
+                    <e-chart-primaryxaxis valueType="Category" interval=1>
+                        <e-majorgridlines width="0"></e-majorgridlines>
+                    </e-chart-primaryxaxis>
+                    <e-chart-primaryyaxis>
+                        <e-majorgridlines width="0"></e-majorgridlines>
+                        <e-majorticklines width="0"></e-majorticklines>
+                        <e-linestyle width="0"></e-linestyle>
+                        <e-labelstyle color="transparent"></e-labelstyle>
+                    </e-chart-primaryyaxis>
+                    <e-chart-chartarea>
+                        <e-chartarea-border width="0"></e-chartarea-border>
+                    </e-chart-chartarea>
+                    <e-series-collection>
+                        <e-series dataSource="@Model?.MostRealEstateVisited" colorName="Name"  xName='Name' yName='VisitingCount' name='@T("global.RealEstate")' width=1 type="@Syncfusion.EJ2.Charts.ChartSeriesType.Column">
+                            <e-series-marker>
+                                <e-series-datalabel visible="true" position="Top">
+                                    <e-font color="#ffffff" fontWeight="600"></e-font>
+                                </e-series-datalabel>
+                            </e-series-marker>
+                        </e-series>
+
+                    </e-series-collection>
+                </ejs-chart>
+            </div>
+        </div>
+    </div>
+
+
+    @*<div class="col-lg-4 col-md-6 col-sm-12" id="regionChart">
+        <div class="control-section">
+            <div id="container2" align='center'>
+                <ejs-accumulationchart id="containe3" title="@T("cp.views.Dashboard.chart.region.title")" pointClick="regionChartClick" enableRtl="isRtl" enableRtl height='420'>
+                    <e-accumulationchart-legendsettings visible="true" position="Top">
+                    </e-accumulationchart-legendsettings>
+                    <e-accumulationchart-tooltipsettings enable="false"></e-accumulationchart-tooltipsettings>
+                    <e-accumulation-series-collection>
+                        <e-accumulation-series dataSource="Model.MostRegionVisited" xName="Name" yName="VisitingCount" radius="80%" innerRadius="40%" name="Project"
+                                               explode=false explodeOffset="10%" explodeIndex=3>
+                            <e-accumulationseries-datalabel visible="true" name="Name" id="Link">
+                                <e-font fontWeight="600" color="white"></e-font>
+                            </e-accumulationseries-datalabel>
+                        </e-accumulation-series>
+                    </e-accumulation-series-collection>
+                </ejs-accumulationchart>
+            </div>
+        </div>
+    </div>*@
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="control-section">
+            <div id="container" align='center'>
+                <ejs-chart id="BarContainer" load="window.onChartLoad" title="@T("cp.views.Dashboard.chart.project.title")" enableRtl="isRtl"  pointClick="chartCustomPointClick" height='420'>
+                    <e-chart-chartarea>
+                        <e-chartarea-border width="0"></e-chartarea-border>
+                    </e-chart-chartarea>
+                    <e-chart-tooltipsettings enable="true">
+                    </e-chart-tooltipsettings>
+                    <e-chart-primaryxaxis valueType="Category" title="@T("global.projects")"
+                                          interval=1>
+                        <e-majorgridlines width="0"></e-majorgridlines>
+                    </e-chart-primaryxaxis>
+                    <e-chart-primaryyaxis edgeLabelPlacement="Shift">
+                        <e-majorgridlines width="0"></e-majorgridlines>
+                        <e-majorticklines width="0"></e-majorticklines>
+                        <e-linestyle width="0"></e-linestyle>
+                        <e-labelstyle color="transparent"></e-labelstyle>
+                    </e-chart-primaryyaxis>
+                    <e-series-collection>
+                        <e-series dataSource="@Model?.MostProjectVisited" xName="Name" yName="VisitingCount" name="@T("global.projects")" width=2 type="@Syncfusion.EJ2.Charts.ChartSeriesType.Bar">
+                            <e-series-marker>
+                                <e-series-datalabel position="Top" visible="true">
+                                    <e-font color="#ffffff" fontWeight="600"></e-font>
+                                </e-series-datalabel>
+                            </e-series-marker>
+                        </e-series>
+
+                    </e-series-collection>
+                </ejs-chart>
+            </div>
+        </div>
+    </div>
+</div>
+<ejs-scripts></ejs-scripts>

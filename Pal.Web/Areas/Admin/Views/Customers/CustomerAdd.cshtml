@@ -1,0 +1,151 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Customer.CustomerDTO
+@{
+    ViewData["Title"] = T("cp.views.customer.add.title");
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+
+<br />
+
+<div class="form-row col-12">
+    <div class="col-auto mr-auto">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                //OnSaveAndNew = "onSave(true)",
+                BackToListhref = "/Admin/Customers/CustomersList",
+            });
+
+        }
+    </div>
+
+
+</div>
+
+<hr />
+<div>
+    
+    <form id="myForm" asp-action="CustomerAdd">
+        <div class="form-row">
+            @*<div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="Username">@T("model.Account.Username")</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="Password">@T("modal.Account.Password")</label>
+                <input asp-for="Password" type="text" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>*@
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="FullName">@T("model.Customer.FullName")</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="CountryId">@T("model.Customer.CountryId")</label>
+                <select asp-for="CountryId" asp-items="ViewBag.cbCountry" class="form-control"></select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="CustomerStatus">@T("model.Customer.CustomerStatus")</label>
+                <select asp-for="CustomerStatus" asp-items="ViewBag.cbCustomerStatus" class="form-control"></select>
+                <span asp-validation-for="CustomerStatus" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="NationalityId">@T("model.Customer.NationalityId")</label>
+                <select asp-for="NationalityId" asp-items="ViewBag.cbNationalities" class="form-control"></select>
+                <span asp-validation-for="NationalityId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="Email">@T("model.Customer.Email")</label>
+                    <input asp-for="Email" class="rounded-0  form-control form-control-sm" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="WorkCompany">@T("model.lead.WorkCompany")</label>
+                <input asp-for="WorkCompany" class="rounded-0  form-control form-control-sm" />
+                <span asp-validation-for="WorkCompany" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="PhoneNumber">@T("model.Customer.PhoneNumber")</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                <label asp-for="WhatsappNumber">@T("model.Customer.WhatsappNumber")</label>
+                <input asp-for="WhatsappNumber" class="form-control" />
+                <span asp-validation-for="WhatsappNumber" class="text-danger"></span>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+    </form>
+
+
+
+
+</div>
+
+@section Scripts{
+
+    <script>
+        var languagesCount = @languages.Count;
+
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+
+            // readyupdata
+            var data = new FormData();
+            data.append('Username', $('#Username').val());
+            data.append('Password', $('#Password').val());
+            data.append('FullName', $('#FullName').val());
+            data.append('CountryId', $('#CountryId').val());
+            data.append('CustomerStatus', $('#CustomerStatus').val());
+            data.append('Email', $('#Email').val());
+            data.append('WorkCompany', $('#WorkCompany').val());
+            data.append('NationalityId', $('#NationalityId').val());
+            data.append('PhoneNumber', $('#PhoneNumber').val());
+            data.append('WhatsappNumber', $('#WhatsappNumber').val());
+
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/Admin/Customers/CustomerAdd",
+                processData: false,
+                contentType: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

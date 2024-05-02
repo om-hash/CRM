@@ -1,0 +1,58 @@
+﻿@using Pal.Data.DTOs.Project
+@model ProjectCardViewModel
+
+@{ 
+    var fullAddress = Model.RegionName + " - " + Model.CityName;
+}
+    <div class="property shadow-hover">
+        <a asp-controller="Projects" asp-action="Project" asp-route-id="@Model.Id" class="property-img">
+            <div class="img-fade"></div>
+            @if (Model.IsFeatured)
+            {
+                <div class="property-tag button status">@T("model.Project.IsFeatured")</div>
+            }
+            <div class="property-price">@Model.MeterAvgPrice.ToString("n0") <i class="fa fa-dollar"></i></div>
+            <div class="property-color-bar"></div>
+            @if (Model.MainImg == null)
+            {
+                <img src="~/img/project-default.webp" alt="" />
+            }
+            else
+            {
+                <img src="@Model.MainImg" alt="" />
+            }
+        </a>
+        <div class="property-content">
+            <div class="property-title">
+                <h4><a asp-controller="Projects" asp-action="Project" asp-route-id="@Model.Id">@Model.ProjectName</a></h4>
+                <p class="property-address"><i class="fa fa-map-marker icon"></i>@fullAddress</p>
+            </div>
+            <table class="property-details">
+                <tr>
+                    <td>@Model.ProjectStatus</td>
+                    <td><i class="fa fa-expand"></i>  @Model.Area &#13217;</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="property-footer">
+            @if (User.FindFirst(Pal.Core.Enums.Account.PalClaimType.UserType.ToString())?.Value == Pal.Core.Enums.Account.UserType.Customers.ToString())
+            {
+                @if (Model.IsAddedToFavorite)
+                {
+                    <span class="right">
+                        <i style="color:#e8792f;" class="fas fa-heart icon"></i>
+                    </span>
+                }
+                else
+                {
+                    <span class="right">
+                       <i style="color:#e8792f;" class="fa fa-heart-o icon"></i>
+                    </span>
+                }
+            }
+
+            <div class="clear"></div>
+        </div>
+        
+    </div>

@@ -1,0 +1,24 @@
+﻿@using Pal.Data.DTOs.Notifications
+@model List<NotificationMsg>;
+
+    <style>
+        .notifiDiv:hover {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+
+<div style="padding:50px" dir="rtl">
+    @foreach (var item in Model)
+    {
+        <div class="notifiDiv" style="background-color:white">
+            <a href="@item.Url" class="dropdown-item">
+                <i class="fas fa-envelope mr-2"></i>
+                <p>@item.Title</p>
+                <span class="float-right text-muted text-sm">@item.Date</span>
+            </a>
+            
+            <hr>
+        </div>
+
+    }
+</div>

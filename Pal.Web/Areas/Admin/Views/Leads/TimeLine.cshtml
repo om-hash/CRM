@@ -1,0 +1,241 @@
+﻿@using Pal.Data.DTOs.Customer;
+@model List<TimeLineDTO>;
+@{
+    var days = Model.GroupBy(x => x.Date.ToString("MMMM dd"));
+    var Chart = Model.GroupBy(x => x.Type).Select(e => new TimeLineDTO { Type = e.Key, TypeName = e.Where(r => r.Type == e.Key).Select(f => f.Type.ToString()).FirstOrDefault(), TypeCount = e.Where(r => r.Type == e.Key).Select(f => f.Type.ToString()).Count() });
+}
+@{ var isRtl = LanguageService.IsLayoutRtl();}
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/fluent.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/fluent.css" />
+<style>
+    .timeline-item {
+        background: #dcdee1d1 !important;
+    }
+
+    .time-label span {
+        background-color: #343a40 !important
+    }
+
+    .timeline > div > .fa, .timeline > div > .fas, .timeline > div > .far, .timeline > div > .fab, .timeline > div > .fal, .timeline > div > .fad, .timeline > div > .svg-inline--fa, .timeline > div > .ion {
+        background-color: #adb5bd;
+        border-radius: 50%;
+        font-size: 16px;
+        height: 30px;
+         right: -21px; 
+        line-height: 30px;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: 30px;
+    }
+</style>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3> @T("cp.views.timeLine.title")</h3>
+    </div>
+    <div class="card-body">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="display:flex">
+            <div class="col-lg-6 col-md-12 col-sm-12">
+                <!-- The time line -->
+                <div class="timeline">
+                    @foreach (var item in days)
+                    {
+                        <!-- timeline time label -->
+                        <div class="time-label">
+                            <span class="bg-red">@item.Key</span>
+                        </div>
+                        <!-- /.timeline-label -->
+                        <!-- timeline item -->
+                        @foreach (var action in item)
+                        {
+                            if (action.Type == Pal.Core.Enums.ActivityLog.LogTransType.Note)
+                            {
+                                <div>
+                                    <i class="fas fa-comment bg-blue"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i>@action.Date.ToString("h:mm tt")</span>
+                                        <h3 class="timeline-header"><a href="#">@T("cp.views.createdBy.title") </a> @action.CreatedBy</h3>
+
+                                        <div class="timeline-body">
+                                            @action.CreatedBy @T("cp.views.AdeddNewNote.title")
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <a href="@action.Link" class="btn btn-primary btn-sm">@T("btn.details")</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (action.Type == Pal.Core.Enums.ActivityLog.LogTransType.Call)
+                            {
+                                <div>
+
+                                    <i class="fas fa-phone  bg-green"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i>@action.Date.ToString("h:mm tt")</span>
+                                        <h3 class="timeline-header"><a href="#">@T("cp.views.createdBy.title") </a> @action.CreatedBy</h3>
+
+                                        <div class="timeline-body">
+                                            @action.CreatedBy @T("cp.views.addedNewCall.title")
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <a href="@action.Link" class="btn btn-primary btn-sm">@T("btn.details")</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (action.Type == Pal.Core.Enums.ActivityLog.LogTransType.Meeting)
+                            {
+                                <div>
+                                    <i class="fas fa-people-carry bg-maroon"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i>@action.Date.ToString("h:mm tt")</span>
+                                        <h3 class="timeline-header"><a href="#">@T("cp.views.createdBy.title") </a> @action.CreatedBy</h3>
+
+                                        <div class="timeline-body">
+                                            @action.CreatedBy @T("cp.views.addedNewMeeting.title")
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <a href="@action.Link" class="btn btn-primary btn-sm">@T("btn.details")</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (action.Type == Pal.Core.Enums.ActivityLog.LogTransType.Deal)
+                            {
+                                <div>
+                                    <i class="fas fa-hands-helping bg-yellow"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i>@action.Date.ToString("h:mm tt")</span>
+                                        <h3 class="timeline-header"><a href="#">@T("cp.views.createdBy.title") </a> @action.CreatedBy</h3>
+
+                                        <div class="timeline-body">
+                                            @action.CreatedBy @T("cp.views.addedNewDeal.title")
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <a href="@action.Link" class="btn btn-warning btn-sm">@T("btn.details")</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+
+                        }
+                    }
+                </div>
+
+            </div>
+
+            <div class="col-lg-6 col-md-12 col-sm-12">
+                <div>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="control-section">
+                            <div id="container2" align='center'>
+                                <ejs-accumulationchart id="containe3" title="@T("cp.views.timeLine.chart.title")" enableRtl="isRtl" height='420'>
+                                    <e-accumulationchart-legendsettings visible="true" position="Top">
+                                    </e-accumulationchart-legendsettings>
+                                    <e-accumulationchart-tooltipsettings enable="false"></e-accumulationchart-tooltipsettings>
+                                    <e-accumulation-series-collection>
+                                        <e-accumulation-series dataSource="Chart" xName="TypeName" yName="TypeCount" radius="80%" innerRadius="40%" name="Project"
+                                                               explode=false explodeOffset="10%" explodeIndex=3>
+                                            <e-accumulationseries-datalabel visible="true" name="TypeCount" id="Link">
+                                                <e-font fontWeight="600" color="white"></e-font>
+                                            </e-accumulationseries-datalabel>
+                                        </e-accumulation-series>
+                                    </e-accumulation-series-collection>
+                                </ejs-accumulationchart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" style="display: flex; flex-wrap: wrap; align-content: flex-start;">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                     
+                            <!-- small card -->
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>@Model.Where(x => x.Type == Pal.Core.Enums.ActivityLog.LogTransType.Call).Count()<sup style="font-size: 20px"></sup></h3>
+
+                                    <p>@T("cp.views.timeLine.chart..call.title")</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                @*<a href="#" class="small-box-footer">
+                                    More info <i class="fas fa-arrow-circle-right"></i>
+                                </a>*@
+                            </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+
+                        <!-- small card -->
+                        <div class="small-box bg-success" >
+                            <div class="inner" style="background-color: #d81b60">
+                                <h3>@Model.Where(x => x.Type == Pal.Core.Enums.ActivityLog.LogTransType.Meeting).Count()<sup style="font-size: 20px"></sup></h3>
+
+                                <p>@T("cp.views.timeLine.chart.meeting.title")</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-people-carry"></i>
+                            </div>
+                            @*<a href="#" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>*@
+                        </div>
+                     
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+
+
+                        <div class="small-box bg-success">
+                            <div class="inner" style="background-color: #ffc107">
+                                <h3>@Model.Where(x => x.Type == Pal.Core.Enums.ActivityLog.LogTransType.Deal).Count()<sup style="font-size: 20px"></sup></h3>
+
+                                <p>@T("cp.views.timeLine.chart.deal.title")</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            @*<a href="#" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>*@
+                        </div>
+
+                        <!-- small box -->
+                       
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+
+
+                        <div class="small-box bg-success">
+                            <div class="inner" style="background-color: #007bff">
+                                <h3>@Model.Where(x => x.Type == Pal.Core.Enums.ActivityLog.LogTransType.Note).Count()<sup style="font-size: 20px"></sup></h3>
+
+                                <p>@T("cp.views.timeLine.chart.note.title")</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            @*<a href="#" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i> 
+            </a>*@
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.col -->
+
+@section Scripts{
+
+    <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

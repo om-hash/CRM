@@ -1,0 +1,24 @@
+﻿@model Pal.Web.Models.SaveButtonViewModel
+
+<div class="form-row">
+    <div class="col-auto mr-auto">
+        @if (!string.IsNullOrEmpty(Model.OnSave))
+        {
+            <button class="btn btn-sm  btn-success" onclick="@Model.OnSave" id="BTNSave"><i class="fas fa-save"></i>&ensp;@T(Model.SaveButtomName)</button>
+        }
+    </div>
+
+
+        
+    @if (!string.IsNullOrEmpty(Model.OnSaveAndNew))
+    {
+        <div class="btn btn-sm btn-success" onclick="@Model.OnSaveAndNew">Save And New</div>
+    }
+
+    <div class="col-auto">
+        @if (!string.IsNullOrEmpty(Model.BackToListhref))
+        {
+            <a class="btn btn-sm  btn-info" href="@Model.BackToListhref">@T("btn.backToList")&ensp;<i class="fas fa-arrow-alt-circle-right"></i> </a>
+        }
+    </div>
+</div>

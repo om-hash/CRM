@@ -1,0 +1,712 @@
+﻿@using Pal.Data.DTOs.Customer;
+@model CustomerDetailsDTO;
+
+<style>
+    .tableCart {
+        overflow-x: scroll;
+    }
+
+    .ListHolder {
+        overflow-y: scroll;
+        height: 300px;
+    }
+
+    h6 {
+    }
+</style>
+@{
+    ViewData["Title"] = T("cp.views.customer.customerDetails.title");
+}
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <div class="form-row">
+            <div class="col-auto mr-auto">
+                @{
+                    await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+
+                BackToListhref = "/Admin/Customers/CustomersList",
+            });
+                }
+
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-sm btn-success" href="/admin/customers/timeline/@Model.Id">TimeLine </a>
+                <a class="btn btn-sm btn-primary" href="/admin/customers/CustomerInformationReport/@Model.Id" target="_blank">@T("btn.PrintReport")</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+
+                    <h3 class="card-title">
+                        <i class="fas fa-user"></i>
+                        @T("cp.views.deals.dealDetails.title.customerInformation")
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="col-12 col-sm-12 col-md-6 d-flex align-items-stretch flex-column">
+                        <div class="card bg-light d-flex flex-fill ">
+                            <div class="card-header text-muted border-bottom-0">
+                                @*@Model.*@
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row">
+                                    <div class="col-12 ">
+                                        <h2 class="lead">@Model.FullName</h2>
+                                        <p class="text-muted text-sm"><strong>  @T("cp.views.deals.dealDetails.title.address"): </strong>@Model.FullAddress</p>
+                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                            <li class="small"><span class="fa-li"><i class="fas fa-envelope"></i></span>@Model.Email</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>@Model.PhoneNumber</li>
+                                        </ul>
+                                    </div>
+                                    <!--<div class="col-5 text-center">-->
+                                    @*<img src="../../dist/img/user1-128x128.jpg" alt="user-avatar" class="img-circle img-fluid">*@
+                                    <!--</div>-->
+                                </div>
+                            </div>
+                            @*<div class="card-footer">
+                                <div class="text-right">
+                                    @{
+                                        var link = "/Admin/Chat/Index?" +
+        $"chatType=1&" +
+        $"senderType=0&" +
+        $"senderId=Admin&" +
+        $"receiverType=Customers&" +
+        $"receiverId={Model.Id}&" +
+        $"ref1=Admin&" +
+        $"ref2={Model.Id}";
+                                    }
+                                    <a href="@link" class="btn btn-sm bg-teal">
+                                        <i class="fas fa-comments"></i>
+                                    </a>
+                                </div>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-week"></i>
+                        @T("cp.views.deals.customerDetails.title.customerDetails")
+                    </h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div style="display:flex; ">
+                        <div class="col-6">
+                            <dl>
+                                <dt>@T("model.Customer.FullName")</dt>
+                                <dd>@Model.FullName</dd>
+                                <dt>@T("model.Customer.NationalityId")</dt>
+                                <dd>@Model.NationalityName</dd>
+                                <dt>@T("model.Customer.PhoneNumber")</dt>
+                                <dd>@Model.PhoneNumber</dd>
+                                <dt>@T("model.Customer.MobileNumber")</dt>
+                                <dd>@Model.MobileNumber</dd>
+                                <dt>@T("global.Email")</dt>
+                                <dd>@Model.Email</dd>
+                                <dt>@T("model.Customer.RegisterDate")</dt>
+                                <dd>@Model.CreationDate</dd>
+                                <dt>@T("model.lead.LeadStatus")</dt>
+                                <dd>@Model.LeadStatusName</dd>
+                                <dt>@T("model.lead.LeadRating")</dt>
+                                <dd>@Model.LeadRatingName</dd>
+                            </dl>
+                        </div>
+                        <div class="col-6">
+                            <dl>
+                                <dt>@T("model.Customer.CountryId")</dt>
+                                <dd>@Model.CountryName</dd>
+                                <dt>@T("global.city")</dt>
+                                <dd>@Model.CityName</dd>
+                                <dt>@T("global.region")</dt>
+                                <dd>@Model.RegionName</dd>
+                                <dt>@T("model.lead.WorkCompany")</dt>
+                                <dd>@Model.WorkCompany</dd>
+                                <dt>@T("model.Customer.FullAddress")</dt>
+                                <dd>@Model.FullAddress</dd>
+                                <dt>@T("model.Customer.CustomerStatus")</dt>
+                                <dd>@Model.CustomerStatusName</dd>
+                                <dt>@T("model.lead.LeadSource")</dt>
+                                <dd>@Model.LeadSourceName</dd>
+                                <dt>@T("model.lead.LastLogInDate")</dt>
+                                <dd>@Model.LastLogInDate.ToString("dd MMMM yyyy")</dd>
+                                <dt>@T("model.lead.RegisterdByAdmin")</dt>
+                                <dd>@(Model.RegisterdByAdmin ? "Yes" : "No")</dd>
+                            </dl>
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-share-alt"></i>
+                        @T("cp.views.deals.customerDetails.title.customerContactInfo")
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @*<ul class="socialMidaBTN" style="display:flex">
+                    <li>
+                    <a href="@Model.Facebook">
+                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                    <span> - Facebook</span>
+                    </a>
+                    </li>
+                    <li>
+                    <a href="@Model.TwitterId">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                    <span> - Twitter</span>
+                    </a>
+                    </li>
+                    <li>
+                    <a href="https://api.whatsapp.com/send?phone=@Model.WhatsappNumber">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                    <span> - Whatsapp</span>
+                    </a>
+                    </li>
+                    <li>
+                    <a href="@Model.Instagram">
+                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                    <span> - Instagram</span>
+                    </a>
+                    </li>
+                    </ul>*@
+
+                    <div id="social-platforms">
+
+
+                        <a class="btn btn-social btn-icon btn-facebook" href="@Model.Facebook"><i class="fab fa-facebook-square"></i><span>Facebook</span></a>
+                        <a class="btn btn-social btn-icon btn-twitter" href="@Model.TwitterId"><i class="fab fa-twitter"></i><span>Twitter</span></a>
+                        <a class="btn btn-social btn-icon btn-linkedin" href="https://api.whatsapp.com/send?phone=@Model.WhatsappNumber"><i class="fab fa-whatsapp"></i><span>Whatsapp</span></a>
+                        <a class="btn btn-social btn-icon btn-googleplus" href="@Model.Instagram"><i class="fab fa-instagram"></i><span>Instgram</span></a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-sticky-note"></i>
+
+                        @T("cp.views.deals.customerDetails.title.customerNotes")
+                    </h3>
+                </div>
+                <div class="card-body ListHolder">
+                    <!-- Default box -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@T("cp.views.customerDetails.tableTitle.note")</h3>
+
+                            <div class="card-tools">
+                                @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+
+                                </button>*@
+
+                            </div>
+                        </div>
+                        <div class="card-body p-0 tableCart">
+                            <table class="table table-sm table-striped projects">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%">
+                                            #
+                                        </th>
+                                        <th style="width: 60%">
+                                            @T("model.CustomerNote.Content")
+                                        </th>
+                                        <th style="width: 7%">
+                                            @T("btn.view")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Notes)
+                                    {
+
+
+                                        <tr>
+                                            <td>
+                                                @item.Id
+                                            </td>
+                                            <td>
+
+                                                <h6>
+                                                    @item.Content
+                                                </h6>
+                                            </td>
+
+                                            <td class="project-actions text-right">
+                                                <a class="btn btn-primary btn-sm" href="/Admin/Leads/LeadUpdate/@item.CustomerId">
+                                                    <i class="fas fa-folder">
+                                                    </i>
+                                                    @T("btn.view")
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-phone-alt"></i>
+
+
+                        @T("cp.views.deals.customerDetails.title.customerCall")
+                    </h3>
+                </div>
+                <div class="card-body ListHolder" style=" overflow-x: scroll;">
+
+                    <!-- Default box -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@T("cp.views.customerDetails.tableTitle.calls")</h3>
+
+                            <div class="card-tools">
+                                @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                                </button>*@
+                            </div>
+                        </div>
+                        <div class="card-body p-0 tableCart">
+                            <table class="table table-sm table-striped projects">
+                                <thead>
+                                    <tr>
+
+                                        <th style="width: 20%">
+                                            @T("model.Call.EmployeeId")
+                                        </th>
+                                        <th style="width: 30%">
+                                            @T("model.Call.CallTypeId")
+                                        </th>
+                                        <th>
+                                            @T("model.Call.CallPurposeId")
+                                        </th>
+                                        <th>
+                                            @T("model.Call.Subject")
+                                        </th>
+                                        <th>
+                                            @T("model.Call.CallStart")
+                                        </th>
+                                        <th>
+                                            @T("model.Call.Duration")
+                                        </th>
+                                        <th style="width:7%">
+                                            @T("btn.view")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Calls != null)
+                                    {
+                                        @foreach (var item in Model.Calls)
+                                        {
+
+
+                                            <tr>
+                                                <td>
+                                                    <h6>
+                                                        @item.EmployeeName
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.CallTypeName
+                                                    </h6>
+                                                </td>
+
+
+
+                                                <td class="project-state">
+                                                    <span class="badge badge-success">@item.CallPurposeName</span>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.Subject
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.CallStart
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.Duration
+                                                    </h6>
+                                                </td>
+                                                <td class="project-actions text-right">
+                                                    <a class="btn btn-primary btn-sm" href="/admin/calls/callupdate/@item.Id">
+                                                        <i class="fas fa-folder">
+                                                        </i>
+                                                        @T("btn.view")
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-handshake"></i>
+
+
+                        @T("cp.views.deals.customerDetails.title.customerMeetings")
+                    </h3>
+                </div>
+                <div class="card-body ListHolder">
+
+                    <!-- Default box -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@T("cp.views.customerDetails.tableTitle.meetings")</h3>
+
+                            <div class="card-tools">
+                                @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                                </button>*@
+                            </div>
+                        </div>
+                        <div class="card-body p-0 tableCart">
+                            <table class="table table-sm table-striped projects">
+                                <thead>
+                                    <tr>
+
+                                        <th style="width: 20%">
+                                            @T("model.Meeting.EmployeeId")
+                                        </th>
+                                        <th>
+                                            @T("model.Meeting.Title")
+                                        </th>
+                                        <th style="width: 20%">
+                                            @T("model.Meeting.From")
+                                        </th>
+                                        <th style="width: 20%">
+                                            @T("model.Meeting.To")
+                                        </th>
+
+
+                                        <th style="width:7%">
+                                            @T("btn.view")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Meetings != null)
+                                    {
+                                        @foreach (var item in Model.Meetings)
+                                        {
+
+
+                                            <tr>
+                                                <td>
+                                                    <h6>
+                                                        @item.EmployeeName
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.Title
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.FromDateTime
+                                                    </h6>
+                                                </td>
+
+
+
+                                                <td class="project-state">
+                                                    <h6>
+                                                        @item.ToDateTime
+                                                    </h6>
+                                                </td>
+
+                                                <td class="project-actions text-right">
+                                                    <a class="btn btn-primary btn-sm" href="/admin/meetings/meetingupdate/@item.Id">
+                                                        <i class="fas fa-folder">
+                                                        </i>
+                                                        @T("btn.view")
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-suitcase-rolling"></i>
+
+
+                        @T("cp.views.deals.customerDetails.title.cutomerTours")
+                    </h3>
+                </div>
+                <div class="card-body ListHolder" style=" overflow-x: scroll;">
+
+                    <!-- Default box -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@T("cp.views.customerDetails.tableTitle.tours")</h3>
+
+                            <div class="card-tools">
+                                @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                                </button>*@
+                            </div>
+                        </div>
+                        <div class="card-body p-0 tableCart">
+                            <table class="table table-sm table-striped projects">
+                                <thead>
+                                    <tr>
+
+                                        <th style="width: 20%">
+                                            #
+                                        </th>
+                                        <th style="width: 25%">
+                                            @T("model.Tour.Date")
+                                        </th>
+                                        <th style="width:15%">
+                                            @T("model.Tour.Time")
+                                        </th>
+                                        <th style="width: 20%">
+                                            @T("model.Tour.TourDuration") <span>(min)</span>
+                                        </th>
+                                        <th style="width: 5%">
+                                            @T("model.Tour.AdvisorId")
+                                        </th>
+
+                                        <th style="width:7%">
+                                            @T("btn.view")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Tours != null)
+                                    {
+
+                                        @foreach (var item in Model.Tours)
+                                        {
+
+
+                                            <tr>
+                                                <td>
+                                                    <h6>
+                                                        @item.Barcode
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.Date.ToString("dd MMMM yyyy")
+                                                    </h6>
+                                                </td>
+
+
+
+                                                <td style="width:5%">
+                                                    <span class="badge badge-success">@item.Time</span>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.TourDuration
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.AdvisorName
+                                                    </h6>
+                                                </td>
+                                                <td class="project-actions text-right">
+                                                    <a class="btn btn-primary btn-sm" href="/Admin/Tours/TourDetails/@item.Id">
+                                                        <i class="fas fa-folder">
+                                                        </i>
+                                                        @T("btn.view")
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-heart"></i>
+
+
+                        @T("cp.views.deals.customerDetails.title.cutomerFavorite")
+                    </h3>
+                </div>
+                <div class="card-body ListHolder" style=" overflow-x: scroll;">
+
+                    <!-- Default box -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@T("cp.views.customerDetails.tableTitle.favorite")</h3>
+
+                            <div class="card-tools">
+                                @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                                </button>*@
+                            </div>
+                        </div>
+                        <div class="card-body p-0 tableCart">
+                            <table class="table table-sm table-striped projects">
+                                <thead>
+                                    <tr>
+
+
+                                        <th style="width: 25%">
+                                            @T("model.favorite.Name")
+                                        </th>
+                                        <th style="width:15%">
+                                            @T("model.favorite.Address")
+                                        </th>
+                                        <th style="width: 20%">
+                                            @T("model.favorite.Price")
+                                        </th>
+                                        <th style="width: 5%">
+                                            @T("model.favorite.ReferenceType")
+                                        </th>
+
+                                        <th style="width:7%">
+                                            @T("btn.view")
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Favorites != null)
+                                    {
+                                        @foreach (var item in Model.Favorites)
+                                        {
+
+
+                                            <tr>
+                                                <td>
+                                                    <h6>
+                                                        @item.Name
+                                                    </h6>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.Address
+                                                    </h6>
+                                                </td>
+
+
+
+                                                <td style="width:5%">
+                                                    <span class="badge badge-success">$@item.Price</span>
+                                                </td>
+                                                <td>
+                                                    <h6>
+                                                        @item.ReferenceType.ToString()
+                                                    </h6>
+                                                </td>
+
+                                                <td class="project-actions text-right">
+                                                    <a class="btn btn-primary btn-sm" href="@item.AdminDashboardLink">
+                                                        <i class="fas fa-folder">
+                                                        </i>
+                                                        @T("btn.view")
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@using Pal.Data.DTOs.Statistics;
+@model List<PyramidDataDTO>;
+@{ var isRtl = LanguageService.IsLayoutRtl();}
+
+
+<div class="control-section" align="center" style="margin-top:10px">
+    <div class="control-section">
+        <div id="container" align='center'>
+            <ejs-accumulationchart id="container55" title="Most Active Agents"  enableRtl="isRtl" >
+                <e-accumulationchart-legendsettings visible="false">
+                </e-accumulationchart-legendsettings>
+                <e-accumulationchart-tooltipsettings enable="true"></e-accumulationchart-tooltipsettings>
+                <e-accumulation-series-collection>
+                    <e-accumulation-series dataSource="@Model" xName="xValue" yName="yValue" type="@Syncfusion.EJ2.Charts.AccumulationType.Pyramid" width="45%" height="80%"
+                                           neckWidth="15%" gapRatio="0.03" name="Agent" explode="true">
+                        <e-accumulationseries-datalabel visible="true" position="@Syncfusion.EJ2.Charts.AccumulationLabelPosition.Inside" name="text">
+                            <e-font fontWeight="600"></e-font>
+                        </e-accumulationseries-datalabel>
+                    </e-accumulation-series>
+                </e-accumulation-series-collection>
+            </ejs-accumulationchart>
+        </div>
+    </div>
+</div>
+
+
+<ejs-scripts></ejs-scripts>

@@ -1,0 +1,38 @@
+﻿@model GridEditModel
+
+<ejs-grid id="@Model.GridId" dataSource="@Model.Model"
+          allowPaging="true" gridLines="Both"
+          enablePersistence="false"
+          allowFiltering="@Model.AllowFiltering"
+          allowMultiSorting="@Model.AllowMultiSorting"
+          allowReordering="@Model.AllowReordering"
+          allowResizing="@Model.AllowResize"
+          allowSelection="@Model.AllowSelection"
+          allowSorting="@Model.AllowSorting"
+          allowGrouping="@Model.AllowGrouping"
+          load="@Model.OnLoad"
+          actionComplete="@Model.OnActionComplete"
+          showColumnChooser="false"
+          toolbar="@(new List<string>() { "Add", "Edit", "Delete" })">
+    <e-grid-editSettings allowAdding="true" allowDeleting="true" allowEditing="true" mode="Dialog" showDeleteConfirmDialog="true"></e-grid-editSettings>
+    <e-grid-pagesettings pageSizes="new []{ 10,20,50,100}" pageSize="10"></e-grid-pagesettings>
+    @*<e-grid-filtersettings showFilterBarStatus="true" showFilterBarOperator="@Model.IsShowFilterBarOperator" type="Excel"></e-grid-filtersettings>*@
+    <e-data-manager json="@Model.Model"
+                    insertUrl="@Model.UrlAdd"
+                    updateUrl="@Model.UrlEdit"
+                    removeUrl="@Model.UrlDelete"
+                    adaptor="RemoteSaveAdaptor">
+
+    </e-data-manager>
+    <e-grid-columns>
+        @foreach (var col in Model.Columns)
+        {
+            <e-grid-column field="@col.Field" visible="col.IsVisible" isPrimaryKey="col.IsPrimaryKey" width="@col.Width" 
+                            editType="@col.EditType.ToString()" 
+                           displayAsCheckBox="col.EditType == GridEditModel.EditType.booleanedit"></e-grid-column>
+        }
+
+
+    </e-grid-columns>
+</ejs-grid>
+

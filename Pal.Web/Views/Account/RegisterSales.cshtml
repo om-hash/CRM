@@ -1,0 +1,661 @@
+﻿@model Pal.Web.Models.SalesRegisterViewModel
+@{
+    ViewData["Title"] = "Register Sales";
+    Layout = "_Layout";
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+
+<style>
+    .form-control {
+        margin-bottom: 0;
+    }
+
+    .iti {
+        display: block;
+    }
+</style>
+
+
+<div class="container " style="margin-top:5rem; margin-bottom:5rem;">
+    <form asp-action="RegisterSales" onsubmit="StopSubment(event)" method="post" id="myForm" enctype="multipart/form-data">
+        <div class="card">
+            <div class="text-center"><h1>@T("publicUI.account.register.UserDetails")</h1></div>
+
+            @Html.ValidationSummary(false, "", new { @class = "text-danger font-weight-bold " })
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FullName">@T("modal.Account.FullName")</label>
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                        <input type="text" class="form-control" required asp-for="FullName" />
+                    </div>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="SalesCategoryId">@T("model.Sales.SalesCategoryId")</label>
+                    <span asp-validation-for="SalesCategoryId" class="text-danger"></span>
+                    <select asp-for="SalesCategoryId" asp-items="ViewBag.SalesCateogries" class="form-control"></select>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="UserName">@T("modal.Account.UserName")</label>
+                        <small class="text-danger field-validation-valid" id="UserNameValidation"></small>
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                        <input onchange="CheckUserName(this.value)" type="text" class="form-control" required asp-for="UserName" />
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Email">@T("modal.Account.Email")</label>
+                        <small class="text-danger field-validation-valid" id="EmailValidation"></small>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <input onchange="CheckEmail(this.value)" type="email" class="form-control" required asp-for="Email" />
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Password">@T("modal.Account.Password")</label>  
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <small class="text-danger field-validation-valid" id="PasswordValidation"></small>
+                        <input type="password" class="form-control" required asp-for="Password" />
+                        
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword">@T("modal.Account.ConfirmPassword")</label>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        <input type="password" class="form-control" required asp-for="ConfirmPassword" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="UserPhoneNumber">@T("model.Phone")</label>
+                        <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                        <span id="error-msg" class="hide text-danger"></span>
+                        <input type="text" class="form-control" required asp-for="UserPhoneNumber" />
+                        <span asp-validation-for="UserPhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="WhatsappNumber">@T("model.Whatsapp")</label>
+                        <span id="valid-msg2" class="hide text-success">✓ Valid</span>
+                        <span id="error-msg2" class="hide text-danger"></span>
+                        <input type="text" class="form-control" required asp-for="WhatsappNumber" />
+                        <span asp-validation-for="WhatsappNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="text-center col-12"><h1>@T("publicUI.account.register.SalesDetails")</h1></div>
+                    <div class="row">
+                        <div class="col-md-12" style="margin-bottom:35px">
+                            <label asp-for="SalesName">@T("model.Sales.SalesName")</label>
+                            <input asp-for="SalesName" class="form-control" />
+                            <span asp-validation-for="SalesName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom:2rem">
+                        <div>
+                            @{
+                                var addressModel = new Pal.Web.Models.AddressViewModel
+                                {
+                                    FieldsCount = 2,
+                                };
+                                await Html.RenderPartialAsync("_AddressEditor", addressModel);
+                            }
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label asp-for="SalesFullAddress">@T("model.Address")</label>
+                            <input type="text" class="form-control" required asp-for="SalesFullAddress" />
+                            <span asp-validation-for="SalesFullAddress" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    <label asp-for="SalesPhoneNumber">@T("model.Phone")</label>
+                                    <span id="valid-msg1" class="hide text-success">✓ Valid</span>
+                                    <span id="error-msg1" class="hide text-danger"></span>
+                                    <input asp-for="SalesPhoneNumber" class="form-control" />
+                                    <span asp-validation-for="SalesPhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="ContactEmail">@T("model.Sales.Email")</label>
+                                    <input asp-for="ContactEmail" type="email" class="form-control" />
+                                    <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    <label asp-for="ManagerName">@T("model.Sales.ManagerName")</label>
+                                    <input asp-for="ManagerName" class="form-control" />
+                                    <span asp-validation-for="ManagerName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="ManagerEmail">@T("model.Sales.ManagerEmail")</label>
+                                    <input asp-for="ManagerEmail" type="email" class="form-control" />
+                                    <span asp-validation-for="ManagerEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="FacebookURL">@T("model.Sales.FacebookURL")</label>
+                                    <input asp-for="FacebookURL" class="form-control" />
+                                    <span asp-validation-for="FacebookURL" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="InstagramURL">@T("model.Sales.InstagramURL")</label>
+                                    <input asp-for="InstagramURL" class="form-control" />
+                                    <span asp-validation-for="InstagramURL" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="linkedinURL">@T("model.Sales.linkedinURL")</label>
+                                    <input asp-for="linkedinURL" class="form-control" />
+                                    <span asp-validation-for="linkedinURL" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="TwitterURL">@T("model.Sales.TwitterURL")</label>
+                                    <input asp-for="TwitterURL" class="form-control" />
+                                    <span asp-validation-for="TwitterURL" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="Website">@T("model.Sales.Website")</label>
+                                    <input asp-for="Website" class="form-control" onchange="onWebsiteLinkChanged()"/>
+                                    <span  id="Website-error" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label asp-for="TaxNumber">@T("model.Sales.TaxNumber")</label>
+                                    <input asp-for="TaxNumber" class="form-control" />
+                                    <span asp-validation-for="TaxNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <label asp-for="TaxDocumentImage">@T("model.Sales.TaxDocumentImage")</label>
+                                <input asp-for="TaxDocumentImageFile" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ManagerSignatureImage">@T("model.Sales.ManagerSignatureImage")</label>
+                                <input asp-for="ManagerSignatureImageFile" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <label asp-for="Logo">@T("model.Sales.Logo")</label>
+                                <input asp-for="Logo" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Attachments">@T("model.Sales.Attachments")</label>
+                                <input asp-for="Attachments" multiple />
+                            </div>
+                        </div>
+                    </div>
+                    <div >
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="PrivacyPolicyAgree" name="PrivacyPolicy" value="PrivacyPolicyAgree">
+                                <label for="PrivacyPolicyAgree">
+                                    @T("publicUI.register.Iagree") <a href="/Home/PrivacyPolicy"target="_blank"> @T("publicInterface.policy.title")</a>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="TermsAndConditionsAgree" name="TermsAndConditions" value="TermsAndConditionsAgree">
+                                <label for="TermsAndConditionsAgree">
+                                    @T("publicUI.register.Iagree") <a href="/Home/TermsAndConditions"target="_blank"> @T("publicInterface.TermsAndConditions.title")</a>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="TermsOfUseAgree" name="TermsOfUse" value="TermsOfUseAgree">
+                                <label for="TermsOfUseAgree">
+                                    @T("publicUI.register.Iagree") <a href="/Home/TermsOfUse"target="_blank"> @T("publicInterface.TermsOfUse.title")</a>
+                                </label>
+                            </div>
+                        </div>
+                     
+                    </div>
+                    <div style="display: flex ;flex-direction: column;">
+                        <button id="submitBtn" onclick="onSave()" class="btn btn-success"> @T("btn.register")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+</div>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+        let EmailCheckValue;
+        let UserNameCheckValue;
+        //----------------------------
+        var linkRegex = /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/;
+
+
+        var input = document.querySelector("#UserPhoneNumber"),
+            errorMsg = document.querySelector("#error-msg"),
+            validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var iti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            /*initialCountry: "auto",*/
+            initialCountry: "tr",
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (iti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = iti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------------------------------------------------------
+        var inputSales = document.querySelector("#SalesPhoneNumber"),
+            errorMsg1 = document.querySelector("#error-msg1"),
+            validMsg1 = document.querySelector("#valid-msg1");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var itiSales = window.intlTelInput(inputSales, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            excludeCountries: ["us"],
+            formatOnDisplay: false,
+            initialCountry: "tr",
+            nationalMode: false,
+            placeholderNumberType: "MOBILE",
+            separateDialCode: true,
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            inputSales.classList.remove("error");
+            errorMsg1.innerHTML = "";
+            errorMsg1.classList.add("hide");
+            validMsg1.classList.add("hide");
+        };
+
+        // on blur: validate
+        inputSales.addEventListener('blur', function () {
+            reset();
+            if (inputSales.value.trim()) {
+                if (itiSales.isValidNumber()) {
+                    validMsg1.classList.remove("hide");
+                } else {
+                    inputSales.classList.add("error");
+                    var errorCode = itiSales.getValidationError();
+                    errorMsg1.innerHTML = errorMap[errorCode];
+                    errorMsg1.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        inputSales.addEventListener('change', reset);
+        inputSales.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------------------------------------------------------
+        //----------------------------------------------------------------
+        var Whatsappinput = document.querySelector("#WhatsappNumber"),
+            errorMsg2 = document.querySelector("#error-msg2"),
+            validMsg2 = document.querySelector("#valid-msg2");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            Whatsappinput.classList.remove("error");
+            errorMsg2.innerHTML = "";
+            errorMsg2.classList.add("hide");
+            validMsg2.classList.add("hide");
+        };
+
+        // on blur: validate
+        Whatsappinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (WhatsappNumberiti.isValidNumber()) {
+                    validMsg2.classList.remove("hide");
+                } else {
+                    Whatsappinput.classList.add("error");
+                    var errorCode = WhatsappNumberiti.getValidationError();
+                    errorMsg2.innerHTML = errorMap1[errorCode];
+                    errorMsg2.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        Whatsappinput.addEventListener('change', reset);
+        Whatsappinput.addEventListener('keyup', reset);
+        //-------------------------------------------------------------------
+        function StopSubment(e) {
+            e.preventDefault();
+
+        }
+        //-----------------------------------------------------------
+        var passwordInput = document.getElementById("Password");
+        passwordInput.addEventListener('input', function () {
+            var passwordCheck = isPasswordSecure(document.getElementById("Password").value)
+            console.log(passwordCheck)
+            const error = document.querySelector('#PasswordValidation');
+            if (passwordCheck == 1) {
+                error.textContent = '';
+                return;
+            }
+            if (passwordCheck == 2) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 lowercase character';
+                return;
+            }
+            else if (passwordCheck == 3) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 uppercase character';
+                return;
+            }
+            else if (passwordCheck == 4) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 number';
+                return;
+            }
+            else if (passwordCheck == 5) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 special character in (!#$%^&*)';
+                return;
+            }
+            else if (passwordCheck == 6) {
+                error.textContent = ' ';
+                error.textContent = 'Password must has at least 8 characters';
+                return;
+            } else {
+                error.textContent = ' ';
+            }
+            //----------------------------------------------------------------------
+        });
+        //-----------------------------------------------------------
+        function CheckUserName(e) {
+            $.ajax({
+                type: "post",
+                url: `/Account/IsUserNameExist?userName=${e}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("UserNameValidation");
+                    if (res.responseType === 0) {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameCheckValue = 0
+
+                    } else {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameErrorSpan.textContent = 'User name Existing!';
+                        UserNameCheckValue = 1;
+
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //-----------------------------------------------------------
+        function CheckEmail(e) {
+
+            $.ajax({
+                type: "post",
+                url: `/Account/IsEmailExist?email=${e}`,
+                contentType: false,
+                processData: false,
+
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("EmailValidation");
+                    if (res.responseType === 0) {
+                        UserNameErrorSpan.textContent = '';
+                        EmailCheckValue = 0;
+
+                    } else {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameErrorSpan.textContent = 'Email Existing!';
+                        EmailCheckValue = 1;
+
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //-----------------------------------------------------------
+
+        function onWebsiteLinkChanged() {
+            var valid = linkRegex.test($('#Website').val());
+            if ($('#Website').val() && !valid) {
+                $('#Website-error').text("Please Enter a valid link");
+
+            } else {
+                $('#Website-error').text("");
+            }
+        }
+
+        function onSave(saveAndNew) {
+
+            if (EmailCheckValue !== 0) return;
+            if (UserNameCheckValue !== 0) return;
+            if (isPasswordSecure(document.getElementById("Password").value) !== 0) return;
+
+
+            if (!$('#myForm').valid()) return
+
+            if (!iti.isValidNumber())
+                return;
+            if (!itiSales.isValidNumber())
+                return;
+            if (!WhatsappNumberiti.isValidNumber())
+                return;
+
+               if ($('#PrivacyPolicyAgree').prop('checked') !== true) {
+                ErrorDialog('@T("publicUI.account.register.errorPrivacy")');
+                return;
+            }
+            if ($('#TermsAndConditionsAgree').prop('checked') !== true) {
+                ErrorDialog('@T("publicUI.account.register.errorTermsAndConditions")');
+                return;
+            }
+            if ($('#TermsOfUseAgree').prop('checked') !== true) {
+                ErrorDialog('@T("publicUI.account.register.errorTermsOfUse")');
+                return;
+            }
+            var valid = linkRegex.test($('#Website').val());
+            if ($('#Website').val() && !valid) {
+                $('#Website-error').text("Please Enter a valid link");
+                return;
+            }
+
+            $('#submitBtn').prop('disabled', true);
+            var data = new FormData();
+            data.append('FullName', $('#FullName').val());
+            data.append('UserName', $('#UserName').val());
+            data.append('SalesCategoryId', $('#SalesCategoryId').val());
+            data.append('Email', $('#Email').val());
+            data.append('Password', $('#Password').val());
+            data.append('ConfirmPassword', $('#ConfirmPassword').val());
+            data.append('UserPhoneNumber', iti.getNumber());
+            data.append('WhatsappNumber', WhatsappNumberiti.getNumber());
+            data.append('SalesName', $('#SalesName').val());
+            data.append('SalesPhoneNumber', itiSales.getNumber());
+            data.append('ContactEmail', $('#ContactEmail').val());
+            data.append('ManagerName', $('#ManagerName').val());
+            data.append('ManagerEmail', $('#ManagerEmail').val());
+            data.append('FacebookURL', $('#FacebookURL').val());
+            data.append('InstagramURL', $('#InstagramURL').val());
+            data.append('linkedinURL', $('#linkedinURL').val());
+            data.append('TwitterURL', $('#TwitterURL').val());
+            data.append('Website', $('#Website').val());
+            data.append('TaxNumber', $('#TaxNumber').val());
+            data.append("TaxDocumentImageFile", document.querySelector('#TaxDocumentImageFile').files[0]);
+            data.append("ManagerSignatureImageFile", document.querySelector('#ManagerSignatureImageFile').files[0]);
+            data.append("Logo", document.querySelector('#Logo').files[0]);
+            data.append("Attachments", document.querySelector('#Attachments').files[0]);
+            data.append('CountryId', document.getElementById("cbCountry").ej2_instances[0].value);
+            data.append('CityIdd', document.getElementById("cbCity").ej2_instances[0].value);
+            console.log("dsdsddsd")
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            pleaseWaitDialog.show();
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/Account/RegisterSales",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        console.log(res.responseText)
+                        window.location.assign(`/Account/PhoneNumberVerification?uid=${res.responseText}`)
+                    } else if (res.responseType === 0) {
+                        ErrorDialog(res.responseText);
+                        document.getElementById("submitBtn").disabled = false;
+                    } else if (res.responseType === 3) {
+                        ErrorDialog(res.responseText);
+                        document.getElementById("submitBtn").disabled = false;
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                },
+                complete: pleaseWaitDialog.hide()
+            });
+        }
+
+
+    </script>
+
+    @*<script>
+        var fullAddressData;
+        function loadXMLDoc() {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                    if (xmlhttp.status == 200) {
+                        fullAddressData = JSON.parse(xmlhttp.responseText);
+                    }
+                    else if (xmlhttp.status == 400) {
+                        alert('There was an error 400');
+                    }
+                    else {
+                        alert('something else other than 200 was returned');
+                    }
+                }
+            };
+
+            xmlhttp.open("GET", "/Admin/Address/GetAddressLookups", true);
+            xmlhttp.send();
+        }
+
+        loadXMLDoc();
+
+        //-*---------------------------
+        function onCoutryChange(e) {
+            console.log(fullAddressData)
+            var cityDropDown = document.getElementById("cbCity").ej2_instances[0];
+            cityDropDown.dataSource = fullAddressData.cities.filter(a => a.countryId == e.value);
+            cityDropDown.value = parseInt(cityDropDown.dataSource[0].Id);
+            cityDropDown.dataBind();
+        }
+
+
+    </script>*@
+
+
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <script src="~/js/ValidationRegister.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

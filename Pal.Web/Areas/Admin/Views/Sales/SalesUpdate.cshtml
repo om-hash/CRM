@@ -1,0 +1,631 @@
+﻿@model Pal.Data.DTOs.Sales.CreateNewSalesDTO;
+@{
+    ViewData["Title"] = T("cp.views.Sales.update.title");
+    var languages = LanguageService.GetAllLanguages();
+    var isRtl = LanguageService.IsLayoutRtl();
+    var colAuto = isRtl ? "ml-auto" : "mr-auto";
+}
+<link href="~/js/suncfusion/tab/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+<style>
+    .iti {
+        display: block;
+    }
+
+</style>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <div class="form-row">
+            <div class="@colAuto mr-auto">
+                @{
+                    await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                    {
+                        OnSave = "onSave(false)",
+                        BackToListhref = "/Admin/Sales/SalesList",
+                    });
+                }
+            </div>
+            <div class="col-auto">
+                @if (Model.ApproveState == 0)
+                {
+                    <a class="btn btn-success btn-sm" asp-action="SalesApprove" asp-route-id="@Model.Id">@T("btn.approve")</a>
+
+                    <a class="btn btn-danger btn-sm" asp-action="SalesDisApprove" asp-route-id="@Model.Id">@T("btn.disapprove")</a>
+                }
+                else if (Model.ApproveState == 1)
+                {
+                    <a class="btn btn-danger btn-sm" asp-action="SalesDisApprove" asp-route-id="@Model.Id">@T("btn.disapprove")</a>
+                }
+                else
+                {
+                    <a class="btn btn-success btn-sm" asp-action="SalesApprove" asp-route-id="@Model.Id">@T("btn.approve")</a>
+                }
+            </div>
+            <a class="btn btn-info btn-sm" href="/Admin/Chat/Index?chatType=0&senderType=0&senderId=Admin&receiverType=1&receiverId=@Model.Id&ref1=Admin&ref2=@Model.Id">@T("btn.chat")</a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div>
+            <form id="SalesForm" asp-action="SalesAdd" class="needs-validation ">
+                <div class="form-row">
+                    @{
+                        await Html.RenderPartialAsync("_AddressEditor", new Pal.Web.Models.AddressViewModel { FieldsCount = 2, CountryId = (Model.CountryId ?? 0) , CityId = Model.CityId
+ }); }
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <input asp-for="FullAddress" class="form-control form-control-sm rounded-0"  placeholder="Full Address" />
+                        <span class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="ApproveState" />
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="SalesCategoryId">@T("model.Sales.SalesCategoryId")</label>
+                        <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "SalesCategoryId")</span>
+                        <select  asp-for="SalesCategoryId" asp-items="ViewBag.SalesCateogries" class="form-control form-control-sm rounded-0"></select>
+                        <span asp-validation-for="SalesCategoryId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="Email">@T("model.Sales.Email")</label>
+                        <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "Email")</span>
+                        <input asp-for="Email" type="email" class="form-control form-control-sm rounded-0"  />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <small class="text-danger field-validation-valid" id="EmailValidation"></small>
+                    </div>
+         @*           <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="OwnerName">@T("modal.Account.OwnerName")</label>
+                        <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "OwnerName")</span>
+                        <input disabled asp-for="OwnerName" class="form-control form-control-sm rounded-0" />
+                        <small class="text-danger field-validation-valid" id="UserNameValidation"></small>
+                        <span asp-validation-for="OwnerName" class="text-danger"></span>
+                    </div>*@
+
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="Phone">@T("model.Sales.Phone")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "Phone")</span>
+                    <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                    <span id="error-msg" class="hide text-danger"></span>
+                    <input asp-for="Phone" min="0" type="number" class="form-control form-control-sm rounded-0"  />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="Website">@T("model.Sales.Website")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "Website")</span>
+                    <input asp-for="Website" class="form-control form-control-sm rounded-0" />
+                    <span asp-validation-for="Website" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="WhatsApp">@T("model.Sales.WhatsApp")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "WhatsApp")</span>
+                    <span id="valid-msg1" class="hide text-success">✓ Valid</span>
+                    <span id="error-msg1" class="hide text-danger"></span>
+                    <input asp-for="WhatsApp" type="number" min="0" class="form-control form-control-sm rounded-0"  />
+                    <span asp-validation-for="WhatsApp" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="ManagerName">@T("model.Sales.ManagerName")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "ManagerName")</span>
+                    <input asp-for="ManagerName" class="form-control form-control-sm rounded-0"  />
+                    <span asp-validation-for="ManagerName" class="text-danger"></span>
+                    <small class="text-danger field-validation-valid" id="UserNameValidation"></small>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="ManagerEmail">@T("model.Sales.ManagerEmail")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "ManagerEmail")</span>
+                    <input asp-for="ManagerEmail" type="email" class="form-control form-control-sm rounded-0"  />
+                    <span asp-validation-for="ManagerEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="TaxNumber">@T("model.Sales.TaxNumber")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "TaxNumber")</span>
+                    <input asp-for="TaxNumber" type="text" class="form-control form-control-sm rounded-0"  />
+                    <span asp-validation-for="TaxNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="FacebookURL">@T("model.Sales.FacebookURL")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "FacebookURL")</span>
+                    <input asp-for="FacebookURL" class="form-control form-control-sm rounded-0" />
+                    <span asp-validation-for="FacebookURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="InstagramURL">@T("model.Sales.InstagramURL")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "InstagramURL")</span>
+                    <input asp-for="InstagramURL" class="form-control form-control-sm rounded-0" />
+                    <span asp-validation-for="InstagramURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="linkedinURL">@T("model.Sales.linkedinURL")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "linkedinURL")</span>
+                    <input asp-for="linkedinURL" class="form-control form-control-sm rounded-0" />
+                    <span asp-validation-for="linkedinURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                    <label asp-for="TwitterURL">@T("model.Sales.TwitterURL")</label>
+                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "TwitterURL")</span>
+                    <input asp-for="TwitterURL" class="form-control form-control-sm rounded-0" />
+                    <span asp-validation-for="TwitterURL" class="text-danger"></span>
+                </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <input asp-for="IsActive" type="checkbox">
+                        <label asp-for="IsActive">@T("model.Sales.IsActive")</label>
+                        <span asp-validation-for="IsActive" class="text-danger"></span>
+                    </div>
+                </div>
+                <br />
+                <section id="tabs">
+                    <h3 class="section-title ">Sales Details</h3>
+                    <div class="row">
+                        <div class="col-12 ">
+                            <nav>
+                                <div class="nav  nav-tabs nav-fill" id="nav-tab" role="tablist">
+                                    @{
+
+                                        for (int i = 0; i < languages.Count; i++)
+                                        {
+                                            var tabName = languages[i].Id;
+                                            if (i == 0)
+                                            {
+                                                <a class="nav-item nav-link active" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                            }
+                                            else
+                                            {
+                                                <a class="nav-item nav-link" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                            }
+                                        }
+                                    }
+
+                                </div>
+                            </nav>
+                            <div class="tab-content " id="nav-tabContent">
+                                @{
+                                    for (int i = 0; i < languages.Count; i++)
+                                    {
+                                        var langId = languages[i].Id;
+                                        <input id="transId-@i" value="@Model.SalesTranslates[i].Id " type="hidden">
+                                        <input type="hidden" class="local-tap" id="langId-@i" value="@langId" />
+                                        <div class='tab-pane fade @(i == 0 ? "show active":"") ' id="contentDiv-@i" role="tabpanel">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label>@T("model.Sales.Name")  (@languages[i].Name)</label>
+                                                    <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "SalesName")</span>
+                                                    <input id="SalesName-@i" asp-for="SalesTranslates[i].SalesName" type="text" class="form-control form-control-sm rounded-0 SalesNameInput"  />
+                                                    <span asp-validation-for="SalesTranslates[i].SalesName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@T("model.Sales.Content") (@languages[i].Name)</label>
+                                                <span class="text-danger">@webWorkContext.IsFieldRequired("Sales", "Content")</span>
+                                                @{
+                                                    var contentEditor = new Pal.Web.Models.HtmlEditorModel()
+                                                    {
+                                                        Value = Model.SalesTranslates[i].Content,
+                                                        Id = "SalesContent-" + i,
+                                                        ImgPath = "",
+                                                        ImgSaveUrl = "",
+                                                    };
+                                                    await Html.RenderPartialAsync("_HtmlEditor", contentEditor);
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <br />
+                <div class="form-row">
+                    <div class="form-group col-lg-6 col-md-12" >
+                        <label>@T("model.Sales.MainImage")</label>
+                        <input type="hidden" asp-for="MainImgUrl" />
+                        <input class="form-control-file" type="file" asp-for="MainImageFile" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview')" />
+                        @if (Model.MainImgUrl != null)
+                        {
+                            <div class="form-group col-lg-6 col-md-12" style="margin-top:10px">
+                                <a href="@Model.MainImgUrl" class="btn btn-success">@T("btn.download")</a>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group col-lg-6 col-md-12">
+                        <label>@T("model.Sales.Logo")</label>
+                        <input type="hidden" asp-for="ComapnyLogo" />
+                        <input class="form-control-file" type="file" asp-for="SalesLogoFile" accept="image/*" onchange="showImgPreview(this, 'LogoPreview')" />
+                        @if (Model.ComapnyLogo != null)
+                        {
+                            <div class="form-group col-lg-6 col-md-12" style="margin-top:10px">
+                                <a href="@Model.ComapnyLogo" class="btn btn-success">@T("btn.download")</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-lg-6 col-md-12"><img src="@Model.MainImgUrl" id="mainImgPreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.MainImgUrl)? "none":"block");" /></div>
+                    <div class="form-group col-lg-6 col-md-12"><img src="@Model.ComapnyLogo" id="LogoPreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.ComapnyLogo)? "none":"block");" /></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-6 col-md-12">
+                        <label>@T("model.Sales.ManagerSignatureImage")</label>
+                        <input type="hidden" asp-for="ManagerSignatureImage" />
+                        <input class="form-control-file" type="file" asp-for="ManagerSignatureImageFile" accept="image/*" onchange="showImgPreview(this, 'ManagerSignaturePreview')" />
+                        @if (Model.ManagerSignatureImage != null)
+                        {
+                            <div class="form-group col-lg-6 col-md-12" style="margin-top:10px">
+                                <a href="@Model.ManagerSignatureImage" class="btn btn-success">@T("btn.download")</a>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group col-lg-6 col-md-12">
+                        <label>@T("model.Sales.TaxDocumentImage")</label>
+                        <input type="hidden" asp-for="TaxDocumentImage" />
+                        <input class="form-control-file" type="file" asp-for="TaxDocumentImageFile" accept="image/*" onchange="showImgPreview(this, 'TaxDocumentPreview')" />
+                        @if (Model.TaxDocumentImage != null)
+                        {
+                            <div class="form-group col-lg-6 col-md-12" style="margin-top:10px">
+                                <a href="@Model.TaxDocumentImage" class="btn btn-success">@T("btn.download")</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-6 col-md-12"><img src="@Model.ManagerSignatureImage" id="ManagerSignaturePreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.ManagerSignatureImage)? "none":"block");" /></div>
+                    <div class="form-group col-lg-6 col-md-12"><img src="@Model.TaxDocumentImage" id="TaxDocumentPreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.TaxDocumentImage)? "none":"block");" /></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="form-group col-lg-6 col-md-12">
+                        <label>@T("model.Sales.Attachments")</label>
+                        <input class="form-control-file" type="file" asp-for="AttachmentsFiles" accept="image/*" multiple />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <h3>@T("model.Sales.Attachments")</h3>
+                    <table class="table  table-responsive ">
+                        <thead>
+                            <tr>
+                                @{
+                                    foreach (var screen in Model.Attachments)
+                                    {
+                                        <td class="td-@screen.Id">
+                                            <div class="btn btn-danger" onclick="onDeleteImg('@screen.Id')">@T("btn.delete")</div>
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                            <tr>
+                                @{
+                                    foreach (var screen in Model.Attachments)
+                                    {
+                                        <td class="td-@screen.Id">
+                                            <img src="@screen.FileName" class="img-fluid img-thumbnail" style="max-height:200px">
+                                        </td>
+                                    }
+                                }
+                            </tr>
+
+                        </thead>
+
+                    </table>
+                </div>
+
+                <br />
+            </form>
+        </div>
+    </div>
+    @*<div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Sales/SalesList",
+            });
+        }
+    </div>*@
+</div>
+
+<hr />
+
+@section Scripts{
+
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+        var languagesCount = @languages.Count;
+        console.log(languagesCount);
+        var input = document.querySelector("#Phone"),
+            errorMsg = document.querySelector("#error-msg"),
+            validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var phonenumberIti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (phonenumberIti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = phonenumberIti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------
+        var Whatsappinput = document.querySelector("#WhatsApp"),
+            errorMsg1 = document.querySelector("#error-msg1"),
+            validMsg1 = document.querySelector("#valid-msg1");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            Whatsappinput.classList.remove("error");
+            errorMsg1.innerHTML = "";
+            errorMsg1.classList.add("hide");
+            validMsg1.classList.add("hide");
+        };
+
+        // on blur: validate
+        Whatsappinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (WhatsappNumberiti.isValidNumber()) {
+                    validMsg1.classList.remove("hide");
+                } else {
+                    Whatsappinput.classList.add("error");
+                    var errorCode = WhatsappNumberiti.getValidationError();
+                    errorMsg1.innerHTML = errorMap1[errorCode];
+                    errorMsg1.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        Whatsappinput.addEventListener('change', reset);
+        Whatsappinput.addEventListener('keyup', reset);
+
+        //-----------------------------------
+        var passwordInput = document.getElementById("Password");
+        passwordInput.addEventListener('input', function () {
+            var passwordCheck = isPasswordSecure(document.getElementById("Password").value)
+            console.log(passwordCheck)
+            const error = document.querySelector('#PasswordValidation');
+            if (passwordCheck == 1) {
+                error.textContent = '';
+                return;
+            }
+            if (passwordCheck == 2) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 lowercase character';
+                return;
+            }
+            else if (passwordCheck == 3) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 uppercase character';
+                return;
+            }
+            else if (passwordCheck == 4) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 number';
+                return;
+            }
+            else if (passwordCheck == 5) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 special character in (!#$%^&*)';
+                return;
+            }
+            else if (passwordCheck == 6) {
+                error.textContent = ' ';
+                error.textContent = 'Password must has at least 8 characters';
+                return;
+            } else {
+                error.textContent = ' ';
+            }
+            //----------------------------------------------------------------------
+        });
+
+
+
+        //-----------------------------------
+
+        function onSave(saveAndNew) {
+              if (!$("#SalesForm").valid()) {
+                return;
+            }
+
+
+
+            if (phonenumberIti.getNumber() && !phonenumberIti.isValidNumber()) {
+                ErrorToast('', 'Enter a valid PhoneNumber');
+                return;
+            }
+
+            if (WhatsappNumberiti.getNumber() && !WhatsappNumberiti.isValidNumber()) {
+                ErrorToast('', 'Whatsapp a valid username');
+                return;
+            }
+
+
+            var SalesTranslateinfo = [];
+            for (var i = 0; i < languagesCount; i++) {
+                var langid = $('#langId-' + i).val();
+                var id = $('#transId-' + i).val();
+                var SalesName = $('#SalesName-' + i).val();
+                var content = document.getElementById('SalesContent-' + i).ej2_instances[0].value;
+                var SalesId = $('#Id').val();
+                SalesTranslateinfo.push({ langid, SalesName, SalesId, id, content });
+            }
+            console.log(languagesCount)
+            console.log(SalesTranslateinfo)
+            // readyupdata
+            var data = new FormData();
+            data.append('Id', document.querySelector('#Id').value);
+            data.append('ApproveState', document.querySelector('#ApproveState').value);
+            data.append('Email', document.querySelector('#Email').value);
+            data.append('Phone', phonenumberIti.getNumber());
+            data.append('TaxNumber', document.querySelector('#TaxNumber').value);
+            data.append('Website', document.querySelector('#Website').value);
+            data.append('WhatsApp', WhatsappNumberiti.getNumber());
+            data.append('ManagerName', document.querySelector('#ManagerName').value);
+            data.append('ManagerEmail', document.querySelector('#ManagerEmail').value);
+            data.append('MainImgUrl', document.querySelector('#MainImgUrl').value);
+            data.append('ComapnyLogo', document.querySelector('#ComapnyLogo').value);
+            data.append('FacebookURL', document.querySelector('#FacebookURL').value);
+            data.append('InstagramURL', document.querySelector('#InstagramURL').value);
+            data.append('linkedinURL', document.querySelector('#linkedinURL').value);
+            data.append('TwitterURL', document.querySelector('#TwitterURL').value);
+            data.append('SalesCategoryId', $('#SalesCategoryId').val());
+            data.append('ManagerSignatureImage', document.querySelector('#ManagerSignatureImage').value);
+            data.append('TaxDocumentImage', document.querySelector('#TaxDocumentImage').value);
+            data.append('IsActive', $('#IsActive').prop('checked'));
+            data.append("MainImageFile", document.querySelector('#MainImageFile').files[0]);
+            data.append("SalesLogoFile", document.querySelector('#SalesLogoFile').files[0]);
+            data.append("TaxDocumentImageFile", document.querySelector('#TaxDocumentImageFile').files[0]);
+            data.append("ManagerSignatureImageFile", document.querySelector('#ManagerSignatureImageFile').files[0]);
+
+            var CompanuyFiles = document.getElementById("AttachmentsFiles");
+            for (i = 0; i < CompanuyFiles.files.length; i++) {
+                data.append("AttachmentsFiles", CompanuyFiles.files[i]);
+            }
+
+            data.append('CountryId', document.getElementById("cbCountry").ej2_instances[0].value);
+            data.append('CityId', document.getElementById("cbCity").ej2_instances[0].value);
+            data.append('FullAddress', document.querySelector('#FullAddress').value);
+
+            SalesTranslateinfo.forEach((val, i) => {
+                data.append('SalesTranslates[' + i + '][LanguageId]', val.langid);
+                data.append('SalesTranslates[' + i + '][SalesName]', val.SalesName);
+                data.append('SalesTranslates[' + i + '][SalesId]', val.SalesId);
+                data.append('SalesTranslates[' + i + '][Id]', val.id);
+                data.append('SalesTranslates[' + i + '][content]', val.content);
+            });
+            // ajax
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                type: "post",
+                url: "/admin/Sales/ComapnyUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (message) {
+                   if (message.isSuccess) {
+						  SuccessToast('@T("cp.alert.onSaveSuccess")');
+					}
+                    else if (message.statusCode === 400) {
+                        ErrorDialogHTML('@T("Required Fields")', message.errors.join('<br/>'));
+					}
+                    else {
+                        ErrorDialogHTML('@T("cp.alert.error")', message.errors.join('<br/>'));
+					}
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+        }
+        //----------------------------------------------------------------------
+        function onDeleteImg(id) {
+            Swal.fire({
+                title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                text:   "@T("cp.alert.onDeleteMessage.title")",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var headers = { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() };
+                    $.ajax({
+                        headers: headers,
+                        url: '/admin/Attachments/DeleteFile?id=' + id,
+                        type: 'POST',
+                        success: function (res) {
+                            if (res.responseType === 1) {
+                                $('.td-' + id).hide();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

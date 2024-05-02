@@ -1,0 +1,175 @@
+@model Pal.Data.DTOs.CRM.Deals.DealDTO
+@{
+    ViewData["Title"] = T("cp.views.deals.dealUpdate").ToString();
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+
+<br />
+
+<style>
+    .pac-target-input {
+        margin-top: 15px;
+        width: 350px;
+    }
+</style>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave()",
+                BackToListhref = "/Admin/Deals/DealsList",
+            });
+        }
+    </div>
+
+    <div class="card-body">
+        <input type="hidden" asp-for="CustomerId" />
+        <div>
+            <form id="myForm" onsubmit="event.preventDefault()" asp-action="ProjectAdd" class="needs-validation was-validated">
+                <div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-row">
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="EmployeeId">@T("model.Deal.EmployeeId")</label>
+                            <select asp-for="EmployeeId" asp-items="ViewBag.Employee" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="CustomerName">@T("model.Deal.CustomerId")</label>
+                            <input asp-for="CustomerName" class="rounded-0 form-control form-control-sm" disabled />
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="StageId">@T("model.Deal.StageId")</label>
+                            <select asp-for="StageId" asp-items="ViewBag.DealStage" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="StageId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="TypeId">@T("model.Deal.TypeId")</label>
+                            <select asp-for="TypeId" asp-items="ViewBag.DealTypes" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="TypeId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="LeadSourceId">@T("model.Deal.LeadSourceId")</label>
+                            <select asp-for="LeadSourceId" asp-items="ViewBag.LeadSource" class="rounded-0  form-control form-control-sm" required>
+                            </select>
+                            <span asp-validation-for="LeadSourceId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="ClosingDate">@T("model.Deal.ClosingDate")</label>
+                            <input asp-for="ClosingDate" type="datetime-local" class="rounded-0 form-control form-control-sm" />
+                            <span asp-validation-for="ClosingDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="Amount">@T("model.Deal.Amount")</label>
+                            <input asp-for="Amount" type="text" class="rounded-0  form-control form-control-sm" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="SuccessProbability">@T("model.Deal.SuccessProbability")</label>
+                            <input asp-for="SuccessProbability" type="text" class="rounded-0  form-control form-control-sm" />
+                            <span asp-validation-for="SuccessProbability" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                            <label asp-for="NextStep">@T("model.Deal.NextStep")</label>
+                            <input asp-for="NextStep" type="text" class="rounded-0  form-control form-control-sm" />
+                            <span asp-validation-for="NextStep" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                            <label asp-for="DealName">@T("model.Deal.DealName")</label>
+                            <input asp-for="DealName" type="text" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="DealName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                            <label asp-for="Description">@T("model.Deal.Description")</label>
+                            <textarea rows="10" asp-for="Description" class="rounded-0  form-control form-control-sm"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+@*    <div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Deals/DealsList",
+            });
+        }
+    </div>*@
+</div>
+
+<hr />
+
+@section Scripts{
+    <script>
+	   var languagesCount = @languages.Count;
+        function onSave(saveAndNew) {
+            if (!$("#myForm").valid())
+                return;
+
+            //------------------------------------------
+            // readyupdata
+            var data = new FormData();
+            data.append('Id', $('#Id').val());
+            data.append('EmployeeId', $('#EmployeeId').val());
+            data.append('CustomerId', $('#CustomerId').val());
+            data.append('StageId', $('#StageId').val());
+            data.append('TypeId', $('#TypeId').val());
+            data.append('LeadSourceId', $('#LeadSourceId').val());
+            data.append('ClosingDate', $('#ClosingDate').val());
+            data.append('Amount', $('#Amount').val());
+            data.append('SuccessProbability', $('#SuccessProbability').val());
+            data.append('NextStep', $('#NextStep').val());
+            data.append('DealName', $('#DealName').val());
+            data.append('Description', $('#Description').val());
+            showLoading();
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/admin/Deals/DealUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                       /* location.href = "/Admin/Deals/DealUpdate/" + res.responseText*/
+                    } else {
+                        alert("hello")
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                },
+                complete: hideLoading()
+            });
+        }
+	//----------------------------------------------------------------------
+
+
+
+    </script>
+
+
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

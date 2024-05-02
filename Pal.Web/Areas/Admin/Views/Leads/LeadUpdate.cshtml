@@ -1,0 +1,863 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Customer.CustomerDTO
+@{
+    ViewData["Title"] = T("cp.views.lead.update.title");
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+<style>
+    label {
+        margin-bottom: 0;
+    }
+
+    .iti {
+        display: block;
+    }
+</style>
+<br />
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="update-form" data-toggle="tab" href="#updateForm" role="tab" aria-controls="updateForm" aria-selected="true">@T("cp.views.lead.update.taps.information")</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">@T("cp.views.lead.update.taps.Note")</a>
+    </li>
+
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="updateForm" role="tabpanel" aria-labelledby="update-form">
+        <form id="myForm" asp-action="LeadAdd" onsubmit="event.preventDefault()" class="needs-validation was-validated">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <div class="form-row">
+                        <div class="col-auto mr-auto">
+                            @{
+                                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                                {
+                                    OnSave = "onSave(false)",
+                                    BackToListhref = "/Admin/Leads/LeadsList",
+                                });
+                            }
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn btn-sm btn-outline-warning" onclick="ConvertToCustomer()">@T("btn.convertToCustomer")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+
+                    <div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="MainImage" />
+                        <div class="row">
+                            <div class="form-row col-lg-9">
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="FullName">@T("model.Customer.FullName")</label>
+                                    <input asp-for="FullName" class="rounded-0  form-control form-control-sm" required />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="CustomerStatus">@T("model.Customer.CustomerStatus")</label>
+                                    <select asp-for="CustomerStatus" asp-items="ViewBag.cbCustomerStatus" class="form-control form-control-sm rounded-0" required></select>
+                                    <span asp-validation-for="CustomerStatus" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="NationalityId">@T("model.Customer.NationalityId")</label>
+                                    <select asp-for="NationalityId" asp-items="ViewBag.cbNationalities" class="rounded-0  form-control form-control-sm" required></select>
+                                    <span asp-validation-for="NationalityId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    @*<label asp-for="WorkCompany">@T("model.lead.WorkCompany")</label>
+                                    <input asp-for="WorkCompany" class="rounded-0  form-control form-control-sm" />
+                                    <span asp-validation-for="WorkCompany" class="text-danger"></span>*@
+
+                                    <label asp-for="CountryId">Country</label>
+                                    <select asp-for="CountryId" asp-items="ViewBag.cbCountry" class="rounded-0  form-control form-control-sm" required></select>
+                                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="PhoneNumber">@T("model.Customer.PhoneNumber")</label>
+                                    <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                                    <span id="error-msg" class="hide text-danger"></span>
+                                    <input asp-for="PhoneNumber" class="rounded-0  form-control form-control-sm" required />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="MobileNumber">@T("model.Customer.MobileNumber")</label>
+                                    <span id="valid-msg1" class="hide text-success">✓ Valid</span>
+                                    <span id="error-msg1" class="hide text-danger"></span>
+                                    <input asp-for="MobileNumber" type="number" min="0" class="rounded-0  form-control form-control-sm" />
+                                    <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="WhatsappNumber">@T("model.Customer.WhatsappNumber")</label>
+                                    <span id="valid-msg2" class="hide text-success">✓ Valid</span>
+                                    <span id="error-msg2" class="hide text-danger"></span>
+                                    <input asp-for="WhatsappNumber" type="number" min="0" class="rounded-0 form-control form-control-sm" required />
+                                    <span asp-validation-for="WhatsappNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="WhatsappNumber">@T("model.lead.LeadSource")</label>
+                                    <ejs-dropdownlist ejs-for="LeadSourceId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadSources"]' showClearButton="true" allowFiltering="true">
+                                        <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="LeadStatusId">@T("model.lead.LeadStatus")</label>
+                                    <ejs-dropdownlist ejs-for="LeadStatusId" id="LeadStatusId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadStatus"]' showClearButton="true" allowFiltering="true">
+                                        <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="LeadRatingId">@T("model.lead.LeadRating")</label>
+                                    <ejs-dropdownlist ejs-for="LeadRatingId" id="LeadRatingId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadRating"]' showClearButton="true" allowFiltering="true">
+                                        <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="FollowedByEmpId">@T("model.lead.FollowedByEmpId")</label><input class="mx-2" type="checkbox" id="followedByEmpIdCheckbox" onchange="followedByEmpId(this)" checked />
+                                    <select asp-for="FollowedByEmpId" asp-items="ViewBag.Employees" class="form-control form-control-sm rounded-0" required></select>
+                                    <span asp-validation-for="FollowedByEmpId" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                    <label asp-for="Email">@T("model.Customer.Email")</label>
+                                    <input asp-for="Email" class="rounded-0  form-control form-control-sm" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <input class="mb-2" asp-for="MainImageFile" type="file" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview');" />
+                                <div>
+                                    <div>
+                                        @if (Model.MainImage != null)
+                                        {
+                                            <img src="\@Model.MainImage" id="mainImgPreview" alt="Image Preview" style="max-width:160px; max-height:160px;" />
+                                        }
+                                        else
+                                        {
+                                            <img src="/images/profile-img.png" id="mainImgPreview" alt="Image Preview" style="max-width:160px; max-height:160px;" />
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr />
+                        <label asp-for="FullAddress">@T("model.address")</label>
+                        <div class="form-row">
+                            @{
+                                var addressModel = new Pal.Web.Models.AddressViewModel
+                                {
+                                    FieldsCount = 3,
+                                    CountryId = Model.CountryId,
+                                    CityId = Model.CityId,
+                                    RegionId = Model.RegionId,
+                                };
+                                await Html.RenderPartialAsync("_AddressEditor", addressModel);
+                            }
+                        </div>
+                        <div class="row form-group col-sm-12">
+                            <input asp-for="FullAddress" type="text" placeholder="address in details" class="form-control form-control-sm">
+                            <span asp-validation-for="FullAddress" class="text-danger"></span>
+                        </div>
+                        <div class="form-row">
+@*                            <label asp-for="MostInterestingProjects">@T("model.Customers.MostInterestingProjects")</label>
+*@                      @*      <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                <ejs-multiselect ejs-for="MostInterestingProjectsId" filterType="Contains" showClearButton="true" allowFiltering="true" id="MostInterestingProjects" dataSource="ViewBag.Projects" mode="CheckBox"
+                                                 placeholder="Select Interesting Project..."
+                                                 showSelectAll="true" showDropDownIcon="true"
+                                                 filterBarPlaceholder="Search Project" popupHeight="350px">
+                                    <e-multiselect-fields text="text" value="id"></e-multiselect-fields>
+                                </ejs-multiselect>
+                            </div>*@
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                <label asp-for="TwitterId">@T("model.lead.Twitter")</label>
+                                <input asp-for="TwitterId" class="rounded-0  form-control form-control-sm" />
+                                <span asp-validation-for="TwitterId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                <label asp-for="Facebook">@T("model.lead.Facebook")</label>
+                                <input asp-for="Facebook" class="rounded-0  form-control form-control-sm" />
+                                <span asp-validation-for="Facebook" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                                <label asp-for="Instagram">@T("model.lead.Instagram")</label>
+                                <input asp-for="Instagram" class="rounded-0  form-control form-control-sm" />
+                                <span asp-validation-for="Instagram" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-lg-4 col-md-6 col-sm-12 ">
+                                <label>@T("model.MediaFiles")</label>
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadModal">
+                                    Upload
+                                </button>
+                                @{
+                                    var uploadModel = new UploadControlViewModel
+                                    {
+                                        ReferenceId = Model.Id.ToString(),
+                                        ReferenceTitle = $"Customers ({Model.FullName})",
+                                        ReferenceType = Pal.Core.Enums.Attachment.ReferenceType.Customer,
+                                    };
+                                }
+                                <partial name="_UploadControl" model="uploadModel" />
+                            </div>
+                        </div>
+                        <table class="table  table-responsive ">
+                            <thead>
+                                <tr>
+                                    @{
+                                        foreach (var screen in Model.Attachments)
+                                        {
+                                            <td class="td-@screen.Id">
+                                                <div class="btn btn-sm btn-danger" onclick="onDeleteCustomerFiles('@screen.Id')">@T("btn.delete")</div>
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                                <tr>
+                                    @{
+                                        foreach (var screen in Model.Attachments)
+                                        {
+                                            if (screen.MediaType == Pal.Core.Enums.Attachment.MediaType.Photos)
+                                            {
+                                                <td class="td-@screen.Id">
+                                                    <img src="@screen.FileName" class="img-fluid img-thumbnail" style="max-height:200px">
+                                                </td>
+                                            }
+
+                                        }
+                                    }
+                                </tr>
+
+                            </thead>
+
+                        </table>
+
+                    </div>
+                </div>
+
+               @* <div class="card-footer">
+                    @{
+                        await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                        {
+                            OnSave = "onSave(false)",
+                            BackToListhref = "/Admin/Leads/LeadsList",
+                        });
+                    }
+                </div>*@
+            </div>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+                <div class="form-row">
+                    <div class="col-auto mr-auto">
+                        <div class="btn btn-sm  btn-outline-success" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-plus"></i>&ensp;@T("btn.add")</div>
+                    </div>
+                    <div class="col-auto">
+                        <a class="btn btn-sm  btn-info" href="/Admin/Leads/LeadsList">@T("btn.backToList")&ensp;<i class="fas fa-arrow-alt-circle-right"></i> </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @{
+
+                    var gridModel = new Pal.Web.Models.GridViewModel
+                    {
+                        GridId = "CustomerNoteGrid",
+                        IsAllowToDelete = true,
+                        AllowToEdit = true,
+                        BlueButtonName = "btn.Edit",
+                        RedButtonName = "btn.Delete",
+                        RedButtonType = "DeleteBtn",
+                        BlueButtonType = "EditBtn",
+                        Model = Model.CustomerNotes,
+                        Columns = new()
+                        {
+
+                    new() { Field = "Id", HeaderText = "#", Width = "100" },
+                    new() { Field = "Content", HeaderText = "Content", Width = "100" },
+                    new() { Field = "Date", ColumnType = GridViewModel.GridColumnType.Date, HeaderText = "Date", Width = "100" },
+
+                }
+                    };
+
+                    await Html.RenderPartialAsync("_GridView", gridModel);
+
+                }
+            </div>
+        </div>
+        <!--AddModel-->  <!--AddModel-->   <!--AddModel-->   <!--AddModel-->   <!--AddModel-->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">@T("cp.views.Lead.AddNote")</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="text-danger" id="errorspan"></span>
+                        <div class="form-row">
+                            <div class="col-lg-12">
+                                <label>@T("model.CustomerNote.Content")</label>
+                                <textarea id="NoteContent" rows="10" style="width:100%" type="text" class="form-control"></textarea>
+                                <small class="text-danger" id="ValdationNoteAdd"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">@T("global.close")</button>
+                        <button type="button" onclick="SaveNote(@Model.Id)" class="btn btn-primary">@T("btn.save")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--AddModel-->  <!--AddModel-->   <!--AddModel-->   <!--AddModel-->   <!--AddModel-->
+
+        <div class="modal fade" id="exampleModalCenter1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">@T("cp.views.Lead.UpdateNote")</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="text-danger" id="errorspan"></span>
+                        <div class="form-row">
+                            <div class="col-lg-12">
+                                <label>@T("model.CustomerNote.Content")</label>
+                                <textarea id="NoteContentUpdate" rows="10" style="width:100%" type="text" class="form-control"></textarea>
+                                <small class="text-danger" id="ValdationNoteUpdate"></small>
+                                <input type="hidden" id="noteId" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">@T("global.close")</button>
+                        <button type="button" onclick="Update()" class="btn btn-primary">@T("btn.save")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+             $(document).ready(function () {
+            var followedbyEmp = @Model.FollowedByEmpId;
+            if (followedbyEmp > 0) {
+                $('#followedByEmpIdCheckbox').attr("checked")
+                $('#FollowedByEmpId').removeAttr("disabled")
+            } else {
+                $('#followedByEmpIdCheckbox').removeAttr("checked")
+                $('#FollowedByEmpId').attr("disabled", "true")
+            }
+        });
+            function followedByEmpId(e) {
+                if (!e.checked) {
+                    $('#FollowedByEmpId').attr("disabled", "true")
+                } else {
+
+                    $('#FollowedByEmpId').removeAttr("disabled")
+                }
+            }
+            //-------------------------------------------------------------------
+          function onDeleteCustomerFiles(id) {
+        Swal.fire({
+            title: '@T("cp.alert.onDeleteMessage.subtitle")',
+            text: "@T("cp.alert.onDeleteMessage.title")",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+            cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var headers = { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() };
+                $.ajax({
+                    headers: headers,
+                    url: '/admin/Attachments/DeleteFile?id=' + id,
+                    type: 'POST',
+                    success: function (res) {
+                        if (res.responseType === 1) {
+                            $('.td-' + id).hide();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+        //-------------------------------------------------------------------
+        var input = document.querySelector("#PhoneNumber"),
+            errorMsg = document.querySelector("#error-msg"),
+            validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var phonenumberIti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (phonenumberIti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = phonenumberIti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------
+        var mobileNumberinput = document.querySelector("#MobileNumber"),
+            errorMsg1 = document.querySelector("#error-msg1"),
+            validMsg1 = document.querySelector("#valid-msg1");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var MobileNumberiti = window.intlTelInput(mobileNumberinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            mobileNumberinput.classList.remove("error");
+            errorMsg1.innerHTML = "";
+            errorMsg1.classList.add("hide");
+            validMsg1.classList.add("hide");
+        };
+
+        // on blur: validate
+        mobileNumberinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (MobileNumberiti.isValidNumber()) {
+                    validMsg1.classList.remove("hide");
+                } else {
+                    mobileNumberinput.classList.add("error");
+                    var errorCode = MobileNumberiti.getValidationError();
+                    errorMsg1.innerHTML = errorMap1[errorCode];
+                    errorMsg1.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        mobileNumberinput.addEventListener('change', reset);
+        mobileNumberinput.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------------------------------------------------------
+        var Whatsappinput = document.querySelector("#WhatsappNumber"),
+            errorMsg2 = document.querySelector("#error-msg2"),
+            validMsg2 = document.querySelector("#valid-msg2");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            Whatsappinput.classList.remove("error");
+            errorMsg2.innerHTML = "";
+            errorMsg2.classList.add("hide");
+            validMsg2.classList.add("hide");
+        };
+
+        // on blur: validate
+        Whatsappinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (WhatsappNumberiti.isValidNumber()) {
+                    validMsg2.classList.remove("hide");
+                } else {
+                    Whatsappinput.classList.add("error");
+                    var errorCode = WhatsappNumberiti.getValidationError();
+                    errorMsg2.innerHTML = errorMap1[errorCode];
+                    errorMsg2.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        Whatsappinput.addEventListener('change', reset);
+        Whatsappinput.addEventListener('keyup', reset);
+
+
+            //----------------------------------------------------------------------
+            function onSave(saveAndNew) { 
+                //------------------------------------------
+                //if (!$("#myForm").valid())
+                //    return;
+
+                //if (document.getElementById("cbCountry").value == "") {
+                //    document.getElementById("CountrySpan").textContent = "Selete Country!";
+                //    allGood = false;
+                //    return;
+                //} else { document.getElementById("CountrySpan").textContent = "", allGood = true }
+
+                //if (document.getElementById("cbCity").value == "") {
+                //    document.getElementById("CitySpan").textContent = "Selete City!";
+                //    allGood = false;
+                //    return;
+                //} else { document.getElementById("CitySpan").textContent = "", allGood = true }
+
+                //if (document.getElementById("cbRegion").value == "") {
+                //    document.getElementById("RegionSpan").textContent = "Selete Region!";
+                //allGood = false;
+                //    return;
+                //} else { document.getElementById("RegionSpan").textContent = "", allGood = true }
+
+                //if (!phonenumberIti.isValidNumber())
+                //    return;
+                //if (!WhatsappNumberiti.isValidNumber())
+                //    return;
+                //if (!MobileNumberiti.isValidNumber())
+                //    return;
+
+
+                //var InterestingProjectsList = "";
+                //if (document.getElementById("MostInterestingProjects").ej2_instances[0].value !== null) {
+                //    var InterestingProjects = document.getElementById("MostInterestingProjects").ej2_instances[0].value
+                //    InterestingProjects.forEach((e) => {
+                //        InterestingProjectsList += "," + e;
+                //    })
+                //}
+
+                //------------------------------------------
+                // readyupdata
+          
+                var data = new FormData();
+                if (document.getElementById("followedByEmpIdCheckbox").checked == true) {
+                    data.append('FollowedByEmpId', $('#FollowedByEmpId').val());
+                } else {
+                    data.append('FollowedByEmpId', 0);
+                }
+            
+                //data.append('MostInterestingProjects', InterestingProjectsList);
+                data.append('FullName', $('#FullName').val());
+                data.append('Id', $('#Id').val());
+                data.append('CustomerStatus', $('#CustomerStatus').val());
+                data.append('NationalityId', $('#NationalityId').val());
+                data.append('PhoneNumber', phonenumberIti.getNumber());
+                data.append('MobileNumber', MobileNumberiti.getNumber());
+                data.append('WhatsappNumber', WhatsappNumberiti.getNumber());
+                data.append('LeadSourceId', document.getElementById("LeadSourceId").ej2_instances[0].value);
+                data.append('LeadStatusId', document.getElementById("LeadStatusId").ej2_instances[0].value);
+                data.append('LeadRatingId', document.getElementById("LeadRatingId").ej2_instances[0].value);
+                data.append('CountryId', $('#CountryId').val());
+                data.append('Email', $("#Email").val());
+                //data.append('WorkCompany', $('#WorkCompany').val());
+                //data.append('CountryId', document.getElementById("cbCountry").ej2_instances[0].value); // ViewBag.cbCountry
+                //data.append('CityId', document.getElementById("cbCity").ej2_instances[0].value);
+                //data.append('RegionId', document.getElementById("cbRegion").ej2_instances[0].value);
+                data.append('FullAddress', $('#FullAddress').val());
+                data.append('TwitterId', $('#TwitterId').val());
+                data.append('Facebook', $('#Facebook').val());
+                data.append('Instagram', $('#Instagram').val());
+                data.append('UserId', $('#UserId').val());
+                data.append('MainImage', $('#MainImage').val());
+                data.append('MainImageFile', document.querySelector('#MainImageFile').files[0]);
+            
+                for (const pair of data.entries()) {
+                  console.log(`${pair[0]}, ${pair[1]}`);
+                }
+
+                showLoading();
+                var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+                $.ajax({
+                    type: "post",
+                    headers: header,
+                    url: "/admin/Leads/LeadUpdate",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (res) {
+                        if (res.responseType === 1) {
+                            SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        } else {
+                            ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                        }
+                    },
+                    error: function (e) {
+                        ErrorToast();
+                        //console.error(e);
+                        console.log(e);
+                    },
+                    complete: hideLoading()
+                });
+            }
+
+            //--------------------------------------------------------------
+            function SaveNote(id) {
+                var note = $("#NoteContent").val();
+                if (note == "") {
+                    document.getElementById("ValdationNoteAdd").textContent = "The Filde Should not be blank!"
+                    return;
+                } else { document.getElementById("ValdationNoteAdd").textContent = "" }
+                $("#NoteContent").val('');
+
+                showLoading();
+                $.ajax({
+                    type: "post",
+                    url: `/admin/Leads/CustomerNoteAdd?note=${note}&customerId=${id}`,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.responseType === 1) {
+                            SuccessToast('@T("cp.alert.onSaveSuccess")');
+                            var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                            grid.dataSource.push({
+                                Id: res.result.id,
+                                Content: res.result.content,
+                                Date: (new Date(res.result.date)),
+                            });
+                            grid.refresh();
+                            $('#exampleModalCenter').modal('toggle')
+                        } else {
+                            ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                        }
+
+                    },
+                    error: function (e) {
+                        ErrorToast();
+                        console.error(e);
+                    },
+                    complete: hideLoading()
+                });
+            }
+            //--------------------------------------------------------------
+
+            function commandClick(args) {
+                switch (args.commandColumn.type) {
+                    case "EditBtn":
+                        var note = args.rowData.Content;
+                        $('#NoteContentUpdate').val(note);
+                        $('#noteId').val(args.rowData.Id)
+                        $('#exampleModalCenter1').modal('show')
+                        break;
+                    case "DeleteBtn":
+                        Swal.fire({
+                            title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                            text: "@T("cp.alert.onDeleteMessage.title")",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                            cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                onDelete(args.rowData.Id);
+                            }
+                        });
+                        break;
+                }
+            }
+            //--------------------------------------------------------------
+
+            function Update() {
+                var content = $('#NoteContentUpdate').val();
+                if (content == "") {
+                    document.getElementById("ValdationNoteUpdate").textContent = "The Filde Should not be blank!"
+                    return;
+                } else { document.getElementById("ValdationNoteUpdate").textContent = "" }
+                var id = $('#noteId').val();
+                showLoading();
+                $.ajax({
+                    type: "post",
+                    url: `/admin/Leads/CustomerNoteUpdate?id=${id}&content=${content}`,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.responseType === 1) {
+                            SuccessToast('@T("cp.alert.onSaveSuccess")');
+                            var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                            grid.dataSource.forEach(function (obj, index, arr) {
+                                if (obj.Id == id) {
+                                    arr[index].Content = res.responseText,
+                                        grid.refresh();
+                                }
+
+                            });
+                            $('#exampleModalCenter1').modal('toggle')
+
+                        } else {
+                            ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                        }
+                    },
+                    error: function (e) {
+                        ErrorToast();
+                        console.error(e);
+                    },
+                    complete: hideLoading()
+                });
+            }
+            //--------------------------------------------
+            function onDelete(id) {
+                $.ajax({
+                    type: "post",
+                    url: "/admin/Leads/CustomerNoteDelete?id=" + id,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.responseType === 1) {
+                            SuccessToast('@T("cp.alert.onSaveSuccess")');
+                            var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                            grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        } else {
+                            ErrorToast('@T("cp.alert.onDeleteSuccess.title")', '@T("cp.alert.onDeleteSuccess.subtitle")');
+                        }
+                    },
+                    error: function (e) {
+                        ErrorToast();
+                        console.error(e);
+                    }
+                });
+            }
+
+
+            //--------------------------------------------
+
+            function ConvertToCustomer() {
+                ConfirmAlert('Are You Sure ??', () => {
+                    showLoading();
+                    $.ajax({
+                        url: '/Admin/Leads/ConvertToCustomer/@Model.Id',
+                        type: 'Post',
+                        success: function (res) {
+                            if (res.responseType == 1) {
+                                location.assign('/Admin/Customers/CustomerDetails/@Model.Id')
+                            } else {
+                                ErrorDialog('Error','Cannot convert to customer!');
+                            }
+                        },
+                        error: function (e) {
+                            console.error(e);
+                        },
+                        complete: function () {
+                            hideLoading();
+                        }
+                    });
+                })
+
+
+            }
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

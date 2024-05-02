@@ -1,0 +1,158 @@
+﻿@{
+    var isRtl = LanguageService.IsLayoutRtl();
+    var dir = isRtl ? "rtl" : "ltr";
+}
+<!DOCTYPE html>
+<style>
+   
+</style>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <partial name="_GlobalVariables" />
+
+    @if (isRtl)
+    {
+        <link rel="stylesheet" href="~/css/admin/adminlte.rtl.css">
+        <link href="~/css/admin/customAdminStyle.rtl.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/css/admin/adminlte.css">
+        <link href="~/css/admin/customAdminStyle.css" rel="stylesheet" />
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <title>Control Panel @ViewBag.Title</title>
+</head>
+
+
+<body class="hold-transition sidebar-mini layout-fixed" id="myBody">
+    <div class="wrapper" dir="@dir">
+
+        @{
+            await Html.RenderPartialAsync("_NavbarLTR");
+
+            if (User.FindFirst(PalClaimType.UserType.ToString()).Value == UserType.Companies.ToString())
+            {
+                await Html.RenderPartialAsync("_SidebarCompanyLTR");
+            }
+            else if (User.FindFirst(PalClaimType.UserType.ToString()).Value == UserType.Customers.ToString())
+            {
+                await Html.RenderPartialAsync("_SidebarCustomerLTR");
+            }
+            else if (User.FindFirst(PalClaimType.UserType.ToString()).Value == UserType.Adviser.ToString())
+            {
+                await Html.RenderPartialAsync("_SidebarAdvisorLTR");
+            }
+            else if (User.FindFirst(PalClaimType.UserType.ToString()).Value == UserType.Lawyer.ToString())
+            {
+                await Html.RenderPartialAsync("_SidebarLawyerLTR");
+            }
+            else
+            {
+                await Html.RenderPartialAsync("_SidebarAdminLTR");
+            }
+        }
+
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            @*<div class="content-header">
+                <div class="container-fluid">
+                <div class="row mb-2">
+                <div class="col-sm-6">
+                <h1 class="m-0">Starter Page</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Starter Page</li>
+                </ol>
+                </div><!-- /.col -->
+                </div><!-- /.row -->
+                </div><!-- /.container-fluid -->
+                </div>*@
+            <!-- /.content-header -->
+            <!-- Main content -->
+            <div class="content">
+                <div class="container-fluid" id="">
+
+                    @RenderBody()
+
+
+
+                </div><!-- /.container-fluid -->
+            </div>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+            <div class="p-3">
+                <h5>Title</h5>
+                <p>Sidebar content</p>
+            </div>
+        </aside>
+        <!-- /.control-sidebar -->
+        <!-- Main Footer -->
+        @*  <footer class="main-footer">
+            <!-- To the right -->
+            <div class="float-right d-none d-sm-inline">
+            Anything you want
+            </div>
+            <!-- Default to the left -->
+            <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+            </footer>*@
+    </div>
+    <!-- ./wrapper -->
+    <!-- REQUIRED SCRIPTS -->
+    <!-- jQuery -->
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AdminLTE App -->
+    <script src="~/js/admin/adminlte.min.js"></script>
+
+
+    <!-- Notifications -->
+@*    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/js/notifications.js"></script>
+    <script src="~/js/chat.js" type="text/javascript"></script>
+    <partial name="_bootstrapNotificationToast" />*@
+    <script src="~/lib/jqueryBlockUI/jquery.blockUI.min.js"></script>
+    <script src="~/js/site.js"></script>
+
+    <script>
+        $('li.active').removeClass('active').removeAttr('aria-current');
+        $('a[href="' + location.pathname + '"]').addClass('active').attr('aria-current', 'page');
+        $('a[href="' + location.pathname + '"]')[0]?.parentNode.parentNode.parentNode.children[0].classList.add('active');
+
+        if ($('a[href="' + location.pathname + '"]')?.offset()?.top > 700) {
+            $('.sidebar').animate({
+                scrollTop: $('a[href="' + location.pathname + '"]').offset().top - 250
+            }, 1);
+        }
+
+    </script>
+    @if (isRtl)
+    {
+        <script>
+            ej.base.enableRtl(true);
+        </script>
+    }
+
+    @RenderSection("Scripts", false)
+</body>
+</html>

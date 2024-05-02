@@ -1,0 +1,233 @@
+﻿@model Pal.Web.Models.AddressViewModel
+
+@{
+    int countryId = Model?.CountryId ?? 1;
+    int cityId = Model?.CityId ?? 1;
+    int regionId = Model?.RegionId ?? 1;
+    int neighborhoodId = Model?.NeighborhoodId ?? 1;
+}
+
+
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+@{
+    if (Model.FieldsCount == 2)
+    {
+        <div class="form-group col-lg-6 col-md-6 col-sm-12 countryInput">
+
+            <ejs-dropdownlist id="cbCountry"   ejs-for="CountryId" placeholder="Select a country" cssClass="rounded-0" filterBarPlaceholder="Search" change="onCountryChange"   allowFiltering="true">
+
+                <e-dropdownlist-fields  disabled="@Model.IsDisabled" text="name" value="id"></e-dropdownlist-fields>
+            </ejs-dropdownlist>
+            <span asp-validation-for="CountryId" class="text-danger"></span>
+            <small id="CountrySpan" class="text-danger"></small>
+        </div>
+    }
+    else
+    {
+        <div class="form-group col-lg-3 col-md-6 col-sm-12 countryInput">
+
+            <ejs-dropdownlist id="cbCountry" ejs-for="CountryId" placeholder="Select a country" cssClass="rounded-0" filterBarPlaceholder="Search" change="onCountryChange" allowFiltering="true">
+                <e-dropdownlist-fields disabled="@Model.IsDisabled" text="name" value="id"></e-dropdownlist-fields>
+            </ejs-dropdownlist>
+            <span asp-validation-for="CountryId" class="text-danger"></span>
+            <small id="CountrySpan" class="text-danger"></small>
+        </div>
+    }
+
+    if (Model.FieldsCount > 1)
+    {
+        if (Model.FieldsCount == 2)
+        {
+            <div class="form-group col-lg-6 col-md-6 col-sm-12 cityInput">
+                <ejs-dropdownlist disabled="@Model.IsDisabled" id="cbCity" ejs-for="CityId" placeholder="Select a city" cssClass="rounded-0" change="onCityChange" filterBarPlaceholder="Search" allowFiltering="true">
+                    <e-dropdownlist-fields text="name" value="id"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+                <small id="CitySpan" class="text-danger"></small>
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-lg-3 col-md-6 col-sm-12 cityInput">
+                <ejs-dropdownlist disabled="@Model.IsDisabled" id="cbCity" ejs-for="CityId" placeholder="Select a city" cssClass="rounded-0" change="onCityChange" filterBarPlaceholder="Search" allowFiltering="true">
+                    <e-dropdownlist-fields text="name" value="id"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+                <small id="CitySpan" class="text-danger"></small>
+            </div>
+        }
+    }
+
+    //if (Model.FieldsCount > 2)
+    //{
+    //    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+
+    //        <ejs-dropdownlist disabled="@Model.IsDisabled" id="cbRegion" ejs-for="RegionId" placeholder="Select a region" cssClass="rounded-0" filterBarPlaceholder="Search" change="onRegionChange" allowFiltering="true">
+    //            <e-dropdownlist-fields text="name" value="id"></e-dropdownlist-fields>
+    //        </ejs-dropdownlist>
+    //        <span asp-validation-for="RegionId" class="text-danger"></span>
+    //        <small id="RegionSpan" class="text-danger"></small>
+    //    </div>
+    //}
+
+    //if (Model.FieldsCount > 3)
+    //{
+    //    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+    //        <ejs-dropdownlist disabled="@Model.IsDisabled" id="cbNeighborhood" ejs-for="NeighborhoodId" placeholder="Select a neighborhood" cssClass="rounded-0" filterBarPlaceholder="Search" allowFiltering="true">
+    //            <e-dropdownlist-fields groupBy="semt" text="name" value="id"></e-dropdownlist-fields>
+    //        </ejs-dropdownlist>
+    //        <span asp-validation-for="NeighborhoodId" class="text-danger"></span>
+    //        <small id="NeighborhoodSpan" class="text-danger"></small>
+    //    </div>
+
+    //}
+
+
+}
+
+<script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+
+<script type="text/javascript">
+
+    var fieldsCount = @Model.FieldsCount;
+
+    function loadXMLDoc() {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                    if (xmlhttp.status == 200) {
+                        //console.log(document.getElementById("cbCountry"))
+                        var countryDropDown = document.getElementById("cbCountry").ej2_instances[0];
+                        countryDropDown.dataSource = JSON.parse(xmlhttp.responseText);
+                        countryDropDown.dataBind();
+                        countryDropDown.value = @Model.CountryId;
+                    }
+                    else if (xmlhttp.status == 400) {
+                        alert('There was an error 400');
+                    }
+                    else {
+                        alert('something else other than 200 was returned');
+                    }
+                }
+            };
+
+        xmlhttp.open("GET", "/Admin/Address/GetCountryLookup", true);
+            xmlhttp.send();
+        }
+
+    loadXMLDoc();
+
+
+
+    function onCountryChange(e) {
+
+        var xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                if (xmlhttp.status == 200) {
+
+                    var cityDropDown = document.getElementById("cbCity").ej2_instances[0];
+                    cityDropDown.dataSource = JSON.parse(xmlhttp.responseText);
+                    cityDropDown.dataBind();
+                    cityDropDown.refresh();
+
+                    cityDropDown.value = @cityId;
+                }
+                else if (xmlhttp.status == 400) {
+                    alert('There was an error 400');
+                }
+                else {
+                    alert('something else other than 200 was returned');
+                }
+            }
+        };
+
+        xmlhttp.open("GET", "/Admin/Address/GetCityLookup/" + e.value, true);
+        xmlhttp.send();
+    }
+
+    if (fieldsCount > 2) {
+        ////-------------------------------------------------------------
+        function onCityChange(e) {
+            //console.log('onCityChange')
+            try {
+                var xmlhttp = new XMLHttpRequest();
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (xmlhttp.status == 200) {
+                            //var regionDropDown = document.getElementById("cbRegion").ej2_instances[0];
+                            //regionDropDown.dataSource = JSON.parse(xmlhttp.responseText);
+                            //regionDropDown.dataBind();
+                            //regionDropDown.refresh();
+                            //regionDropDown.value = @@regionId;
+
+                        }
+                        else if (xmlhttp.status == 400) {
+                            alert('There was an error 400');
+                        }
+                        else {
+                            alert('something else other than 200 was returned');
+                        }
+                    }
+                };
+
+                xmlhttp.open("GET", "/Admin/Address/GetRegionLookup/" + e.value, true);
+                xmlhttp.send();
+
+            } catch (e) {
+
+            }
+
+        }
+    }
+
+    if (fieldsCount > 3) {
+        ////-------------------------------------------------------------
+        function onRegionChange(e) {
+            try {
+                //console.log(e);
+                var xmlhttp = new XMLHttpRequest();
+
+                xmlhttp.onreadystatechange = function () {
+
+                    if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (xmlhttp.status == 200) {
+                            //console.log(JSON.parse(xmlhttp.responseText))
+                            var neighborhooddropdown = document.getElementById("cbNeighborhood").ej2_instances[0];
+                            neighborhooddropdown.dataSource = JSON.parse(xmlhttp.responseText);
+                            neighborhooddropdown.dataBind();
+                            neighborhooddropdown.refresh();
+                            neighborhooddropdown.value = @neighborhoodId;
+                        }
+                        else if (xmlhttp.status == 400) {
+                            alert('There was an error 400');
+                        }
+                        else {
+                            alert('something else other than 200 was returned');
+                        }
+                    }
+                };
+
+                xmlhttp.open("GET", "/Admin/Address/GetNeighborhoodLookup/" + e.value, true);
+                xmlhttp.send();
+
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+
+    }
+
+
+</script>
+
+@*<partial name="_ValidationScriptsPartial" />*@
+
+<ejs-scripts></ejs-scripts>
+<script>
+    var cbCountryId = document.getElementById("cbCountry").ej2_instances[0]
+</script>

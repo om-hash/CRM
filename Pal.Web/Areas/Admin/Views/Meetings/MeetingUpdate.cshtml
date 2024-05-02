@@ -1,0 +1,207 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.CRM.Meeting.MeetingDTO
+@{
+    ViewData["Title"] = T("cp.views.Meeting.add.title");
+
+    var languages = LanguageService.GetAllLanguages();
+    var Isonline = Model.IsOnline;
+
+
+    var customers = Json.Serialize(ViewBag.Customers1);
+    var leads = Json.Serialize(ViewBag.Leads1);
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+
+<style>
+    label {
+        margin-bottom: 0;
+    }
+</style>
+<br />
+
+<form id="myForm" asp-action="MeetingUpdate" onsubmit="event.preventDefault()" class="needs-validation was-validated">
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Meetings/meetingsList",
+                });
+            }
+        </div>
+
+        <div class="card-body">
+            <input type="hidden" asp-for="CustomerId" />
+            <div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-row">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                        <label asp-for="EmployeeId">@T("model.Meeting.EmployeeId")</label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.Employee" class="rounded-0  form-control form-control-sm" required></select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                        <label asp-for="CustomerName">@T("model.Call.CustomerId")</label>
+                        <input asp-for="CustomerName" class="rounded-0 form-control form-control-sm" disabled />
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="Location">@T("model.Meeting.Location")</label>
+                        <input asp-for="Location" class="rounded-0  form-control form-control-sm" required/>
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="From">@T("model.Meeting.From")</label>
+                        <input asp-for="From" type="datetime-local" class="rounded-0  form-control form-control-sm" required/>
+                        <span asp-validation-for="From" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="To">@T("model.Meeting.To")</label>
+                        <input asp-for="To" type="datetime-local" class="rounded-0  form-control form-control-sm" required/>
+                        <span asp-validation-for="To" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12" style="display: flex; margin-top: 20px; padding-right: 150px;">
+
+                        <label asp-for="IsOnline">@T("model.Meeting.IsOnline")</label>
+                        <input asp-for="IsOnline" type="checkbox" onchange="disableDate(this)" class="rounded-0  form-control form-control-sm" />
+                        <span asp-validation-for="IsOnline" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label asp-for="Title">@T("model.Meeting.Title")</label>
+                        <input asp-for="Title" class="rounded-0 form-control form-control-sm" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label asp-for="Description">@T("model.Meeting.Description")</label>
+                        <textarea rows="10" asp-for="Description" class="rounded-0  form-control form-control-sm"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-6 col-sm-12" style="display:flex; justify-content:center; align-items:center;">
+                        <label style="margin-top: 1px; width: 211%;" asp-for="IsAssignedToTask">@T("model.Call.IsAssignedToTask")</label>
+                        <input asp-for="IsAssignedToTask" type="checkbox" class="form-control form-control-sm" />
+                        <span asp-validation-for="IsAssignedToTask" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="card-footer">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Leads/LeadsList",
+                });
+            }
+        </div>*@
+    </div>
+</form>
+
+
+
+@section Scripts{
+
+    <script>
+         var customers = @customers;
+    var leads = @leads;
+        function changeusertype(e) {
+
+            var selectobject = document.getElementById("CustomerId");
+            $('#CustomerId').html('');
+
+            if (e==1) {
+                Array.from(customers).forEach(a => {
+                    $('#CustomerId').append(`
+                     <option value="${a.id}">${a.name}</option>
+                `)
+                });
+            } else {
+                Array.from(leads).forEach(a => {
+                    $('#CustomerId').append(`
+                     <option value="${a.id}">${a.name}</option>
+                `)
+                });
+            }
+        }
+
+
+
+        var IsOnline = @Isonline.ToString().ToLower();
+        var languagesCount = @languages.Count;
+
+
+        $(document).ready(function () {
+
+            if (IsOnline) {
+                $('#Location').attr("disabled", "true")
+            } else {
+                $('#Location').removeAttr("disabled")
+            }
+        });
+
+        function disableDate(e) {
+            if (e.checked) {
+
+                $('#Location').attr("disabled", "true")
+            } else {
+
+                $('#Location').removeAttr("disabled")
+            }
+        }
+
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+             //------------------------------------------
+            if (!$("#myForm").valid())
+                return;
+
+            //------------------------------------------
+            // readyupdata
+
+            var data = new FormData();
+            data.append('Id', $('#Id').val());
+            data.append('EmployeeId', $('#EmployeeId').val());
+            data.append('CustomerId', $('#CustomerId').val());
+            data.append('Location', $('#Location').val());
+            data.append('From', $('#From').val());
+            data.append('To', $('#To').val());
+            data.append('IsOnline', $('#IsOnline').val());
+            data.append('Title', $('#Title').val());
+            data.append('Description', $('#Description').val());
+            data.append('IsAssignedToTask', $('#IsAssignedToTask').prop('checked'));
+            showLoading();
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/admin/Meetings/MeetingUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                    } else {
+                        alert("hello")
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                },
+                complete: hideLoading()
+            });
+        }
+
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

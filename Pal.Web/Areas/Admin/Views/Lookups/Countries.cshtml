@@ -1,0 +1,314 @@
+﻿@model ICollection<Pal.Data.DTOs.Lookups.SysCountryDTO>
+@{
+    ViewData["Title"] = T("Lookups");
+    var gridModel = new GridViewModel
+    {
+        GridId = "SysCountries",
+        OnCommandClick = "commandClick",
+        Model = Model,
+        Columns = new List<GridViewModel.GridViewColumn>
+{
+            new GridViewModel.GridViewColumn{ Field = "Id",HeaderText = "Id"},
+            new GridViewModel.GridViewColumn{ Field = "CountryName",HeaderText = "Name"},
+        }
+    };
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/customGridStyle.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datetimepicker/bootstrap4.min.css" rel="stylesheet" />
+
+<br />
+<partial name="_Buttons" />
+<hr />
+<h2>Countries</h2>
+<button class="btn btn-outline-primary" onclick="onAddNew()">@T("btn.add")</button>
+
+<form asp-action="Add" method="post">
+    @Html.AntiForgeryToken()
+</form>
+<br />
+
+@{
+    await Html.RenderPartialAsync("_GridView", gridModel);
+}
+
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalTitle">@T("cp.views.lookUps.addNewValue.title")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <nav>
+                    <div class="nav  nav-tabs nav-fill" id="nav-tab" role="tablist">
+                        @{
+
+                            for (int i = 0; i < languages.Count; i++)
+                            {
+                                var tabName = languages[i].Id;
+                                if (i == 0)
+                                {
+                                    <a class="nav-item nav-link active" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                }
+                                else
+                                {
+                                    <a class="nav-item nav-link" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                }
+                            }
+                        }
+
+                    </div>
+                </nav>
+                <div class="tab-content " id="nav-tabContent">
+                    @{
+                        for (int i = 0; i < languages.Count; i++)
+                        {
+                            var langId = languages[i].Id;
+                            <input type="hidden" class="local-tap" id="langId-@i" value="@langId" />
+                            <input type="hidden" class="local-tap" id="Id-@i" />
+                            <div class='tab-pane fade @(i == 0 ? "show active":"") ' id="contentDiv-@i" role="tabpanel">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>@T("model.Lookups.name") (@languages[i].Name)</label>
+                                        <input id="lookName-@i" type="text" class="form-control lookNameInput">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@T("global.close")</button>
+                <button type="button" id="saveChanges" class="btn btn-primary">@T("btn.save")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+
+    <script>
+
+         function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    var trans = args.rowData.Translates;
+                    for (var i = 0; i < args.rowData.Translates.length; ++i) {
+                        var langId = $('#langId-' + i).val();
+                        var transalte = trans.filter(obj => {
+                            return obj.LanguageId == langId
+                        });
+                        $('#Id-' + i).val(transalte[0].Id)
+                        $('#lookName-' + i).val(transalte[0].Name)
+
+                    }
+                    $('#saveChanges')[0].setAttribute('onclick', 'onUpdate(' + args.rowData.Id + ')')
+                    $('#editModal').modal('show')
+
+                    //window.location.assign('/Admin/Lookups/HeatingTypesEdit/' + args.rowData.Id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                        title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.Id);
+                        }
+                    });
+                    break;
+            }
+         }
+
+        //--------------------------------------------
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/Admin/Lookups/CountryDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                             '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+
+        //-----------------------------------
+        function onAddNew() {
+            for (var i = 0; i < @languages.Count; ++i) {
+
+                $('#lookName-' + i).val("")
+
+            }
+            $('#saveChanges')[0].setAttribute('onclick' , 'onSave()')
+            $('#editModal').modal('show');
+        }
+
+
+        //--------------------------------------------
+        function onSave() {
+            var allGood = true;
+            var translates = [];
+
+            $(".lookNameInput").each(function (i, elemnt) {
+                if (!elemnt.value || elemnt.value.trim() === "") {
+                    ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    allGood = false;
+                    return;
+                }
+                translates.push({
+                    LanguageId: $('#langId-'+i).val(),
+                    Name: elemnt.value,
+                });
+            });
+            if (!allGood) return;
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() };
+
+            var formdata = new FormData();
+            translates.forEach((val, i) => {
+                formdata.append('translates[' + i + '][LanguageId]', val.LanguageId);
+                formdata.append('translates[' + i + '][Name]', val.Name);
+            });
+
+            $.ajax({
+                headers: header,
+                url: '/Admin/Lookups/CountryAdd',
+                type: 'post',
+                data: formdata,
+                contentType: false,
+                processData:false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                        grid.dataSource.push({
+                            Id: res.result.id,
+                            CountryName: res.result.translates[0].Name,
+                            Translates: res.result.translates,
+                        });
+                        grid.refresh();
+                        $(".lookNameInput").val('');
+                    } else {
+                        ErrorToast('@T("cp.alert.error")',' @T("cp.alert.onSaveFailde")');
+                    }
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+
+            })
+        }
+
+        //--------------------------------------------
+        function onUpdate(id) {
+            var allGood = true;
+            var translates = [];
+
+            $(".lookNameInput").each(function (i, elemnt) {
+                if (!elemnt.value || elemnt.value.trim() === "") {
+                    ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    allGood = false;
+                    return;
+                }
+                translates.push({
+                    Id: $('#Id-'+i).val(),
+                    LanguageId: $('#langId-'+i).val(),
+                    Name: elemnt.value,
+                });
+            });
+            if (!allGood) return;
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() };
+
+            var formdata = new FormData();
+            formdata.append('Id', id);
+            formdata.append('CountryName', translates[0].Name);
+            translates.forEach((val, i) => {
+                formdata.append('translates[' + i + '][Id]', val.Id);
+                formdata.append('translates[' + i + '][LanguageId]', val.LanguageId);
+                formdata.append('translates[' + i + '][Name]', val.Name);
+            });
+
+            $.ajax({
+                headers: header,
+                url: '/Admin/Lookups/CountryUpdate',
+                type: 'post',
+                data: formdata,
+                contentType: false,
+                processData:false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                        var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+                        grid.dataSource.forEach(function (obj, index, arr) {
+                            if (obj.Id == id) {
+                                arr[index].Id = res.result.id,
+                                arr[index].CountryName = res.result.translates[0].Name,
+                                arr[index].Translates = res.result.translates,
+                                grid.refresh();
+                            }
+
+                        });
+
+                        $(".lookNameInput").val('');
+                        $('#editModal').modal('hide');
+
+                    } else {
+                        ErrorToast('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+
+            })
+        }
+    </script>
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+
+
+}

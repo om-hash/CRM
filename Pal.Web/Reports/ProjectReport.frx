@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2022 01:24:27" ReportInfo.Modified="10/20/2022 00:42:03" ReportInfo.CreatorVersion="2022.3.0.0">
+  <ScriptText>using System;                       using System;
+
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void Picture1_BeforePrint(object sender, EventArgs e)
+    {
+//      string URL1;
+//
+//      URL1=((String)Report.GetColumnValue(&quot;Projects.MainImg&quot;));
+//      URL1+=&quot;&amp;w=&quot;+Convert.ToInt32(Picture1.Width).ToString()+&quot;&amp;h=&quot;+Convert.ToInt32(Picture1.Height).ToString();
+//      Picture1.ImageLocation=URL1;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="Connection" ConnectionStringExpression="[ConnectionString]">
+      <TableDataSource Name="Projects" DataType="System.Int32" Enabled="true" TableName="Projects" SelectCommand="exec Report_ProjectDetails @ProjectId">
+        <Column Name="CompId" DataType="System.Int32"/>
+        <Column Name="NeighborhoodId" DataType="System.Int32"/>
+        <Column Name="CompletionDate" DataType="System.DateTime"/>
+        <Column Name="Area" DataType="System.Single"/>
+        <Column Name="BuildingCount" DataType="System.Int32"/>
+        <Column Name="RealEstateAvgPrice" DataType="System.Single"/>
+        <Column Name="MeterAvgPrice" DataType="System.Single"/>
+        <Column Name="AvrageRating" DataType="System.Single"/>
+        <Column Name="TourDuration" DataType="System.Single"/>
+        <Column Name="ExtraFeatures" DataType="System.String"/>
+        <Column Name="FullAddress" DataType="System.String"/>
+        <Column Name="BuildingAge" DataType="System.Int32"/>
+        <Column Name="MainImg" DataType="System.String"/>
+        <Column Name="ApproveState" DataType="System.Int32"/>
+        <Column Name="IsActive" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsFeatured" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ApprovedBy" DataType="System.String"/>
+        <Column Name="Lat" DataType="System.String"/>
+        <Column Name="Lng" DataType="System.String"/>
+        <Column Name="ApprovedDate" DataType="System.DateTime"/>
+        <Column Name="IsForRent" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IsDeleted" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="Barcode" DataType="System.String"/>
+        <Column Name="RowNo" DataType="System.Int32"/>
+        <Column Name="ProjectId" DataType="System.Int32"/>
+        <Column Name="ProjectName" DataType="System.String"/>
+        <Column Name="Subtitle" DataType="System.String"/>
+        <Column Name="Content" DataType="System.String"/>
+        <Column Name="CompanyName" DataType="System.String"/>
+        <Column Name="ProjectTypeName" DataType="System.String"/>
+        <Column Name="StatusName" DataType="System.String"/>
+        <Column Name="NeighborhoodName" DataType="System.String"/>
+        <Column Name="RegionName" DataType="System.String"/>
+        <Column Name="CityName" DataType="System.String"/>
+        <Column Name="CountryName" DataType="System.String"/>
+        <Column Name="LanguageId" DataType="System.Int32"/>
+        <CommandParameter Name="ProjectId" DataType="22" Expression="[ProjectId]"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+    <MsSqlDataConnection Name="Connection1" ConnectionStringExpression="[ConnectionString]">
+      <TableDataSource Name="RealEstateGeneralInfo" DataType="System.Int32" Enabled="true" TableName="RealEstateGeneralInfo" SelectCommand="exec Report_ProjectDetails_RealEstateGeneralInfo @ProjectId, @LangId">
+        <Column Name="Id" DataType="System.Int64"/>
+        <Column Name="AreaTotal" DataType="System.Single"/>
+        <Column Name="AreaNet" DataType="System.Single"/>
+        <Column Name="Notes" DataType="System.String"/>
+        <Column Name="RealEstateTypeName" DataType="System.String"/>
+        <Column Name="LanguageId" DataType="System.Int32"/>
+        <Column Name="RoomsCount" DataType="System.String"/>
+        <CommandParameter Name="ProjectId" DataType="22" Expression="[ProjectId]"/>
+        <CommandParameter Name="LangId" DataType="22" Expression="[LangId]"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="ProjectId" DataType="System.String"/>
+    <Parameter Name="LangId" DataType="System.String"/>
+    <Parameter Name="ConnectionString" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="58.4">
+      <TextObject Name="Text1" Left="255.15" Top="9.45" Width="217.35" Height="37.8" Text="Project detials" Font="Arial, 20.25pt"/>
+      <TextObject Name="Text73" Left="538.65" Top="18.9" Width="170.1" Height="28.35" Text="[Date]" Font="Arial, 10pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="62.4" Width="718.2" Height="170.1">
+      <TextObject Name="Text63" Left="9.45" Top="9.45" Width="151.2" Height="28.35" Text="Project name:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text64" Left="9.45" Top="66.15" Width="151.2" Height="28.35" Text="Address:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text71" Left="9.45" Top="127.3" Width="151.2" Height="28.35" Text="Meter Avg. Price:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text75" Left="179.55" Top="9.45" Width="359.1" Height="28.35" Text="[Projects.ProjectName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text76" Left="179.55" Top="66.15" Width="359.1" Height="28.35" Text="[Projects.NeighborhoodName], [Projects.FullAddress] /[Projects.RegionName] /[Projects.CityName] /[Projects.CountryName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text77" Left="179.55" Top="127.85" Width="359.1" Height="28.35" Text="[Projects.MeterAvgPrice]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.CurrencySymbol="$" Format.PositivePattern="0" Format.NegativePattern="0" Font="Arial, 10pt"/>
+      <BarcodeObject Name="Barcode1" Left="538.65" Top="28.35" Width="116" Height="116" DataColumn="Projects.Barcode" ShowText="false" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="236.5" Width="718.2" Height="463.05">
+      <TextObject Name="Text6" Left="9.45" Top="37.8" Width="151.2" Height="28.35" Text="Company" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text10" Left="9.45" Top="110.4" Width="151.2" Height="28.35" Text="Project Type" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text14" Left="9.45" Top="178.55" Width="151.2" Height="28.35" Text="Project Status" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text18" Left="9.45" Top="245.7" Width="151.2" Height="28.35" Text="Completion Date" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text22" Left="9.45" Top="305.4" Width="151.2" Height="28.35" Text="Area" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text26" Left="359.1" Top="245.7" Width="189" Height="28.35" Text="Buildings Age" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text30" Left="359.1" Top="305.4" Width="189" Height="28.35" Text="Properties Avg Price" Font="Arial Black, 11pt"/>
+      <LineObject Name="Line2" Width="756"/>
+      <TextObject Name="Text78" Left="179.55" Top="37.8" Width="170.1" Height="28.35" Text="[Projects.CompanyName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text79" Left="179.55" Top="110.4" Width="170.1" Height="28.35" Text="[Projects.ProjectTypeName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text80" Left="179.55" Top="178.55" Width="170.1" Height="28.35" Text="[Projects.StatusName]" Font="Arial, 10pt"/>
+      <TextObject Name="Text81" Left="179.55" Top="245.7" Width="170.1" Height="28.35" Text="[Projects.CompletionDate]" Format="Date" Format.Format="d" Font="Arial, 10pt"/>
+      <TextObject Name="Text82" Left="179.55" Top="305.4" Width="170.1" Height="28.35" Text="[Projects.Area]" Font="Arial, 10pt"/>
+      <TextObject Name="Text83" Left="548.1" Top="245.7" Width="170.1" Height="28.35" Text="[Projects.BuildingAge]" Font="Arial, 10pt"/>
+      <TextObject Name="Text84" Left="548.1" Top="305.4" Width="170.1" Height="28.35" Text="[Projects.RealEstateAvgPrice]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.CurrencySymbol="$" Format.PositivePattern="0" Format.NegativePattern="0" Font="Arial, 10pt"/>
+      <PictureObject Name="Picture1" Left="359.1" Top="9.45" Width="340.2" Height="226.8" DataColumn="Projects.MainImg"/>
+      <SubreportObject Name="Subreport1" Top="425.25" Width="718.2" Height="28.35" ReportPage="Page2" PrintOnParent="true"/>
+      <TableObject Name="Table2" Top="406.35" Width="717.76" Height="18.9">
+        <TableColumn Name="Column5" Width="179.44"/>
+        <TableColumn Name="Column6" Width="179.44"/>
+        <TableColumn Name="Column7" Width="179.44"/>
+        <TableColumn Name="Column8" Width="179.44"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell10" Border.Lines="All" Text="Total area" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="Area Net" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="RealEstate Type" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="Rooms count" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <LineObject Name="Line3" Left="-9.45" Top="368.55" Width="756"/>
+      <TextObject Name="Text85" Left="294.95" Top="377" Width="113.4" Height="18.9" Text="Properties" Font="Arial, 15pt, style=Bold"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="703.55" Width="718.2" Height="37.8">
+      <TextObject Name="Text72" Left="349.65" Top="18.9" Width="94.5" Height="18.9" Text="[Page#]" Font="Arial, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+  <ReportPage Name="Page2" Visible="false" Watermark.Font="Arial, 60pt">
+    <DataBand Name="Data2" Width="718.2" Height="56.7" DataSource="RealEstateGeneralInfo" KeepTogether="true">
+      <TableObject Name="Table1" Top="18.9" Width="717.76" Height="18.9">
+        <TableColumn Name="Column1" Width="179.44"/>
+        <TableColumn Name="Column2" Width="179.44"/>
+        <TableColumn Name="Column3" Width="179.44"/>
+        <TableColumn Name="Column4" Width="179.44"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Text="[RealEstateGeneralInfo.AreaTotal]" Font="Arial, 10pt"/>
+          <TableCell Name="Cell7" Text="[RealEstateGeneralInfo.AreaNet]" Font="Arial, 10pt"/>
+          <TableCell Name="Cell8" Text="[RealEstateGeneralInfo.RealEstateTypeName]" Font="Arial, 10pt"/>
+          <TableCell Name="Cell9" Text="[RealEstateGeneralInfo.RoomsCount]" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <LineObject Name="Line4" Top="47.25" Width="718.2" Diagonal="true"/>
+    </DataBand>
+  </ReportPage>
+</Report>

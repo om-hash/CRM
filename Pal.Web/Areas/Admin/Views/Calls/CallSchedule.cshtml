@@ -1,0 +1,167 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.CRM.Call.CallDTO
+@{
+    ViewData["Title"] = T("cp.views.Call.add.schedule.title");
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+
+<style>
+    label {
+        margin-bottom: 0;
+    }
+</style>
+<br />
+
+<form id="myForm" asp-action="CallAdd" onsubmit="event.preventDefault()">
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Calls/CallsList",
+                });
+            }
+        </div>
+
+        <div class="card-body">
+
+            <div>
+                <div class="form-row">
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="EmployeeId">@T("model.Call.EmployeeId")</label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.Employee" class="rounded-0  form-control form-control-sm" required></select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="CustomerId">@T("model.Call.CustomerId")</label>
+                        <select asp-for="CustomerId" asp-items="ViewBag.Customers" class="rounded-0  form-control form-control-sm" required></select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="CallTypeId">@T("model.Call.CallTypeId")</label>
+                        <select asp-for="CallTypeId" asp-items="ViewBag.CallTypes" class="rounded-0  form-control form-control-sm" required></select>
+                        <span asp-validation-for="CallTypeId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="CallPurposeId">@T("model.Call.CallPurposeId")</label>
+                        <select asp-for="CallPurposeId" asp-items="ViewBag.CallPurpose" class="rounded-0  form-control form-control-sm" required></select>
+                        <span asp-validation-for="CallPurposeId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="CallStatusId">@T("model.Call.CallStatusId")</label>
+                        <select asp-for="CallStatusId" asp-items="ViewBag.CallStatus" disabled class="rounded-0  form-control form-control-sm">
+                            <option value="0">Selete..</option>
+                        </select>
+                        <span asp-validation-for="CallStatusId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="Subject">@T("model.Call.Subject")</label>
+                        <input asp-for="Subject" class="rounded-0 form-control form-control-sm" required />
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12" >
+                        <label asp-for="CallStart">@T("model.Call.CallStart")</label>
+                        <input asp-for="CallStart" type="datetime-local" class="rounded-0  form-control form-control-sm" />
+                        <span asp-validation-for="CallStart" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                        <label asp-for="Duration">@T("model.Call.Duration")</label>
+                        <input asp-for="Duration" type="time" class="rounded-0 form-control form-control-sm" disabled />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label asp-for="CallResultId">@T("model.Call.CallResultId")</label>
+                        <select asp-for="CallResultId" asp-items="ViewBag.CallResult" class="rounded-0  form-control form-control-sm" disabled>
+                            <option value="0">Selete..</option>
+                        </select>
+                        <span asp-validation-for="CallResultId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label asp-for="CallDetails">@T("model.Call.CallDetails")</label>
+                        <textarea rows="10" asp-for="CallDetails" class="rounded-0  form-control form-control-sm" disabled></textarea>
+                        <span asp-validation-for="CallDetails" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+@*        <div class="card-footer">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Leads/LeadsList",
+                });
+            }
+        </div>*@
+    </div>
+</form>
+
+
+
+@section Scripts{
+
+    <script>
+        var languagesCount = @languages.Count;
+
+
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+             //------------------------------------------
+            if (!$("#myForm").valid())
+                return;
+
+            //------------------------------------------
+            // readyupdata
+            var data = new FormData();
+            data.append('EmployeeId', $('#EmployeeId').val());
+            data.append('CustomerId', $('#CustomerId').val());
+            data.append('CallTypeId', $('#CallTypeId').val());
+            data.append('CallPurposeId', $('#CallPurposeId').val());
+   /*         data.append('CallStatusId', $('#CallStatusId').val());*/
+            data.append('Subject', $('#Subject').val());
+            data.append('CallStart', $('#CallStart').val());
+        /*    data.append('Duration', $('#Duration').val());*/
+            //data.append('CallResultId', $('#CallResultId').val());
+            //data.append('CallDetails', $('#CallDetails').val());
+            data.append('IsScheduled', true);
+
+            showLoading();
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/admin/Calls/CallAdd",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        location.href = "/Admin/Calls/CallUpdate/" + res.responseText
+                    } else {
+                        alert("hello")
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                },
+                complete: hideLoading()
+            });
+        }
+
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

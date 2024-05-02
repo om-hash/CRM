@@ -1,0 +1,53 @@
+﻿@model string
+@{
+    ViewData["Title"] = T("cp.views.lookups.title");
+}
+<div style="display:flex; justify-content:space-between">
+    <div>
+
+<h3>@ViewData["Title"]</h3>
+    </div>
+    <div>
+        <a class="btn btn-warning mb-2" onclick="RemoveCach()">@T("cp.views.lookUps.title.RemoveCachingKeys")</a>
+    </div>
+</div>
+
+<partial  name="_Buttons"/>
+@section Scripts{
+    <script>
+        function RemoveCach() {
+             $.ajax({
+                url: '/Admin/Lookups/RemoveCachingKeys',
+                type: 'POST',
+                success: function (res) {
+                    if (res.responseType === 1) {
+              
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                           '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+    </script>
+
+}

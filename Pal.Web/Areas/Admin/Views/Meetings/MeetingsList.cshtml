@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = T("cp.views.Meeting.list.title");
+}
+
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/customGridStyle.css" rel="stylesheet" />
+
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <a class="btn btn-sm btn-primary" asp-action="MeetingAdd">@T("btn.add")</a>
+        <a class="btn btn-sm btn-primary" onclick="document.querySelector('#UploadList').click()">@T("btn.addList")</a>
+        <input id="UploadList" onchange="UploadList(this)" type="file" hidden />
+        <form asp-action="MeetingDelete" method="post">
+        </form>
+    </div>
+    <div class="card-body">
+        <div>
+            @{
+
+                var gridModel = new Pal.Web.Models.GridViewModel
+                {
+                    GridId = "MeetingGrid",
+                    Url = "/Admin/Meetings/MeetingsPaginatedList",
+                    Columns = new()
+                    {
+                    new() { Field = "id", HeaderText = "#", Width = "100" },
+                    new() { Field = "title", HeaderText = T("model.Meeting.Title").ToString(), Width = "100" },
+                    new() { Field = "location", HeaderText = T("model.Meeting.Location").ToString(), Width = "100" },
+                    new() { Field = "isOnline", HeaderText = T("model.Meeting.IsOnline").ToString(), Width = "100", Visiable = false },
+                    new() { Field = "fromDateTime", HeaderText = T("model.Meeting.From").ToString(), Width = "100" },
+                    new() { Field = "toDateTime", HeaderText = T("model.Meeting.To").ToString(), Width = "100" },
+                    new() { Field = "employeeName", HeaderText = T("model.Meeting.EmployeeId").ToString(), Width = "100" },
+                    new() { Field = "customerName", HeaderText = T("model.Meeting.CustomerId").ToString(), Width = "100" },
+                    new() { Field = "description", HeaderText = T("model.Meeting.Description").ToString(), Width = "100", Visiable = false },
+                },
+                };
+
+                await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+            }
+
+        </div>
+    </div>
+    @*<div class="card-footer">
+        <a class="btn btn-sm btn-primary" asp-action="CompanyAdd">@T("btn.add")</a>
+    </div>*@
+</div>
+    @section Scripts{
+        <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+        <ejs-scripts></ejs-scripts>
+        <script>
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Meetings/meetingUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                         title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+            }
+        }
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/Admin/Meetings/meetingDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                           '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                          '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+
+
+
+        function UploadList(input) {
+            var files = input.files;
+            var formData = new FormData();
+            formData.append("ExcelFile", files[0]);
+
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "UploadList",
+                    data: formData,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        alert("Files Uploaded!");
+                    }
+                }
+            );
+
+        }
+
+
+
+        </script>
+    }

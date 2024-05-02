@@ -1,0 +1,99 @@
+﻿<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+
+<div class="col-12 panel panel-default ">
+    <div class="col-6">
+        <h1>@T("cp.views.languages.list.title")</h1>
+    </div>
+</div>
+<div class="form-row mb-1 " style="display: flex; justify-content:space-between; align-items:center">
+    <div>
+        <a asp-action="LanguageAdd" class="btn btn-success">Add</a>
+    </div>
+</div>
+<form asp-action="LanguageDelete"></form>
+@{
+    var gridModel = new Pal.Web.Models.GridViewModel
+    {
+        GridId = "LanguageListGrid",
+        Url = "/Admin/Languages/LanguagesPaginatedList",
+        Columns = new()
+        {
+            new() { Field = "id", HeaderText = "#", Width = "100" },
+            new() { Field = "name", HeaderText = T("model.Language.Name").ToString(), Width = "100" },
+            new() { Field = "shortcut", HeaderText = T("model.Language.Shortcut").ToString(), Width = "100" },
+            new() { Field = "culture", HeaderText = T("model.Language.Culture").ToString(), Width = "100" },
+            new() { Field = "isRtl", HeaderText = T("model.Language.IsRtl").ToString(), Width = "100" },
+        }
+    };
+
+    await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+}
+
+
+@section Scripts{
+    <script>
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Languages/LanguageUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                        title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+            }
+        }
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/admin/Languages/LanguageDelelte/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                             '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

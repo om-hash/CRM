@@ -1,0 +1,12 @@
+﻿@using Pal.Data.DTOs.RealEstate
+@model List<RealEstateCardViewModel>
+
+
+    <div class="row" id="realEstates">
+        @foreach (var realEstate in Model)
+        {
+            <div class="col-lg-12 col-md-12" style="margin-block-end: 20px;">
+                <partial name="_FeaturedRealEstates" model="@realEstate" />
+            </div>
+        }
+    </div><!-- end row -->

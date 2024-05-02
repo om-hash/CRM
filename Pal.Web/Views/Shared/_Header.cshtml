@@ -1,0 +1,251 @@
+﻿@inject IOptions<RequestLocalizationOptions> LocOptions
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+@using Pal.Data.VMs.FooterAndHeader
+@using Pal.Core.Enums.Account
+@model HeaderFooterInfoVm
+
+@{
+    string returnUrl = ViewContext.HttpContext.Request.Path;
+
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems =(await CacheService.GetAsync("currentWorkingLanguages")).Select(x=> new SelectListItem { Value = x.Culture, Text = x.Name }).ToList();
+    //LocOptions.Value.SupportedUICultures
+    //.Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
+    //.ToList();
+
+    var userTypeString = User.FindFirst(Pal.Core.Enums.Account.PalClaimType.UserType.ToString())?.Value;
+    int customerId = 0;
+    if (userTypeString == UserType.Customers.ToString())
+    {
+        customerId = int.Parse(User.FindFirst(Pal.Core.Enums.Account.PalClaimType.CustomerId.ToString()).Value);
+    }
+}
+
+<style>
+    .header-default .nav.navbar-nav li.tourbtn:after {
+        margin-right: 18px;
+    }
+    #homeIcone:before {
+        color: white !important;
+    }
+   
+
+</style>
+
+
+
+<header class="header-default">
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-left left">
+                <ul class="top-bar-item right social-icons">
+                    <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                    <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                    <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                </ul>
+                <div class="clear"></div>
+            </div>
+
+            <div class="top-bar-right right">
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="account" asp-action="login" class="top-bar-item"><i class="fa fa-sign-in icon"></i>@T("global.login")</a>
+                    <a data-toggle="modal" data-target="#registerDescriptionModal" class="top-bar-item"><i class="fa fa-user-plus icon"></i>@T("global.register")</a>
+                }
+                @if (User.Identity.IsAuthenticated && userTypeString == UserType.Customers.ToString())
+                {
+                    <a id="headerChatBox" onclick="chat(1, 3, @customerId, 0, 'Admin', 'Admin', @customerId, 'Admin')" class="top-bar-item"><i class="fas fa-comment icon"></i>@T("global.chatWithAdmin")</a>
+                }
+
+                <form asp-action="ChangeLanguage" asp-controller="Home" method="post" style="display: inline-flex; ">
+                    <input type="hidden" id="returnUrl" name="returnUrl" value="@returnUrl" />
+                    <select id="culture"
+                            name="culture"
+                            class="form-control"
+                            style=""
+                            onchange="this.form.submit();"
+                            asp-items="cultureItems"
+                            asp-for="@requestCulture.RequestCulture.UICulture.Name">
+                    </select>
+                </form>
+                @*<a href="#" onclick="document.getElementById('culture').setAttribute('disabled', '');">stop lang</a>*@
+                <div class="clear"></div>
+            </div>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- navbar header -->
+        <div class="navbar-header">
+
+            <div class="header-details">
+                <div class="header-item header-phone left">
+                    <table>
+                        <tr>
+                            <td><i class="fa fa-phone"></i></td>
+                            <td class="header-item-text">
+
+                                @T("global.callUsAntime	")<br />
+                                <span><a href="tel:@Model.PhoneNumber" style="color: #464646; font-size: 16px; font-weight: 400;margin-top:5px">@Model.PhoneNumber</a></span>
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="header-item header-phone left">
+                    <table>
+                        <tr>
+                            <td><i class="fa fa-envelope"></i></td>
+                            <td class="header-item-text">
+
+                                @T("global.dropUsLine")<br />
+                         @*       <span><a style="color:#464646; font-size:15px; font-weight:400" href="mailto:@Model.GetInTouch.Email">@Model.GetInTouch.Email</a></span>*@
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <a class="navbar-brand" href="/"><img src="~/images/logo.png" alt="Homely" /></a>
+
+            <!-- nav toggle -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+        </div>
+
+        <!-- main menu -->
+        <div class="navbar-collapse collapse">
+            <div class="main-menu-wrap">
+                <div class="container-fixed">
+
+                    <div class="member-actions right">
+                        @if (userTypeString == UserType.Customers.ToString())
+                        {
+                        <ul class="nav navbar-nav" >
+                            <li class="menu-item-has-children">
+                                <a href="blog-right-sidebar.html">@T("btn.myAccount")</a>
+                                <ul class="sub-menu" style="color:red; ">
+                                    <li><a asp-controller="Customers" asp-action="Profile">@T("global.profile")</a></li>
+                                    <li><a asp-controller="Customers" asp-action="Favorite">@T("glboal.favorites")</a></li>
+                                    <li><a asp-controller="Chat" asp-action="Index">@T("global.chats")</a></li>
+                                    <li>
+                                        <form id="logoutForm" asp-action="Logout" asp-controller="Account" asp-area="" method="post">
+                                            <a class="nav-link" role="button" onclick="$('#logoutForm').submit()">
+                                                @T("global.logout")
+                                            </a>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="menu-item-has-children tourbtn" style=" width: 137px; ">
+                                <a class="button small alt button-icon tourText" style="text-align:center"><i id="homeIcone" class="fa fa-home"></i>@T("btn.tourService")</a>
+                                <ul class="sub-menu">
+                                    <li><a href="/Tour">@T("publicInterface.profile.Sidebar.newTour")</a></li>
+                                    <li><a href="/Customers/Tours">@T("btn.tourService")</a></li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                        }
+                        @if (userTypeString == UserType.Companies.ToString() || userTypeString == UserType.Admins.ToString() || userTypeString == UserType.Adviser.ToString() || userTypeString == UserType.Lawyer.ToString())
+                        {
+                    <ul class="nav navbar-nav">
+                        <li class="menu-item-has-children" style="margin-right:20px">
+                            <a href="blog-right-sidebar.html">@T("btn.myAccount")</a>
+                            <ul class="sub-menu">
+                                <li><a href="/Admin/Dashboard">@T("global.dashboard")</a></li>
+                                <li>
+                                    <form id="logoutForm" asp-action="Logout" asp-controller="Account" asp-area="" method="post">
+                                        <a class="nav-link" role="button" onclick="$('#logoutForm').submit()">
+                                            Logout
+                                        </a>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="menu-item-has-children tourbtn" style=" width: 137px; ">
+                            <a class="button small alt button-icon tourText" style="text-align:center"><i id="homeIcone" class="fa fa-home "></i>@T("btn.tourService")</a>
+                            <ul class="sub-menu">
+                                <li><a href="/Tour">@T("publicInterface.profile.Sidebar.newTour")</a></li>
+                                <li><a href="/Customers/Tours">@T("btn.tourService")</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                        }
+                        
+                        @if (userTypeString == null)
+                        {
+
+                        <a href="/Tour" class="button small alt button-icon"><i class="fa fa-home " id="homeIcone"></i>@T("btn.tourService")</a>
+                        }
+
+                    </div>
+                    <ul class="nav navbar-nav right">
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">@T("global.home")</a>
+
+                        </li>
+                        <li>
+                            <a style="cursor:pointer" onclick="Projects()">@T("global.projects")</a>
+
+                        </li>
+                        <li>
+
+                            <a style="cursor:pointer" onclick="RealEstates()">@T("global.realEstate")</a>
+
+                        </li>
+                        <li>
+
+                            <a style="cursor:pointer" onclick="Regions()">@T("global.region")</a>
+
+                        </li>
+                        <li>
+
+                            <a style="cursor:pointer" href="/Blogs/Blogs">@T("publicInterface.blog.title")</a>
+
+                        </li>
+                        <li>
+                            <a href="/Home/About">@T("global.About")</a>
+                        </li>
+                        <li>
+                            <a href="/Home/Contact">@T("global.contact")</a>
+                        </li>
+                        <li>
+                            <a href="/Home/OurServices">@T("global.ourServices")</a>
+                        </li>
+
+                    </ul>
+                    <div class="clear"></div>
+
+                </div>
+
+            </div><!-- end main menu wrap -->
+        </div><!-- end navbar collaspe -->
+
+    </div><!-- end container -->
+</header>
+@if (User.Identity.IsAuthenticated && userTypeString == UserType.Customers.ToString())
+{
+    <div dir="ltr">
+        <div class="chatTaggelBtn" style=" position: fixed; background-color: #e8792f;border-radius:100%">
+            <a style=" color:white" onclick="chat(1, 3, @customerId, 0, 'Admin', 'Admin', @customerId, 'Admin')" class="top-bar-item"><i class="fas fa-comments" style="font-size: 40px; color:white "> @*@T("global.chatWithAdmin")*@</i></a>
+        </div>
+    </div>
+}
+<script>
+    var firstAfterDomain = window.location.pathname.replace('\.+(co.uk|me|com|us)', '').split('.').pop().split('/')[1];
+    if (firstAfterDomain == 'Chat') {
+        document.getElementById('headerChatBox').classList.add('hidden')
+    }
+</script>

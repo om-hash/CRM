@@ -1,0 +1,404 @@
+﻿
+<style>
+	#chatBox .panel {
+		margin-bottom: 0px;
+	}
+
+	#chatBox .chat-window {
+		bottom: 0;
+		right: 0;
+		position: fixed;
+		float: right;
+		margin-left: 10px;
+		z-index: 100;
+	}
+
+		#chatBox .chat-window > div > .panel {
+			border-radius: 5px 5px 0 0;
+		}
+
+	#chatBox .icon_minim {
+		padding: 2px 10px;
+	}
+
+	#chatBox a {
+		color: black;
+	}
+
+	#chatBox .msg_container_base {
+		background: #e5e5e5;
+		margin: 0;
+		padding: 0 10px 10px;
+		max-height: 300px;
+		overflow-x: hidden;
+	}
+
+	#chatBox .top-bar {
+		padding: 10px;
+		position: relative;
+		overflow: hidden;
+	}
+
+	#chatBox .msg_receive {
+		padding-left: 0;
+		margin-left: 0;
+		padding-bottom: 20px !important;
+	}
+
+	#chatBox .msg_sent {
+		padding-bottom: 20px !important;
+		margin-right: 0;
+	}
+
+	#chatBox .messages {
+		background: white;
+		padding: 10px;
+		border-radius: 2px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		max-width: 100%;
+	}
+
+		#chatBox .messages > p {
+			font-size: 13px;
+			margin: 0 0 0.2rem 0;
+		}
+
+		#chatBox .messages > time {
+			font-size: 11px;
+			color: #ccc;
+		}
+
+	#chatBox .msg_container {
+		padding: 10px;
+		overflow: hidden;
+		display: flex;
+	}
+
+	#chatBox .base_receive > .avatar:before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border: 5px solid #FFF;
+		border-left-color: rgba(0, 0, 0, 0);
+		border-bottom-color: rgba(0, 0, 0, 0);
+	}
+
+	#chatBox .base_sent {
+		justify-content: flex-start;
+		align-items: flex-start;
+	}
+
+	#chatBox .base_receive {
+		justify-content: flex-end;
+		align-items: flex-end;
+	}
+
+	#chatBox .base_sent > .avatar:before {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border: 5px solid white;
+		border-right-color: transparent;
+		border-top-color: transparent;
+		box-shadow: 1px 1px 2px rgba(black, 0.2);
+		// not quite perfect but close
+	}
+
+	#chatBox .msg_sent > time {
+		float: right;
+	}
+
+
+
+	#chatBox .msg_container_base::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+
+	#chatBox .msg_container_base::-webkit-scrollbar {
+		width: 12px;
+		background-color: #F5F5F5;
+	}
+
+	#chatBox .msg_container_base::-webkit-scrollbar-thumb {
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+		background-color: #555;
+	}
+
+	#chatBox .btn-group.dropup {
+		position: fixed;
+		left: 0px;
+		bottom: 0;
+	}
+
+	/*---*CHAT*-----*/
+	#chatBox .panel-heading {
+		background-image: url(http://www.caixa.gov.br/Style%20Library/images/bg_destaqueInternas.jpg);
+		background-position: center 30%;
+	}
+
+	#chatBox .messages {
+		box-shadow: none;
+		background: #f3f5f9;
+	}
+
+    #chatBox .base_sent .messages {
+        background: #eeeeee;
+        border-radius: 8px 8px 0px 8px;
+        -webkit-border-radius: 8px 8px 0px 8px;
+        color: #434446;
+        border-bottom: 1px solid #f5f6f7;
+    }
+
+    #chatBox .base_sent::before {
+        width: 0;
+        height: 0;
+        border-top: 0px solid transparent;
+        border-right: 10px solid #c1c1c1;
+        border-bottom: 10px solid transparent;
+    }
+
+    #chatBox .base_receive .messages {
+        background: #323746;
+        -webkit-border-radius: 8px 8px 0px 8px;
+        border-bottom: 1px solid #ccc;
+        color: white;
+    }
+
+    #chatBox .base_receive::after {
+        top: 0px;
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-left: 10px solid #323746;
+        border-bottom: 0px solid transparent;
+    }
+
+	#chatBox .msg_container_base {
+		background: #fff;
+	}
+
+	#chatBox time {
+		font-style: italic;
+		float: right;
+	}
+
+    #btn-chat {
+        background-color: var(--primaryColor);
+		color: white;
+    }
+</style>
+
+<div class="container hidden" id="chatBox">
+	<div class="row chat-window col-xs-12 col-sm-6 col-lg-3" id="chat_window_1" style="margin-left:10px;">
+		<div class="col-xs-12 col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading top-bar">
+					<div class="col-md-8 col-xs-8">
+						<h3 class="panel-title" id="contactNameBox"></h3>
+					</div>
+					<div class="col-md-4 col-xs-4" style="text-align: right;">
+						<a><span onclick="toggleChat()" id="minim_chat_window" class="fas fa-plus icon_minim panel-collapsed"></span></a>
+						<a onclick="closeChat()"><span class="fas fa-times icon_close" data-id="chat_window_1"></span></a>
+					</div>
+				</div>
+				<div class="panel-body msg_container_base" style="display:none; height:500px" id="messagesBox">
+				</div>
+				<div class="panel-footer">
+					<div class="input-group">
+						<input onfocus="onInputFocus()" id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Write your message here..." />
+						<span class="input-group-btn">
+							<button class="btn btn-sm" id="btn-chat" onclick="onSendMsgBox()">Send</button>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div hidden>
+	<input type="text" id="chatTypeBox" />
+	<input type="text" id="mySenderTypeBox" />
+	<input type="text" id="mySenderIdBox" />
+	<input type="text" id="myReceiverTypeBox" />
+	<input type="text" id="myReceiverIdBox" />
+	<input type="text" id="chatRef1Box" />
+	<input type="text" id="chatRef2Box" />
+
+</div>
+
+<script>
+	var isChatOpenedBefore = false;
+	
+	function toggleChat() {
+		/*console.log(this)*/
+	
+		if (!$('#minim_chat_window').hasClass('panel-collapsed')) {
+			$('.panel-body').slideUp();
+			$('#minim_chat_window').addClass('panel-collapsed');
+			$('#minim_chat_window').removeClass('fa-minus').addClass('fa-plus');
+		} else {
+			$('.panel-body').slideDown();
+			$('#minim_chat_window').removeClass('panel-collapsed');
+			$('#minim_chat_window').removeClass('fa-plus').addClass('fa-minus');
+			scrollChatDown()
+
+		}
+	}
+
+	function onInputFocus() {
+
+		if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+			$('.panel-body').slideDown();
+			$('#minim_chat_window').removeClass('panel-collapsed');
+			$('#minim_chat_window').removeClass('fa-plus').addClass('fa-minus');
+			scrollChatDown()
+		}
+	}
+
+	function closeChat() {
+		$("#chatBox").addClass('hidden');
+	}
+	
+	function chat(chatType, senderType, senderId, receiverType, receiverId, ref1, ref2, contactName) {
+
+		toggleChat()
+		$('#contactNameBox').html(`<span class="fas fa-comment"></span> ${contactName}`)
+		$('#chatTypeBox').val(chatType)
+		$('#chatRef1Box').val(ref1)
+		$('#chatRef2Box').val(ref2)
+		$('#mySenderIdBox').val(senderId)
+		$('#mySenderTypeBox').val(senderType)
+		$('#myReceiverTypeBox').val(receiverType)
+		$('#myReceiverIdBox').val(receiverId)
+
+	
+		$.ajax({
+			type: "get",
+			url: "/Chat/GetChat?chatType=" + chatType + "&senderType=" + senderType + "&senderId=" + senderId + "&receiverType=" + receiverType + "&receiverId=" + receiverId + "&ref1=" + ref1 + "&ref2=" + ref2,
+			success: function(data) {
+				if (data.responseType == 1) {
+					$('#chatBox').removeClass('hidden');
+					$('#messagesBox').html('');
+					console.log(data)
+					data.result.forEach(message => {
+						
+                        ShowMsgOnScreenBox(message);
+					})
+					 joidGroup();
+				}
+
+			},
+			error: function(e) {
+				console.error(e);
+			}
+		});
+	}
+
+	function onSendMsgBox() {
+		if (!$('#btn-input').val()) return;
+
+
+		var data = {
+			chatType: $('#chatTypeBox').val(),
+			referenceId1: $('#chatRef1Box').val(),
+			referenceId2: $('#chatRef2Box').val(),
+			senderId: $('#mySenderIdBox').val(),
+			senderType: $('#mySenderTypeBox').val(),
+			receiverType: $('#myReceiverTypeBox').val(),
+			receiverId: $('#myReceiverIdBox').val(),
+			msgType: 0,
+			content: $('#btn-input').val(),
+			msgDateLocal: (new Date()).toLocaleString().replace(',', ""),
+		};
+		chatConnection.invoke('SendMsg', JSON.stringify(data)).then(() => {
+			$('#btn-input').val('');
+			ShowMsgOnScreenBox(data);
+		}).catch((e) => {
+			console.error("Error ", e);
+		});
+
+	}
+	document.getElementById('btn-input')
+		.addEventListener('keyup', function(event) {
+			if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+				onSendMsgBox()
+			}
+		});
+
+	//-----------------------------------------------------
+	function ShowMsgOnScreenBox(msg) {
+
+		var senderType = $('#mySenderTypeBox').val();
+		switch (msg.msgType) {
+			case 0: // Text
+				console.log(senderType);
+				addStringMsgBox(msg.senderType == senderType, msg.content, msg.msgDateLocal)
+				break;
+
+			case 1: // Image
+
+				break;
+
+			default:
+		}
+	}
+
+	//-----------------------------------------------------
+	function addStringMsgBox(iAmSender, content, date) {
+        var dateFormated = (new Date(date)).toLocaleString().replace(',', "");
+		var msg = `<div class="row msg_container ${iAmSender ? 'base_sent' : 'base_receive'}">
+							<div class="col-xs-10 col-md-10">
+								<div class="messages ${iAmSender ? 'msg_sent' : 'msg_receive'}">
+									<p>
+										${content}
+									</p>
+									<time datetime="2009-11-13T20:00">${dateFormated}</time>
+								</div>
+							</div>
+
+						</div>`
+
+		$('#messagesBox').append(msg);
+        scrollChatDown();
+	}
+
+	function scrollChatDown() {
+		$('#messagesBox').scrollTop($('#messagesBox')[0].scrollHeight);
+	}
+
+	//-----------------------------------------------------
+	function joidGroup() {
+		console.log(chatConnection.state);
+		if (chatConnection.state != "Connected") {
+			setTimeout(joidGroup, 400);
+			return;
+		}
+		var chatType = parseInt($('#chatTypeBox').val());
+		var ref1 = $('#chatRef1Box').val()
+		var ref2 = $('#chatRef2Box').val()
+		var senderType = parseInt($('#mySenderTypeBox').val());
+		console.log(chatType,ref1,ref2,senderType)
+		chatConnection
+			.invoke("JoinGroup", chatType, ref1, ref2, senderType)
+			.then(() => {
+				globalOpenedChat = chatType + ref1 + ref2;
+			})
+			.catch(function(err) {
+				return console.error("JoinGroup Error ", err.toString());
+			});
+	}
+	//-------------------------
+	chatConnection.on("receiveChatMsg", function(data) {
+		console.log("hello")
+		ShowMsgOnScreenBox(data);
+        scrollChatDown();
+	});
+</script>

@@ -1,0 +1,728 @@
+﻿@using Newtonsoft.Json;
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+@{
+    ViewData["Title"] = T("admin.companiesList.View.Title");
+    var languages = LanguageService.GetAllLanguages();
+    var workingLanguage = LanguageService.GetLanguageIdFromRequestAsync();
+    var comapmyCategory = ViewBag.CompanyCateogries;
+    var City = ViewBag.City;
+    var Countries = ViewBag.Countries;
+
+
+}
+
+<style>
+    .e-griderror {
+        margin-top: 60px;
+        top:45px !important;
+        max-width: 141px !important;
+    }
+    #iti-3__country-listbox {
+        z-index:99999 !important;
+    }
+</style>
+<link href="~/css/select2.min.css" rel="stylesheet" />
+<form asp-action="CompanyDelete"></form>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+
+    </div>
+
+    <div class="card-body">
+        <div>
+            @{
+                var gridModel = new Pal.Web.Models.GridViewModel
+                {
+                    GridId = "CompanyGrid",
+                    AllowResize = true,
+                    AllowEditing = true,
+                    ActionBeginName = "actionBegin",
+                    Url = "/Admin/Companies/CompaniesEditableListData",
+                    Columns = new()
+                    {
+                        new() { Field = "id", HeaderText = "#", Width = "100", IsAllowEditing = false },
+                        new() { Field = "companyName", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("model.company.Name").ToString(), Width = "200", Id = "companyName" },
+                        new() { Field = "phone", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("model.company.Phone").ToString(), Width = "200" },
+                        new() { Field = "whatsApp", HeaderText = T("model.Company.WhatsApp").ToString(), Width = "200" },
+                        new() { Field = "email", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("model.company.Email").ToString(), Id = "ee", Width = "200" },
+                        new() { Field = "userName", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("modal.Account.UserName").ToString(), Width = "200" },
+                        new() { Field = "password", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("modal.Account.Password").ToString(), Width = "200" },
+                        new() { Field = "website", HeaderText = T("model.company.Website").ToString(), Width = "200" },
+                        new() { Field = "managerName", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("model.company.managerName").ToString(), Width = "200" },
+                        new() { Field = "managerEmail", ColumnType = GridViewModel.GridColumnType.RequiredText, HeaderText = T("model.company.managerEmail").ToString(), Width = "200" },
+                        new() { Field = "fullAddress", HeaderText = T("FullAddress").ToString(), Width = "200" },
+                        new() { Field = "countryName", HeaderText = T("country").ToString(), Width = "200" },
+                        new() { Field = "cityName", HeaderText = T("cityName").ToString(), Width = "200", Id = "city" },
+                        new() { Field = "categoryName", HeaderText = T("model.Company.CompanyCategoryId").ToString(), Width = "200" },
+                        new() { Field = "facebookURL", HeaderText = T("Facebook URL").ToString(), Width = "200" },
+                        new() { Field = "instagramURL", HeaderText = T("Instagram URL").ToString(), Width = "200" },
+                        new() { Field = "linkedinURL", HeaderText = T("linkedin URL").ToString(), Width = "200" },
+                        new() { Field = "twitterURL", HeaderText = T("Twitter URL").ToString(), Width = "200" },
+
+
+
+                    }
+                };
+
+                await Html.RenderPartialAsync("_EditableGridView", gridModel);
+            }
+      
+
+        </div>
+    </div>
+
+    @*<div class="card-footer">
+
+    </div>*@
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+        //----------------------------
+        var phonenumberIti;
+        var WhatsappNumberiti
+
+
+
+        function actionBegin(args) {
+            console.log(args.requestType)
+              var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+               var languagesCount = @languages.Count;
+               var languages = @Html.Raw(JsonConvert.SerializeObject(languages));
+            var languagesId = @Html.Raw(JsonConvert.SerializeObject(workingLanguage));
+
+
+            console.log(languagesId)
+                    @*console.log($("#CompanyGridEditForm").find("tr").append(`<td class="e-rowcell" style="text-align:Left" colspan=""><input asp-for="IsEmailAutoActivation" type="checkbox" class="form-control form-control-sm rounded-0" /><label asp-for="IsEmailAutoActivation">@T("model.Company.IsEmailAutoActivation")</label></td>`));
+                    console.log($("#CompanyGridEditForm").find("tr").append(`<td class="e-rowcell" style="text-align:Left" colspan=""><input asp-for="IsEmailAutoActivation" type="checkbox" class="form-control form-control-sm rounded-0" /><label asp-for="IsEmailAutoActivation">@T("model.Company.IsPhoneNumberAutoActivation")</label></td>`));*@
+
+            if (args.requestType === 'add') {
+                console.log(args);
+                setTimeout(() => {
+
+                    var input = document.querySelector("#CompanyGridphone"),
+                        errorMsg = document.querySelector("#error-msg"),
+                        validMsg = document.querySelector("#valid-msg");
+
+                    var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+                    phonenumberIti = window.intlTelInput(input, {
+                        allowDropdown: true,
+                        autoHideDialCode: false,
+                        autoPlaceholder: "on",
+
+                        formatOnDisplay: false,
+
+                        initialCountry: "tr",
+
+                        nationalMode: false,
+
+                        placeholderNumberType: "MOBILE",
+
+                        separateDialCode: true,
+
+                        utilsScript: "/lib/intl-tel-input/js/utils.js",
+                    });
+                    var reset = function () {
+                        input.classList.remove("error");
+                        errorMsg.innerHTML = "";
+                        errorMsg.classList.add("hide");
+                        validMsg.classList.add("hide");
+                    };
+
+                    // on blur: validate
+                    input.addEventListener('blur', function () {
+                        reset();
+                        if (input.value.trim()) {
+                            if (phonenumberIti.isValidNumber()) {
+                                validMsg.classList.remove("hide");
+                            } else {
+                                input.classList.add("error");
+                                var errorCode = phonenumberIti.getValidationError();
+                                errorMsg.innerHTML = errorMap[errorCode];
+                                errorMsg.classList.remove("hide");
+                            }
+                        }
+                    });
+
+                    //// on keyup / change flag: reset
+                    input.addEventListener('change', reset);
+                    input.addEventListener('keyup', reset);
+                    //-----------------------------------------------------------------
+                    var Whatsappinput = document.querySelector("#CompanyGridwhatsApp"),
+                        errorMsg1 = document.querySelector("#error-msg1"),
+                        validMsg1 = document.querySelector("#valid-msg1");
+
+                    var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+                   WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+                        allowDropdown: true,
+                        autoHideDialCode: false,
+                        autoPlaceholder: "on",
+                        /*dropdownContainer: document.body,*/
+                        //excludeCountries: ["us"],
+                        formatOnDisplay: false,
+                        //geoIpLookup: function(callback) {
+                        //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+                        //    var countryCode = (resp && resp.country) ? resp.country : "";
+                        //    callback(countryCode);
+                        //  });
+                        //},
+                        /*   hiddenInput: "full_number",*/
+                        initialCountry: "tr",
+                        //localizedCountries: { 'de': 'Deutschland' },
+                        nationalMode: false,
+                        /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+                        placeholderNumberType: "MOBILE",
+
+                        separateDialCode: true,
+
+                        utilsScript: "/lib/intl-tel-input/js/utils.js",
+                    });
+                    var reset = function () {
+                        Whatsappinput.classList.remove("error");
+                        errorMsg1.innerHTML = "";
+                        errorMsg1.classList.add("hide");
+                        validMsg1.classList.add("hide");
+                    };
+
+                    // on blur: validate
+                    Whatsappinput.addEventListener('blur', function () {
+                        reset();
+                        if (input.value.trim()) {
+                            if (WhatsappNumberiti.isValidNumber()) {
+                                validMsg1.classList.remove("hide");
+                            } else {
+                                Whatsappinput.classList.add("error");
+                                var errorCode = WhatsappNumberiti.getValidationError();
+                                errorMsg1.innerHTML = errorMap1[errorCode];
+                                errorMsg1.classList.remove("hide");
+                            }
+                        }
+                    });
+
+                    //// on keyup / change flag: reset
+                    Whatsappinput.addEventListener('change', reset);
+                    Whatsappinput.addEventListener('keyup', reset);
+
+        //*-+-------------------------------------------------------------------------------
+
+                //اضافة حقول اللغة
+                var parent1 = $('#CompanyGridcompanyName').parent();
+                $('#CompanyGridcompanyName').remove();
+                for (var i = 0; i < languagesCount; i++)
+                {
+                    var parent2 = parent1.parent()
+                    parent2.append(`<input style="margin-top:5px" placeholder="${languages[i].Name}" langId ="${languages[i].Id}" class="e-field e-input e-defaultcell e-control e-textbox e-lib" type="text" value="" style="text-align: Left" id="companyName-${languages[i].Id}" name="companyName" e-mappinguid="grid-column2" role="textbox" /><br/>`);
+                }
+                parent1.remove();
+                  //اضافة حقول اللغة
+
+                    //اضافة  نوع الشركة
+                    var CategoryParent = $('#CompanyGridcategoryName').parent();
+                    var companyCateogry = @Html.Raw(JsonConvert.SerializeObject(comapmyCategory));
+                    CategoryParent.append(`<select   id="compcategory" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(companyCateogry).forEach(a => {
+                        $('#compcategory').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                    $('#compcategory').select2({
+                        width: '100%',
+
+                    });
+                   CategoryParent[0].children[0].remove();
+                     //اضافة  نوع الشركة
+
+                     //اضافة   الدول
+                    var CountryParent = $('#CompanyGridcountryName').parent();
+                    var country = @Html.Raw(JsonConvert.SerializeObject(Countries));
+                    CountryParent.append(`<select id="country" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(country).forEach(a => {
+                        $('#country').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                    $('#country').select2({
+                        width: '100%',
+
+                    });
+                    CountryParent[0].children[0].remove();
+                    //اضافة   الدول
+
+                   //اضافة   المدن
+                    var CityParent = $('#CompanyGridcityName').parent();
+                    var city = @Html.Raw(JsonConvert.SerializeObject(City));
+                    CityParent.append(`<select id="city" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(city).forEach(a => {
+                        $('#city').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                    $('#city').select2({
+                        width: '100%',
+
+                    });
+                    CityParent[0].children[0].remove();
+                    //اضافة   المدن
+
+                     //اضافة  نوع تفعيل الايميل تلقائي
+                    var emailParent = $('#CompanyGridemail').parent();
+                    var emailParent2 = emailParent.parent()
+                    emailParent.css("margin-top", "20px");
+                    console.log(emailParent2)
+                    emailParent2.append(`<div style="margin-bottom:-10px">
+                <input type="checkbox" id="emailAutoActivate" />
+                <label for="emailAutoActivate">Auto Activate</label>
+                </div>`)
+
+                     //اضافة  نوع تفعيل الايميل تلقائي
+                    //اضافة  نوع تفعيل الهاتف تلقائي
+                    var emailParent = $('#CompanyGridphone').parent();
+                    var emailParent2 = emailParent.parent()
+                    var emailParent3 = emailParent2.parent()
+                    emailParent2.css("margin-top", "20px");
+                    console.log(emailParent2)
+                    emailParent3.append(`<div style="margin-bottom:-10px">
+                <input type="checkbox" id="phoneAutoActivate" />
+                <label for="phoneAutoActivate">Auto Activate</label>
+                </div>`)
+
+                     //اضافة  نوع تفعيل الهاتف تلقائي
+
+                }, 5)
+            }
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            // في حالة التعديل
+            if (args.requestType === 'beginEdit') {
+
+                setTimeout(() => {
+
+                    $("#CompanyGridpassword").attr("disabled", true)
+                    $("#CompanyGriduserName").attr("disabled", true)
+                    var input = document.querySelector("#CompanyGridphone"),
+
+                        errorMsg = document.querySelector("#error-msg"),
+                        validMsg = document.querySelector("#valid-msg");
+
+                    var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+                    phonenumberIti = window.intlTelInput(input, {
+                        allowDropdown: true,
+                        autoHideDialCode: false,
+                        autoPlaceholder: "on",
+
+                        formatOnDisplay: false,
+
+                        initialCountry: "tr",
+
+                        nationalMode: false,
+
+                        placeholderNumberType: "MOBILE",
+
+                        separateDialCode: true,
+
+                        utilsScript: "/lib/intl-tel-input/js/utils.js",
+                    });
+                    var reset = function () {
+                        input.classList.remove("error");
+                        errorMsg.innerHTML = "";
+                        errorMsg.classList.add("hide");
+                        validMsg.classList.add("hide");
+                    };
+
+                    // on blur: validate
+                    input.addEventListener('blur', function () {
+                        reset();
+                        if (input.value.trim()) {
+                            if (phonenumberIti.isValidNumber()) {
+                                validMsg.classList.remove("hide");
+                            } else {
+                                input.classList.add("error");
+                                var errorCode = phonenumberIti.getValidationError();
+                                errorMsg.innerHTML = errorMap[errorCode];
+                                errorMsg.classList.remove("hide");
+                            }
+                        }
+                    });
+
+                    //// on keyup / change flag: reset
+                    input.addEventListener('change', reset);
+                    input.addEventListener('keyup', reset);
+                    //-----------------------------------------------------------------
+                    var Whatsappinput = document.querySelector("#CompanyGridwhatsApp"),
+                        errorMsg1 = document.querySelector("#error-msg1"),
+                        validMsg1 = document.querySelector("#valid-msg1");
+
+                    var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+                   WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+                        allowDropdown: true,
+                        autoHideDialCode: false,
+                        autoPlaceholder: "on",
+                        /*dropdownContainer: document.body,*/
+                        //excludeCountries: ["us"],
+                        formatOnDisplay: false,
+                        //geoIpLookup: function(callback) {
+                        //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+                        //    var countryCode = (resp && resp.country) ? resp.country : "";
+                        //    callback(countryCode);
+                        //  });
+                        //},
+                        /*   hiddenInput: "full_number",*/
+                        initialCountry: "tr",
+                        //localizedCountries: { 'de': 'Deutschland' },
+                        nationalMode: false,
+                        /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+                        placeholderNumberType: "MOBILE",
+
+                        separateDialCode: true,
+
+                        utilsScript: "/lib/intl-tel-input/js/utils.js",
+                    });
+                    var reset = function () {
+                        Whatsappinput.classList.remove("error");
+                        errorMsg1.innerHTML = "";
+                        errorMsg1.classList.add("hide");
+                        validMsg1.classList.add("hide");
+                    };
+
+                    // on blur: validate
+                    Whatsappinput.addEventListener('blur', function () {
+                        reset();
+                        if (input.value.trim()) {
+                            if (WhatsappNumberiti.isValidNumber()) {
+                                validMsg1.classList.remove("hide");
+                            } else {
+                                Whatsappinput.classList.add("error");
+                                var errorCode = WhatsappNumberiti.getValidationError();
+                                errorMsg1.innerHTML = errorMap1[errorCode];
+                                errorMsg1.classList.remove("hide");
+                            }
+                        }
+                    });
+
+                    //// on keyup / change flag: reset
+                    Whatsappinput.addEventListener('change', reset);
+                    Whatsappinput.addEventListener('keyup', reset);
+
+
+
+        //*-+-------------------------------------------------------------------------------
+
+                //اضافة حقول اللغة
+                 var parent1 = $('#CompanyGridcompanyName').parent();
+
+                $('#CompanyGridcompanyName').remove();
+                for (var i = 0; i < languagesCount; i++)
+                {
+                    var translate = args.rowData.companyTranslates.find(a => a.languageId == languages[i].Id);
+                    if (translate == null) {
+                        var parent2 = parent1.parent()
+                        parent2.append(`<input style="margin-top:5px" placeholder="${languages[i].Name}" langId ="${languages[i].Id}" class="e-field e-input e-defaultcell e-control e-textbox e-lib" type="text" value="" style="text-align: Left" id="companyName-${languages[i].Id}" name="companyName" e-mappinguid="grid-column2" role="textbox" /><br/>`);
+                    } else {
+
+                    var parent2 = parent1.parent()
+                        parent2.append(`<input style="margin-top:5px" value="${translate.companyName ?? "-"}" placeholder="${languages[i].Name}" langId ="${languages[i].Id}" class="e-field e-input e-defaultcell e-control e-textbox e-lib" type="text" value="" style="text-align: Left" id="companyName-${languages[i].Id}" name="companyName" e-mappinguid="grid-column2" role="textbox" /><br/>`);
+                    }
+                }
+                parent1.remove();
+                  //اضافة حقول اللغة
+
+                    //اضافة  نوع الشركة
+                    var CategoryParent = $('#CompanyGridcategoryName').parent();
+                     var companyCateogry = @Html.Raw(JsonConvert.SerializeObject(comapmyCategory));
+                     CategoryParent.append(`<select value="${args.rowData.categoryid}"   id="compcategory" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(companyCateogry).forEach(a => {
+                        $('#compcategory').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                     $("#compcategory").val(args.rowData.categoryid)
+                    $('#compcategory').select2({
+                        width: '100%',
+
+                    });
+               
+                   CategoryParent[0].children[0].remove();
+                     //اضافة  نوع الشركة
+
+                     //اضافة   الدول
+                    var CountryParent = $('#CompanyGridcountryName').parent();
+                    var country = @Html.Raw(JsonConvert.SerializeObject(Countries));
+                    CountryParent.append(`<select id="country" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(country).forEach(a => {
+                        $('#country').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                     $("#country").val(args.rowData.countryId)
+                    $('#country').select2({
+                        width: '100%',
+
+                    });
+                    CountryParent[0].children[0].remove();
+                    //اضافة   الدول
+
+                         //اضافة   المدن
+                    var CityParent = $('#CompanyGridcityName').parent();
+                    var city = @Html.Raw(JsonConvert.SerializeObject(City));
+                    CityParent.append(`<select id="city" class="form-control form-control-sm rounded-0"></select>`)
+                    Array.from(city).forEach(a => {
+                        $('#city').append(`
+                     <option value="${a.Value}">${a.Text}</option>
+                    `)
+                    });
+                     $("#city").val(args.rowData.cityId)
+                    $('#city').select2({
+                        width: '100%',
+
+                    });
+                    CityParent[0].children[0].remove();
+                    //اضافة   المدن
+
+                }, 5)
+
+            }
+            if (args.requestType === 'delete') {
+                console.log(args)
+                var token = $("input[name='__RequestVerificationToken']").val();
+                $.ajax({
+                    url: '/Admin/Companies/CompanyDelete/' + args.data[0].id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        @*var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);*@
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+            }
+
+            if (args.requestType === 'save') {
+             //عند الاضافة-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*-+-----
+                if (args.data.id == null) {
+                    var CompanyTranslateinfo = [];
+                    for (var i = 1; i < languagesCount + 1; i++) {
+                        var langid = $('#companyName-' + i).attr("langId");
+                        var CompanyName = $('#companyName-' + i).val();
+
+                        CompanyTranslateinfo.push({ langid, CompanyName });
+                    }
+
+                    var data = new FormData();
+                    data.append('Email', args.data.email);
+                    data.append('UserName', args.data.userName);
+                    data.append('Phone', phonenumberIti.getNumber());
+                    data.append('Website', args.data.website);
+                    data.append('Password', args.data.password);
+                    data.append('ManagerName', args.data.managerName);
+                    data.append('ManagerEmail', args.data.managerEmail);
+                    data.append('FacebookURL', args.data.facebookURL);
+                    data.append('linkedinURL', args.data.linkedinURL);
+                    data.append('instagramURL', args.data.instagramURL);
+                    data.append('twitterURL', args.data.twitterURL);
+                    data.append('FullAddress', args.data.fullAddress);
+                    data.append('isEmailAutoActivation', $('#emailAutoActivate').prop('checked'));
+                    data.append('isPhoneNumberAutoActivation', $('#phoneAutoActivate').prop('checked'));
+                    data.append('WhatsApp', WhatsappNumberiti.getNumber());
+                    data.append('CountryId', $("#country").val());
+                    data.append('CityId', $("#city").val());
+                    data.append('CompanyCategoryId', $('#compcategory').val());
+
+                    CompanyTranslateinfo.forEach((val, i) => {
+                        data.append('CompanyTranslates[' + i + '][LanguageId]', val.langid);
+                        data.append('CompanyTranslates[' + i + '][CompanyName]', val.CompanyName);
+                    })
+
+                  var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+			$.ajax({
+				headers: header,
+				type: "post",
+				url: "/admin/Companies/CompanyAdd",
+				contentType: false,
+				processData: false,
+				data: data,
+				success: function(message) {
+					if (message.responseType === 3) {
+						ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+					}
+					else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        $("#BTNSave").attr("disabled", "true")
+					}
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', message.responseText);
+					}
+				},
+				error: function() {
+					alert('@T("cp.alert.error")');
+				}
+			});
+
+               //عند التعديل-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*-+-----
+                } else {
+
+                    console.log(args.data)
+                    var CompanyTranslateinfo = [];
+                    for (var i = 0; i < languagesCount; i++) {
+                        var e = i + 1;
+                        console.log(args.data.companyTranslates.find(a => a.languageId == languages[i].Id))
+                        var translate = args.data.companyTranslates.find(a => a.languageId == languages[i].Id);
+
+                        var id = translate.id;
+                        var langid = translate.languageId;
+                        var CompanyName = $('#companyName-' + e).val();
+                        var content = translate.content;
+                        var companyId = translate.companyId;
+
+                        CompanyTranslateinfo.push({ id, langid, CompanyName, content, companyId});
+                    }
+
+                    var data = new FormData();
+                    data.append('Email', args.data.email);
+                    data.append('Id', args.data.id);
+                    data.append('Phone', phonenumberIti.getNumber());
+                    data.append('Website', args.data.website);
+                    data.append('Password', args.data.password);
+                    data.append('UserName', args.data.userName);
+                    data.append('ManagerName', args.data.managerName);
+                    data.append('ManagerEmail', args.data.managerEmail);
+                    data.append('FullAddress', args.data.fullAddress);
+                    data.append('FacebookURL', args.data.facebookURL);
+                    data.append('linkedinURL', args.data.linkedinURL);
+                    data.append('instagramURL', args.data.instagramURL);
+                    data.append('twitterURL', args.data.twitterURL);
+                    data.append('WhatsApp', WhatsappNumberiti.getNumber());
+                    data.append('CountryId', $("#country").val());
+                    data.append('CityId', $("#city").val());
+                    data.append('CompanyCategoryId', $('#compcategory').val());
+
+                    CompanyTranslateinfo.forEach((val, i) => {
+                        data.append('CompanyTranslates[' + i + '][LanguageId]', val.langid);
+                        data.append('CompanyTranslates[' + i + '][CompanyName]', val.CompanyName);
+                        data.append('CompanyTranslates[' + i + '][Id]', val.id);
+                        data.append('CompanyTranslates[' + i + '][content]', val.content);
+                        data.append('CompanyTranslates[' + i + '][CompanyId]', val.companyId);
+                    })
+                     var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                type: "post",
+                url: "/admin/Companies/ComapnyUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+             }
+
+
+
+            }
+        }
+
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Companies/CompanyUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                        title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+            }
+        }
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/Admin/Companies/CompanyDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+    <script src="~/js/select2.full.min.js"></script>
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

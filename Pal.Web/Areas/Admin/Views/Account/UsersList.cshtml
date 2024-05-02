@@ -1,0 +1,100 @@
+﻿@using Pal.Data.DTOs.Account
+@model List<UsersDTOList>;
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+@{
+	ViewData["Title"] = T("cp.views.users.list.title");
+}
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <a asp-action="UserAdd" class="btn btn-primary btn-sm">@T("btn.add")</a>
+    </div>
+    <div class="card-body">
+        <form asp-action="UserDelete"></form>
+        @{
+            var gridModel = new Pal.Web.Models.GridViewModel
+            {
+                GridId = "UsersGrid",
+                //Model = Model,
+                AllowResize = true,
+				Url = "/Admin/Account/UsersPaginatedList",
+                Columns = new()
+                {
+                    new() { Field = "fullName", HeaderText = T("modal.Account.FullName").ToString(), Width = "100" },
+                    new() { Field = "userName", HeaderText = T("modal.Account.UserName").ToString(), Width = "100" },
+                    new() { Field = "email", HeaderText = T("modal.Account.Email").ToString(), Width = "100" },
+                    new() { Field = "phoneNumber", HeaderText = T("model.Phone").ToString(), Width = "100" },
+
+                }
+            };
+
+            await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+        }
+    </div>
+    </div>
+    @section Scripts{
+
+        <script>
+		function commandClick(args) {
+			switch (args.commandColumn.type) {
+				case "EditBtn":
+					window.location.assign('/Admin/Account/UserUpdate/' + args.rowData.id);
+					break;
+				case "DeleteBtn":
+					Swal.fire({
+						title: '@T("cp.alert.onDelete.btnDelete")',
+						text: "@T("cp.alert.onDeleteMessage.title")",
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#d33',
+						cancelButtonColor: '#3085d6',
+						confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+						cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+					}).then((result) => {
+						if (result.isConfirmed) {
+							onDelete(args.rowData.id);
+						}
+					});
+					break;
+			}
+		}
+		function onDelete(id) {
+			var token = $("input[name='__RequestVerificationToken']").val();
+			$.ajax({
+				url: '/admin/Account/UserDelete/' + id,
+				type: 'POST',
+				headers: { RequestVerificationToken: token },
+				success: function(res) {
+					if (res.responseType === 1) {
+						var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+						grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+						Swal.fire(
+							'@T("cp.alert.onDeleteSuccess.title")',
+							'@T("cp.alert.onDeleteSuccess.subtitle")',
+							'success',
+						);
+
+					} else {
+						Swal.fire(
+							'@T("cp.alert.onDeleteFailde.title")',
+							'@T("cp.alert.onDeleteFailde")',
+							'error',
+						);
+					}
+
+				},
+				error: function(e) {
+					Swal.fire(
+						'@T("cp.alert.onDeleteFailde.title")',
+						'@T("cp.alert.onDeleteFailde.subtitle")',
+						'error',
+					);
+					console.error(e);
+				}
+			});
+		}
+        </script>
+
+        <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+        <ejs-scripts></ejs-scripts>
+
+    }

@@ -1,0 +1,519 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Customer.CustomerDTO
+@{
+    ViewData["Title"] = T("cp.views.lead.add.title");
+    var currentUserId = webWorkContext.GetMyUserId();
+    var userName =await webWorkContext.GetMyUserFullName(currentUserId);
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+
+<style>
+    label {
+        margin-bottom: 0;
+    }
+
+    .iti {
+        display: block;
+    }
+</style>
+<br />
+
+<form id="myForm" asp-action="LeadAdd" onsubmit="event.preventDefault()" class="needs-validation was-validated">
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Leads/LeadsList",
+                });
+            }
+        </div>
+
+        <div class="card-body">
+
+            <div>
+
+                <div class="row">
+
+
+                    <div class="form-row col-lg-9">
+                        <input type="hidden" value="@userName" id="CreateUserName" />
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="FullName">@T("model.Customer.FullName")</label>
+                            <input asp-for="FullName" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="CustomerStatus">@T("model.Customer.CustomerStatus")</label>
+                            <select asp-for="CustomerStatus" asp-items="ViewBag.cbCustomerStatus" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="CustomerStatus" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="NationalityId">@T("model.Customer.NationalityId")</label>
+                            <select asp-for="NationalityId" asp-items="ViewBag.cbNationalities" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="NationalityId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            @*<label asp-for="WorkCompany">@T("model.lead.WorkCompany")</label>
+                            <input asp-for="WorkCompany" class="rounded-0  form-control form-control-sm" />
+                            <span asp-validation-for="WorkCompany" class="text-danger"></span>*@
+
+                            <label asp-for="CountryId">Country</label>
+                            <select asp-for="CountryId" asp-items="ViewBag.cbCountry" class="rounded-0  form-control form-control-sm" required></select>
+                            <span asp-validation-for="CountryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="PhoneNumber">@T("model.Customer.PhoneNumber")</label>
+                            <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                            <span id="error-msg" class="hide text-danger"></span>
+                            <input asp-for="PhoneNumber" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="MobileNumber">@T("model.Customer.MobileNumber")</label>
+                            <span id="valid-msg1" class="hide text-success">✓ Valid</span>
+                            <span id="error-msg1" class="hide text-danger"></span>
+                            <input asp-for="MobileNumber" type="number" min="0" class="rounded-0  form-control form-control-sm" />
+                            <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="WhatsappNumber">@T("model.Customer.WhatsappNumber")</label>
+                            <span id="valid-msg2" class="hide text-success">✓ Valid</span>
+                            <span id="error-msg2" class="hide text-danger"></span>
+                            <input asp-for="WhatsappNumber" type="number" min="0" class="rounded-0 form-control form-control-sm" />
+                            <span asp-validation-for="WhatsappNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+
+                            <label asp-for="WhatsappNumber">@T("model.lead.LeadSource")</label>
+                            <ejs-dropdownlist ejs-for="LeadSourceId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadSources"]' showClearButton="true" allowFiltering="true">
+
+                                <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                            </ejs-dropdownlist>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="LeadStatusId">@T("model.lead.LeadStatus")</label>
+                            <ejs-dropdownlist ejs-for="LeadStatusId" id="LeadStatusId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadStatus"]' showClearButton="true" allowFiltering="true">
+                                <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                            </ejs-dropdownlist>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="LeadRatingId">@T("model.lead.LeadRating")</label>
+                            <ejs-dropdownlist ejs-for="LeadRatingId" ejs-required id="LeadRatingId" placeholder="" filterBarPlaceholder="Search" cssClass="rounded-0" filterType="Contains" dataSource='ViewData["LeadRating"]' showClearButton="true" allowFiltering="true">
+                                <e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+                            </ejs-dropdownlist>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="FollowedByEmpId">@T("model.lead.FollowedByEmpId")</label><input class="mx-2" type="checkbox" onchange="followedByEmpId(this)" checked />
+                            <select asp-for="FollowedByEmpId" asp-items="ViewBag.Employees" class="form-control form-control-sm rounded-0" required></select>
+                            <span asp-validation-for="FollowedByEmpId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                            <label asp-for="Email">@T("model.Customer.Email")</label>
+                            <input asp-for="Email" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <input class="mb-2" asp-for="MainImageFile" type="file" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview');" />
+                        <div>
+                            <div>
+                                @if (Model.MainImage != null)
+                                {
+                                    <img src="\@Model.MainImage" id="mainImgPreview" alt="Image Preview" style="max-width:160px; max-height:160px;" />
+                                }
+                                else
+                                {
+                                    <img src="/images/profile-img.png" id="mainImgPreview" alt="Image Preview" style="max-width:160px; max-height:160px;" />
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <label asp-for="FullAddress">@T("model.address")</label>
+                <div class="form-row">
+                    @{
+                        var addressModel = new Pal.Web.Models.AddressViewModel
+                        {
+                            FieldsCount = 3,
+                            CountryId = Model.CountryId,
+                            CityId = Model.CityId,
+                            RegionId = Model.RegionId,
+                            NeighborhoodId = 0,
+                        };
+                        await Html.RenderPartialAsync("_AddressEditor", addressModel);
+                    }
+                </div>
+                <div class="row form-group col-sm-12">
+                    <input asp-for="FullAddress" type="text" placeholder="address in details" class="form-control form-control-sm rounded-0">
+                    <span asp-validation-for="FullAddress" class="text-danger"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="TwitterId">@T("model.lead.Twitter")</label>
+                        <input asp-for="TwitterId" class="rounded-0  form-control form-control-sm" />
+                        <span asp-validation-for="TwitterId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="Facebook">@T("model.lead.Facebook")</label>
+                        <input asp-for="Facebook" class="rounded-0  form-control form-control-sm" />
+                        <span asp-validation-for="Facebook" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="Instagram">@T("model.lead.Instagram")</label>
+                        <input asp-for="Instagram" class="rounded-0  form-control form-control-sm" />
+                        <span asp-validation-for="Instagram" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        @*<div class="card-footer">
+            @{
+                await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                {
+                    OnSave = "onSave(false)",
+                    BackToListhref = "/Admin/Leads/LeadsList",
+                });
+            }
+        </div>*@
+    </div>
+</form>
+
+
+
+@section Scripts{
+
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+
+
+        $('#PhoneNumber').on("keyup", function () {
+            $('#MobileNumber').val($(this).val());
+            $('#WhatsappNumber').val($(this).val());
+        });
+
+
+        function followedByEmpId(e) {
+            if (!e.checked) {
+                $('#FollowedByEmpId').attr("disabled", "true")
+            } else {
+
+                $('#FollowedByEmpId').removeAttr("disabled")
+            }
+        }
+
+
+        //-------------------------------------------------------------------
+        var input = document.querySelector("#PhoneNumber"),
+            errorMsg = document.querySelector("#error-msg"),
+            validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var phonenumberIti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (phonenumberIti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = phonenumberIti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------
+        var mobileNumberinput = document.querySelector("#MobileNumber"),
+            errorMsg1 = document.querySelector("#error-msg1"),
+            validMsg1 = document.querySelector("#valid-msg1");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var MobileNumberiti = window.intlTelInput(mobileNumberinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            mobileNumberinput.classList.remove("error");
+            errorMsg1.innerHTML = "";
+            errorMsg1.classList.add("hide");
+            validMsg1.classList.add("hide");
+        };
+
+        // on blur: validate
+        mobileNumberinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (MobileNumberiti.isValidNumber()) {
+                    validMsg1.classList.remove("hide");
+                } else {
+                    mobileNumberinput.classList.add("error");
+                    var errorCode = MobileNumberiti.getValidationError();
+                    errorMsg1.innerHTML = errorMap1[errorCode];
+                    errorMsg1.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        mobileNumberinput.addEventListener('change', reset);
+        mobileNumberinput.addEventListener('keyup', reset);
+        //-----------------------------------------------------------------------------------------------------------------
+        var Whatsappinput = document.querySelector("#WhatsappNumber"),
+            errorMsg2 = document.querySelector("#error-msg2"),
+            validMsg2 = document.querySelector("#valid-msg2");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            Whatsappinput.classList.remove("error");
+            errorMsg2.innerHTML = "";
+            errorMsg2.classList.add("hide");
+            validMsg2.classList.add("hide");
+        };
+
+        // on blur: validate
+        Whatsappinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (WhatsappNumberiti.isValidNumber()) {
+                    validMsg2.classList.remove("hide");
+                } else {
+                    Whatsappinput.classList.add("error");
+                    var errorCode = WhatsappNumberiti.getValidationError();
+                    errorMsg2.innerHTML = errorMap1[errorCode];
+                    errorMsg2.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        Whatsappinput.addEventListener('change', reset);
+        Whatsappinput.addEventListener('keyup', reset);
+        //-------------------------------------------------------------------
+        var languagesCount = @languages.Count;
+
+
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+             //------------------------------------------
+            if (!$("#myForm").valid())
+                return;
+
+            if (!phonenumberIti.isValidNumber())
+                return;
+            if (!WhatsappNumberiti.isValidNumber())
+                return;
+            //if (!MobileNumberiti.isValidNumber())
+            //    return;
+            
+
+            if (document.getElementById("cbCountry").value == "") {
+                document.getElementById("CountrySpan").textContent = "Selete Country!";
+                allGood = false;
+                return;
+            } else { document.getElementById("CountrySpan").textContent = "", allGood = true }
+
+            if (document.getElementById("cbCity").value == "") {
+                document.getElementById("CitySpan").textContent = "Selete City!";
+                allGood = false;
+                return;
+            } else { document.getElementById("CitySpan").textContent = "", allGood = true }
+
+            //if (document.getElementById("cbRegion").value == "") {
+            //    //document.getElementById("RegionSpan").textContent = "Selete Region!";
+            //    allGood = false;
+            //    return;
+            //} else { document.getElementById("RegionSpan").textContent = "", allGood = true }
+
+            //------------------------------------------
+
+            // readyupdata
+            var data = new FormData();
+            data.append('FullName', $('#FullName').val());
+            data.append('CustomerStatus', $('#CustomerStatus').val());
+            data.append('NationalityId', $('#NationalityId').val());
+            data.append('FollowedByEmpId', $('#FollowedByEmpId').val());
+            data.append('PhoneNumber', phonenumberIti.getNumber());
+            data.append('MobileNumber', MobileNumberiti.getNumber());
+            data.append('WhatsappNumber', WhatsappNumberiti.getNumber());
+            data.append('LeadSourceId', $("#LeadSourceId_hidden").val());
+            data.append('LeadStatusId', $("#LeadStatusId_hidden").val());
+            data.append('Email', $("#Email").val());
+
+            data.append('LeadRatingId', document.getElementById("LeadRatingId_hidden").value);
+            //data.append('WorkCompany', $('#WorkCompany').val());
+
+            data.append('CountryId', document.getElementById("cbCountry_hidden").value);
+            data.append('CityId', document.getElementById("cbCity_hidden").value);
+            //data.append('RegionId', document.getElementById("cbRegion_hidden").value);
+            data.append('FullAddress', $('#FullAddress').val());
+            data.append('TwitterId', $('#TwitterId').val());
+            data.append('Facebook', $('#Facebook').val());
+            data.append('Instagram', $('#Instagram').val());
+            data.append('IsRegisterdByAdmin', true);
+            data.append('CreatedBy', $('#CreateUserName').val());
+            data.append('MainImageFile', document.querySelector('#MainImageFile').files[0]);
+
+            console.log($('#FullName').val());
+            console.log($('#CustomerStatus').val());
+            console.log($('#NationalityId').val());
+            console.log($('#FollowedByEmpId').val());
+            console.log(phonenumberIti.getNumber());
+            console.log(MobileNumberiti.getNumber());
+            console.log(WhatsappNumberiti.getNumber());
+            console.log($("#LeadSourceId_hidden").val());
+            console.log($("#LeadStatusId_hidden").val());
+            console.log($('#LeadRatingId_hidden').val());
+            console.log($('#cbCountry_hidden').val());
+            console.log($('#cbCity_hidden').val());
+            console.log($('#FullAddress').val());
+            console.log($('#TwitterId').val());
+            console.log($('#Facebook').val());
+            console.log($('#Instagram').val());
+            console.log($('#CreateUserName').val());
+
+            // Display the key/value pairs
+            for (const pair of data.entries()) {
+              console.log(`${pair[0]}, ${pair[1]}`);
+            }
+
+            showLoading();
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/admin/Leads/LeadAdd",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        location.href = "/Admin/Leads/LeadUpdate/" + res.responseText
+                    } else {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                },
+                complete: hideLoading()
+            });
+
+        }
+
+       
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

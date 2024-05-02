@@ -1,0 +1,17 @@
+﻿@model Pal.Web.Models.HtmlEditorModel
+@{ 
+    var HtmlEditorItems = new[] {"Bold", "Italic", "Underline", "StrikeThrough",
+                "FontName", "FontSize", "FontColor", "BackgroundColor",
+                "LowerCase", "UpperCase", "|",
+                "Formats", "Alignments", "OrderedList", "UnorderedList",
+                "Outdent", "Indent", "|",
+                "CreateLink",  "|", "ClearFormat", "Print",
+                "SourceCode", "FullScreen", "|", "Undo", "Redo" };
+}
+@*"Image",*@
+<ejs-richtexteditor disabled ="@Model.IsDisabled" id="@Model.Id"  showCharCount="true"
+                    value="@Model.Value"
+                    height="@Model.Height">
+    <e-richtexteditor-insertimagesettings saveUrl="@Model.ImgSaveUrl" path="@Model.ImgPath"></e-richtexteditor-insertimagesettings>
+    <e-richtexteditor-toolbarsettings type="MultiRow" enableFloating="false" items="@HtmlEditorItems"></e-richtexteditor-toolbarsettings>
+</ejs-richtexteditor>

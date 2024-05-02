@@ -1,0 +1,62 @@
+﻿@using Pal.Data.VMs.Tour;
+@model List<TourListVM>
+<section class="subheader" style="background-image: url('/images/about-us-main-الجولة-العقارية.jpg') ">
+    <div class="container">
+        <h1>@T("publicInterface.customers.tours.title")</h1>
+        <div class="breadcrumb right">@T("global.home") <i class="fa fa-angle-right"></i> <a href="#" class="current">@T("publicInterface.customers.tours.title")</a></div>
+        <div class="clear"></div>
+    </div>
+</section>
+
+<section class="module favorited-properties">
+    <div class="container">
+        <div class="row">
+            <partial name="Partials/_ProfileSidebar" model="new  Pal.Data.VMs.Customer.ProfileSidebarViewModel(Model[0]?.ProfileSidebarViewModel?.CustomerImage)" />
+
+            <div class="col-lg-9 col-md-9">
+                <table class="my-properties-list favorite-properties-list">
+                    <tr>
+                        <th>@T("global.barcode")</th>
+                        <th>@T("global.city")</th>
+                        <th>@T("btn.details")</th>
+                        <th>@T("global.manage")</th>
+                    </tr>
+                    @foreach (var item in Model)
+                    {
+
+                <tr id="row-@item.Id">
+                    <td class="property-title" style=" width: 30%;">
+
+                        @*<i class="fa fa-map-marker icon"></i>*@ <a >@item.Barcode</a><br />
+                      
+                    </td>
+                    <td class="property-title" style=" width: 20%;">
+                        <i class="fa fa-map-marker icon"></i> <a >@item.CityName</a><br />
+                    </td>
+                    <td class="property-title" style="width: 50%">
+                        @if (item.AdvisorId > 0)
+                        {
+                            <a href="/Advisors/AdvisorProfile/@item.AdvisorId"><p href="property-single.html"><i class="fas fa-user-tie"></i> @item.AdvisorName</p></a>
+
+                        }
+                        else
+                        {
+                            <a><p href="property-single.html"><i class="fas fa-user-tie"></i> @item.AdvisorName</p></a>
+                        }
+                        <p class="property-address"><i class="fas fa-calendar-alt"></i><strong style="margin-left:10px">@item.Date.ToString("dd-MM-yyyy")</strong></p>
+                        <p><i class="fa fa-clock icon "></i>@item.Time </p>
+                        <p><i class="fas fa-hourglass-half"></i>@item.TourDuration</p>
+                    </td>
+                    <td class="property-actions">
+                        <a href="/Customers/TourDetails/@item.Id" style=" display: flex; "><i class="fa fa-eye icon"></i>@T("btn.details")</a>
+                    </td>
+                </tr>
+                    }
+                </table>
+            </div><!-- end col -->
+        </div><!-- end row -->
+
+
+    </div><!-- end container -->
+</section>
+

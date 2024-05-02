@@ -1,0 +1,278 @@
+﻿@model Pal.Data.DTOs.Company.CreateNewCompanyDTO;
+@{
+    ViewData["Title"] = T("cp.views.company.update.title");
+}
+@{
+    var isRtl = LanguageService.IsLayoutRtl();
+    var colAuto = isRtl ? "ml-auto" : "mr-auto";
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/tab/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <div style="display:flex">
+            <div class="col-auto @colAuto">
+                <div class="btn btn-success" onclick="onSave(false)">@T("btn.save")</div>
+            </div> 
+            <div class="col-auto">
+                <a class="btn btn-sm  btn-warning" onclick="ChangePassword('@Model.UserId')">@T("btn.changePassword")&ensp;<i class="fas fa-lock"></i> </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form id="CompanyForm" asp-action="CompanyAdd" class="needs-validation was-validated">
+            <div class="form-row">
+                @{ await Html.RenderPartialAsync("_AddressEditor", new Pal.Web.Models.AddressViewModel { FieldsCount = 2, CountryId = (Model.CountryId??0), CityId = Model.CityId }); }
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <input asp-for="FullAddress" class="form-control form-control-sm" placeholder="Full Address" />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="CompanyCategoryId">@T("model.Company.CompanyCategoryId")</label>
+                    <select asp-for="CompanyCategoryId" asp-items="ViewBag.CompanyCateogries" class="form-control"></select>
+                    <span asp-validation-for="CompanyCategoryId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="Email">@T("model.Company.Email")</label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="Phone">@T("model.Company.Phone")</label>
+                    <input asp-for="Phone" type="number" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="Website">@T("model.Company.Website")</label>
+                    <input asp-for="Website" class="form-control" />
+                    <span asp-validation-for="Website" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="WhatsApp">@T("model.Company.WhatsApp")</label>
+                    <input asp-for="WhatsApp" type="number" class="form-control" />
+                    <span asp-validation-for="WhatsApp" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="ManagerName">@T("model.Company.ManagerName")</label>
+                    <input asp-for="ManagerName" class="form-control" />
+                    <span asp-validation-for="ManagerName" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="ManagerEmail">@T("model.Company.ManagerEmail")</label>
+                    <input asp-for="ManagerEmail" type="email" class="form-control" />
+                    <span asp-validation-for="ManagerEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="FacebookURL">@T("model.Company.FacebookURL")</label>
+                    <input asp-for="FacebookURL" class="form-control" />
+                    <span asp-validation-for="FacebookURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="InstagramURL">@T("model.Company.InstagramURL")</label>
+                    <input asp-for="InstagramURL" class="form-control" />
+                    <span asp-validation-for="InstagramURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="linkedinURL">@T("model.Company.linkedinURL")</label>
+                    <input asp-for="linkedinURL" class="form-control" />
+                    <span asp-validation-for="linkedinURL" class="text-danger"></span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                    <label asp-for="TwitterURL">@T("model.Company.TwitterURL")</label>
+                    <input asp-for="TwitterURL" class="form-control" />
+                    <span asp-validation-for="TwitterURL" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="form-row">
+
+                <div class="form-group col-lg-6 col-md-12">
+                    <label>@T("model.Company.MainImage")</label>
+                    <input type="hidden" asp-for="MainImgUrl" />
+                    <input class="form-control-file" type="file" asp-for="MainImageFile" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview')" />
+                </div>
+                <div class="form-group col-lg-6 col-md-12">
+                    <label>@T("model.Company.Logo")</label>
+                    <input type="hidden" asp-for="ComapnyLogo" />
+                    <input class="form-control-file" type="file" asp-for="CompanyLogoFile" accept="image/*" onchange="showImgPreview(this, 'LogoPreview')" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-lg-6 col-md-12"><img src="@Model.MainImgUrl" id="mainImgPreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.MainImgUrl)? "none":"block");" /></div>
+                <div class="form-group col-lg-6 col-md-12"><img src="@Model.ComapnyLogo" id="LogoPreview" style="max-width:160px; display: @(string.IsNullOrEmpty(Model.ComapnyLogo)? "none":"block");" /></div>
+            </div>
+
+
+            <br />
+            <section id="tabs">
+                <h3 class="section-title ">Company Details</h3>
+                <div class="row">
+                    <div class="col-12 ">
+                        <nav>
+                            <div class="nav  nav-tabs nav-fill" id="nav-tab" role="tablist">
+                                @{
+
+                                    for (int i = 0; i < languages.Count; i++)
+                                    {
+                                        var tabName = languages[i].Id;
+                                        if (i == 0)
+                                        {
+                                            <a class="nav-item nav-link active" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                        }
+                                        else
+                                        {
+                                            <a class="nav-item nav-link" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                        }
+                                    }
+                                }
+
+                            </div>
+                        </nav>
+                        <div class="tab-content " id="nav-tabContent">
+                            @{
+                                for (int i = 0; i < languages.Count; i++)
+                                {
+                                    var langId = languages[i].Id;
+                                    <input id="transId-@i" value="@Model.CompanyTranslates[i].Id " type="hidden">
+                                    <input type="hidden" class="local-tap" id="langId-@i" value="@langId" />
+                                    <div class='tab-pane fade @(i == 0 ? "show active":"") ' id="contentDiv-@i" role="tabpanel">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>@T("model.Company.Name")  (@languages[i].Name)</label>
+                                                <input id="CompanyName-@i" asp-for="CompanyTranslates[i].CompanyName" type="text" class="form-control CompanyNameInput">
+                                                <span asp-validation-for="CompanyTranslates[i].CompanyName" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>@T("model.Company.Content") (@languages[i].Name)</label>
+                                            @{
+                                                var contentEditor = new Pal.Web.Models.HtmlEditorModel()
+                                                {
+                                                    Value = Model.CompanyTranslates[i].Content,
+                                                    Id = "CompanyContent-" + i,
+                                                    ImgPath = "",
+                                                    ImgSaveUrl = "",
+                                                };
+                                                await Html.RenderPartialAsync("_HtmlEditor", contentEditor);
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </form>
+    </div>
+
+</div>
+
+
+@section Scripts{
+
+
+    <script>
+        function ChangePassword(e) {
+            console.log(e)
+            window.location.assign(`/admin/Dashboard/ChangePassword?UserId=${e}`);
+        }
+
+
+
+        var languagesCount = '@languages.Count';
+        function onSave(saveAndNew) {
+            var CompanyTranslateinfo = [];
+            for (var i = 0; i < languagesCount; i++) {
+                var langid = $('#langId-' + i).val();
+                var id = $('#transId-' + i).val();
+                var CompanyName = $('#CompanyName-' + i).val();
+                var content = document.getElementById('CompanyContent-' + i).ej2_instances[0].value;
+                var CompanyId = $('#Id').val();
+                CompanyTranslateinfo.push({ langid, CompanyName, CompanyId, id, content });
+            }
+            var allGood = true;
+            $("#CompanyForm").valid();
+            var inpo = document.querySelectorAll('.CompanyNameInput');
+            inpo.forEach((ele) => {
+                if (!ele.value) {
+                    ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    allGood = false;
+                }
+
+            });
+            if (!allGood) return;
+
+
+            // readyupdata
+            var data = new FormData();
+            data.append('Id', document.querySelector('#Id').value);
+            data.append('Email', document.querySelector('#Email').value);
+            data.append('Phone', document.querySelector('#Phone').value);
+            data.append('Website', document.querySelector('#Website').value);
+            data.append('WhatsApp', document.querySelector('#WhatsApp').value);
+            data.append('ManagerName', document.querySelector('#ManagerName').value);
+            data.append('ManagerEmail', document.querySelector('#ManagerEmail').value);
+            data.append('MainImgUrl', document.querySelector('#MainImgUrl').value);
+            data.append('ComapnyLogo', document.querySelector('#ComapnyLogo').value);
+            data.append("MainImageFile", document.querySelector('#MainImageFile').files[0]);
+            data.append("CompanyLogoFile", document.querySelector('#CompanyLogoFile').files[0]);
+            data.append('CountryId', document.getElementById("cbCountry").ej2_instances[0].value);
+            data.append('CityId', document.getElementById("cbCity").ej2_instances[0].value);
+            data.append('FullAddress', document.querySelector('#FullAddress').value);
+            data.append('FacebookURL', document.querySelector('#FacebookURL').value);
+            data.append('InstagramURL', document.querySelector('#InstagramURL').value);
+            data.append('linkedinURL', document.querySelector('#linkedinURL').value);
+            data.append('TwitterURL', document.querySelector('#TwitterURL').value);
+            data.append('CompanyCategoryId', $('#CompanyCategoryId').val());
+
+            CompanyTranslateinfo.forEach((val, i) => {
+                data.append('CompanyTranslates[' + i + '][LanguageId]', val.langid);
+                data.append('CompanyTranslates[' + i + '][CompanyName]', val.CompanyName);
+                data.append('CompanyTranslates[' + i + '][CompanyId]', val.CompanyId);
+                data.append('CompanyTranslates[' + i + '][Id]', val.id);
+                data.append('CompanyTranslates[' + i + '][content]', val.content);
+            });
+            // ajax
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                type: "post",
+                url: "/admin/Companies/ComapnyUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

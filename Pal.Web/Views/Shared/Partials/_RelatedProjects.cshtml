@@ -1,0 +1,13 @@
+﻿@using Pal.Data.DTOs.Project
+@model List<ProjectCardViewModel>
+
+
+
+        <div class="row" id="projects">
+            @foreach (var project in Model)
+            {
+                <div class="col-lg-12 col-md-12" style="margin-block-end: 20px;">
+                    <partial name="_FeaturedProjects" model="@project" />
+                </div>
+            }
+        </div><!-- end row -->

@@ -1,0 +1,352 @@
+﻿@model Pal.Data.DTOs.CRM.Task.TaskCreateDTO
+@{
+    ViewData["Title"] = T("cp.views.task.update").ToString();
+    //var endDate = Model.EndDate ?? DateTime.UtcNow.ToLocalTime().AddHours(1).ToString("yyyy-MM-dd HH:mm").Replace(' ', 'T');
+
+
+    var customers = Json.Serialize(ViewBag.Customers1);
+    var leads = Json.Serialize(ViewBag.Leads1);
+}
+
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datetimepicker/bootstrap4.min.css" rel="stylesheet" />
+<br />
+
+<style>
+    .pac-target-input {
+        margin-top: 15px;
+        width: 350px;
+    }
+</style>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                //OnSaveAndNew = "onSave(true)",
+                BackToListhref = "/Admin/Tasks/TasksList",
+            });
+        }
+    </div>
+
+    <div class="card-body">
+        <input type="hidden" asp-for="CustomerId" />
+        <div>
+            <form id="myForm" onsubmit="event.preventDefault()" asp-action="TaskAdd" class="needs-validation was-validated">
+
+                <div class="form-row">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CreatedBy" />
+
+                    <div class="form-group col-sm-12">
+                        <label asp-for="Subject">@T("model.Task.Subject")</label>
+                        @*<input asp-for="Subject" type="text" class="form-control form-control-sm rounded-0" required>*@
+                        <select asp-for="Subject" asp-items="ViewBag.Decisiones" class="form-control form-control-sm rounded-0" required></select>
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                    </div>
+
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="StatusId">@T("model.Task.StatusId")</label>
+                        <select asp-for="StatusId" asp-items="ViewBag.Statuses" class="form-control form-control-sm rounded-0" required></select>
+                        <span asp-validation-for="StatusId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="TaskPriority">@T("model.Task.TaskPriority")</label>
+                        <select asp-for="TaskPriority" class="form-control form-control-sm rounded-0" required>
+                            <option value="0">@T("enum.taskPriority.veryLow")</option>
+                            <option value="1">@T("enum.taskPriority.low")</option>
+                            <option value="2">@T("enum.taskPriority.normal")</option>
+                            <option value="3">@T("enum.taskPriority.high")</option>
+                            <option value="4">@T("enum.taskPriority.veryHigh")</option>
+
+                        </select>
+                        <span asp-validation-for="TaskPriority" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="StartDate">@T("model.Task.StartDate")</label>
+
+                        <input type="datetime-local" asp-for="StartDate"
+                               class="form-control form-control-sm rounded-0">
+
+
+                        @*<ejs-datetimepicker ejs-for="StartDate" class="form-control form-control-sm rounded-0" required></ejs-datetimepicker>*@
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="EndDate">@T("model.Task.EndDate")</label>
+                        <input type="datetime-local" asp-for="EndDate" required
+                               class="form-control form-control-sm rounded-0">
+
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="EmployeeId">@T("model.Task.EmployeeId")</label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-control form-control-sm rounded-0" required></select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-4 col-md-6 col-sm-12">
+                        <label asp-for="CustomerName">@T("model.Task.CustomerId")</label>
+                        <input asp-for="CustomerName" class="rounded-0 form-control form-control-sm" disabled />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>@T("model.Project.MediaFiles")</label>
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadModal">
+                            @T("btn.upload")
+                        </button>
+                        @{
+                            var uploadModel = new UploadControlViewModel
+                            {
+                                ReferenceId = Model.Id.ToString(),
+                                ReferenceTitle = $"Task ({Model.Subject})",
+                                ReferenceType = Pal.Core.Enums.Attachment.ReferenceType.Tasks,
+                            };
+                        }
+                        <partial name="_UploadControl" model="uploadModel" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <table class="table  table-responsive ">
+                        <thead>
+                            <tr>
+                                @{
+                                    foreach (var screen in Model.Attachments)
+                                    {
+                                        <td class="td-@screen.Id">
+                                            <div class="btn btn-sm btn-danger" onclick="onDeleteTaskImg('@screen.Id')">@T("btn.delete")</div>
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                            <tr>
+                                @{
+                                    foreach (var screen in Model.Attachments)
+                                    {
+                                        if (screen.MediaType == Pal.Core.Enums.Attachment.MediaType.Photos)
+                                        {
+                                            <td class="td-@screen.Id">
+                                                <img src="@screen.FileName" class="img-fluid img-thumbnail" style="max-height:200px">
+                                            </td>
+                                        }
+
+                                        if (screen.MediaType == Pal.Core.Enums.Attachment.MediaType.Videos)
+                                        {
+                                            <td class="td-@screen.Id">
+                                                <video controls="controls" style="max-width: 275px;">
+                                                    <source src="@screen.FileName" type="video/mp4" />
+                                                </video>
+                                            </td>
+                                        }
+
+                                    }
+                                }
+                            </tr>
+
+                        </thead>
+
+                    </table>
+                </div>
+
+                <div class="form-row">
+                    <div><img src="" id="mainImgPreview" alt="Image Preview" style="max-width:160px;display:none;" /></div>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group col-sm-12">
+                        <label>@T("model.Task.Description")</label>
+                        @{
+                            var contentEditor = new Pal.Web.Models.HtmlEditorModel
+                            {
+                                Value = Model.Description,
+                                Id = "Description",
+                                ImgPath = "",
+                                ImgSaveUrl = "",
+                            };
+                            await Html.RenderPartialAsync("_HtmlEditor", contentEditor);
+                        }
+                    </div>
+                </div>
+
+            </form>
+
+
+            <form asp-action="UploadFiles" asp-controller="Attachments" id="form-Attachments"></form>
+        </div>
+
+    </div>
+    @*<div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Tasks/TasksList",
+            });
+        }
+    </div>*@
+</div>
+
+<hr />
+
+@section Scripts{
+
+
+    <script>
+         var customers = @customers;
+    var leads = @leads;
+        function changeusertype(e) {
+
+            var selectobject = document.getElementById("CustomerId");
+            $('#CustomerId').html('');
+
+            if (e==1) {
+                Array.from(customers).forEach(a => {
+                    $('#CustomerId').append(`
+                     <option value="${a.id}">${a.name}</option>
+                `)
+                });
+            } else {
+                Array.from(leads).forEach(a => {
+                    $('#CustomerId').append(`
+                     <option value="${a.id}">${a.name}</option>
+                `)
+                });
+            }
+        }
+
+
+
+        $(function () {
+            if (!$('#isWithCustomer').is(':checked')) {
+                $('#CustomerId').prop('disabled', true);
+            }
+        })
+
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+            var allGood = true;
+
+            if (!$("#myForm").valid()) {
+                ErrorToast('Please fill the red boxes')
+                return;
+            }
+
+            if (!allGood) return;
+           
+            showLoading();
+
+            // readyupdata
+            var data = new FormData();
+            data.append('Id', $('#Id').val());
+            data.append('StatusId', $('#StatusId').val());
+            data.append('Subject', $('#Subject option:selected').text());
+            data.append('TaskPriority', $('#TaskPriority').val());
+            data.append('StartDate', $('#StartDate').val());
+            data.append('EndDate', $('#EndDate').val());
+            data.append('EmployeeId', $('#EmployeeId').val());
+            data.append('CustomerName', $('#CustomerName').val());
+            data.append('CustomerId', $('#CustomerId').val());
+            data.append('Description', $('#Description').val());
+
+            if ($('#isWithCustomer').is(':checked')) {
+                data.append('CustomerId', $('#CustomerId').val());
+            }
+
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/admin/Tasks/Taskupdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                        hideLoading()
+                    } else {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                        hideLoading()
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                    hideLoading()
+                }
+            });
+        }
+
+
+        //----------------------------------------------------------------------
+        function OnClickImagesBtn() {
+            Swal.fire(
+                '@T("cp.alert.imageBtn.title")',
+                '@T("cp.alert.imageBtn.subtitle")',
+                'info',
+            );
+        }
+
+        $(document).on('change', '#isWithCustomer', function () {
+            if (!$(this).prop('checked')) {
+                $('#CustomerId').attr('disabled', 'disabled');
+            } else {
+                $('#CustomerId').removeAttr('disabled');
+            }
+        });
+
+        //----------------------------------------------------------------------
+        function onDeleteTaskImg(id) {
+            Swal.fire({
+                title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                text: "@T("cp.alert.onDeleteMessage.title")",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var headers = { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() };
+                    $.ajax({
+                        headers: headers,
+                        url: '/Admin/Attachments/DeleteFile?id=' + id,
+                        type: 'POST',
+                        success: function (res) {
+                            if (res.responseType === 1) {
+                                $('.td-' + id).hide();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/datetimepicker/datetimepicker.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+
+    <ejs-scripts></ejs-scripts>
+
+}
+

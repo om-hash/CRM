@@ -1,0 +1,314 @@
+﻿@using Pal.Data.VMs.Maps;
+@model MapsVm;
+
+<style>
+    .pac-target-input {
+        margin-top: 15px;
+        width: 250px;
+    }
+
+    .modal-backdrop {
+        z-index: 20;
+    }
+</style>
+
+<button type="button" class="button alt small" style="margin-top:30px" data-toggle="modal" data-target="#myModal">@T("global.locationDetails")</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" style="z-index: 150; margin-top: 46px; ">
+
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">@T("global.locationDetails")</h4>
+                <div class="form-row">
+
+
+                    <div class="col-lg-12 col-md-6 col-sm-3" style="display: flex;  flex-wrap:wrap">
+                        <label for="restaurantCheckBox" value="resturant" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-utensils"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.restaurant")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float:left; padding-left:5px"><input id="restaurantCheckBox" value="restaurant" type="checkbox" onclick="showPlaces(this)" /></div>
+                        </label>
+                        <label for="schoolCheckBox" value="school" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-school"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.school")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float:left; padding-left:5px"><input value="school" onclick="showPlaces(this)" id="schoolCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="hospitalCheckBox" value="hospital" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-hospital"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.hospital")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float:left; padding-left:5px"><input value="hospital" onclick="showPlaces(this)" id="hospitalCheckBox" type="checkbox" /></div>
+                        </label>
+
+                        <label for="atmCheckBox" value="atm" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-money-check-alt"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.ATM")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="atm" onclick="showPlaces(this)" id="atmCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="pharmacyCheckBox" value="pharmacy" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-first-aid"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.pharmacy")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="pharmacy" onclick="showPlaces(this)" id="pharmacyCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="mosqueCheckBox" value="mosque" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-mosque"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.mosque")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="mosque" onclick="showPlaces(this)" id="mosqueCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="parkCheckBox" value="park" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-tree"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.park")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="park" onclick="showPlaces(this)" id="parkCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="cafeCheckBox" value="cafe" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-coffee"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.cafe")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="cafe" onclick="showPlaces(this)" id="cafeCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="localGovernmentOfficeCheckBox" value="local_government_office" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-building"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.governmentOffice")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="local_government_office" onclick="showPlaces(this)" id="localGovernmentOfficeCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="busCheckBox" value="transit_station" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-bus"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.busStations")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="transit_station" onclick="showPlaces(this)" id="busCheckBox" type="checkbox" /></div>
+                        </label>
+                        <label for="mallCheckBox" value="shopping_mall" class="col-lg-3 col-md-3 col-sm-3" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                            <div class="col-lg-1 col-md-1 col-sm-1"><i class="fas fa-shopping-bag"></i></div>
+                            <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("global.shoppingMall")</span></div>
+                            <div class="col-lg-3 col-md-3 col-sm-3" style="float: left; padding-left: 5px"><input value="shopping_mall" onclick="showPlaces(this)" id="mallCheckBox" type="checkbox" /></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div id="container">
+                    <input id="searchInput" class="controls" type="text" placeholder="Enter a location">
+                    <div id="map" style="height:500px"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<input id="searchInput" class="controls" type="text" placeholder="Enter a location">*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="mainScript" src="https://maps.googleapis.com/maps/api/js?key=@ConfigrationService.GetGoogleMapsAPIKey()&callback=initMap&libraries=places,geometry&v=weekly" async></script>
+@*AIzaSyDFCD_gzPzPbsHSPIWLYZnxqQ-5AHngc48*@
+<script>
+        let mylocation;
+        let mymap;
+        let image;
+    var tempArray = [];
+        var markers = [];
+    function initMap() {
+        // Create the map.
+        const pyrmont = { lat: @Model.Lat, lng:@Model.Lng  };
+        mylocation = pyrmont;
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: pyrmont,
+  
+            zoom: 17,
+            mapId: "8d193001f940fde3",
+            streetViewControl: false,
+        });
+   /*     google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);*/
+        const svgMarker = {
+            url: "/images/Maps/residence-new-512.png",
+            scaledSize: new google.maps.Size(100, 100),
+            fillOpacity: 1,
+            strokeWeight: 0,
+            rotation: 0,
+
+        };
+        new google.maps.Marker({
+            position: pyrmont,
+            map,
+            animation: google.maps.Animation.DROP,
+            icon: svgMarker,
+        });
+        mymap = map;
+      
+        searchBox();
+
+        }
+    function searchBox() {
+        var input = document.getElementById('searchInput');
+        mymap.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo('bounds', mymap);
+
+
+        var infowindow = new google.maps.InfoWindow();
+        var marker = new google.maps.Marker({
+            map: mymap,
+            anchorPoint: new google.maps.Point(0, -29)
+        });
+
+        autocomplete.addListener('place_changed', function () {
+            infowindow.close();
+            marker.setVisible(false);
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                return;
+            }
+
+            // If the place has a geometry, then present it on a map.
+            if (place.geometry.viewport) {
+               
+                mymap.fitBounds(place.geometry.viewport);
+            } else {
+                mymap.setCenter(place.geometry.location);
+                mymap.setZoom(17);
+            }
+            marker.setIcon(({
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(35, 35)
+            }));
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+
+            var address = '';
+            if (place.address_components) {
+                address = [
+                    (place.address_components[0] && place.address_components[0].short_name || ''),
+                    (place.address_components[1] && place.address_components[1].short_name || ''),
+                    (place.address_components[2] && place.address_components[2].short_name || '')
+                ].join(' ');
+            }
+
+            infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+            infowindow.open(mymap, marker);
+        });
+
+
+        }
+
+
+        function showPlaces(e) {
+            var key = e.getAttribute('value')
+            if (e.checked == true) {
+                if (markersByKey(key).length > 0) {
+                    markersByKey(key).forEach((result, i) => {
+                        result.setMap(mymap);
+                    })
+                    return;
+                }
+                const service = new google.maps.places.PlacesService(mymap);
+              
+                service.nearbySearch(
+                    {
+                        location: mylocation, radius: 600, types: [key]
+                    },
+                    (results, status) => {
+
+                        if (status !== "OK" || !results) return;
+                        addPlaces(results, mymap);
+                    }
+                );
+                function addPlaces(places, map) {
+
+                    for (const place of places) {
+                        
+                        if (place.geometry && place.geometry.location) {
+                            if (key == "transit_station") {
+                                image = {
+                                    url: src = "https://pic.onlinewebfonts.com/svg/img_466437.png",
+                                    size: new google.maps.Size(71, 71),
+                                    origin: new google.maps.Point(0, 0),
+                                    anchor: new google.maps.Point(17, 34),
+                                    scaledSize: new google.maps.Size(25, 25),
+                                };
+                            }
+                            else {
+                                 image = {
+                                    url: place.icon,
+                                    size: new google.maps.Size(71, 71),
+                                    origin: new google.maps.Point(0, 0),
+                                    anchor: new google.maps.Point(17, 34),
+                                    scaledSize: new google.maps.Size(25, 25),
+                                };
+                            }
+                           
+                           tempArray.push(new google.maps.Marker({
+                                map,
+                                icon: image,
+                                title: place.name,
+                                position: place.geometry.location,
+                               map: mymap,
+
+                           }))
+                            let distance = google.maps.geometry.spherical.computeDistanceBetween(mylocation, place.geometry.location)
+                            onClickMarker(tempArray[tempArray.length - 1], distance, place.name);
+                        }
+                    }
+                    markers.push({
+                        key: key,
+                        values: [...tempArray],
+                    });
+                    while (tempArray.length > 0) {
+                        tempArray.pop();
+                    }
+                    //var b = new google.maps.LatLng(30.7141289, 76.709398);
+                    //alert(google.maps.geometry.spherical.computeDistanceBetween(mylocation, tempArray[7].position));
+
+                }
+
+            } else {
+                var mark = markersByKey(key);
+                mark.forEach((result, i) => {
+                    result.setMap(null);
+                })
+            }
+
+        }
+        //------------------------------------------------------------
+        function markersByKey(key) {
+            if (markers.length > 0) {
+                var marks = markers.filter(a => a.key == key)[0]?.values;
+                if (marks?.length > 0) {
+                    return marks
+                }
+                else {
+                    return 0;
+                }
+            }
+            else {
+                return 0;
+            }
+    }
+        //------------------------------------------------------------
+    function onClickMarker(marker, distance, name) {
+        var ditanceInMeter = distance.toString().split('.')[0];
+        const contentString =
+            '<div id="content">' +
+            '<div id="siteNotice">' +
+            "</div>" +
+            `<h5 id="firstHeading" class="firstHeading">${name}</h5>` +
+            '<div id="bodyContent">' +
+            `<p style="color:#e8792f"><b>Dicstince: </b>${ditanceInMeter} M</p>`+
+            "</div>" +
+            "</div>";
+        const infowindow = new google.maps.InfoWindow({
+            content: contentString,
+        });
+       /* secretMessage.toString()*/
+        marker.addListener("click", () => {
+            infowindow.open(marker.get("map"), marker);
+        });
+    }
+
+
+
+</script>
+

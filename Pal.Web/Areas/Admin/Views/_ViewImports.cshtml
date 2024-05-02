@@ -1,0 +1,15 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Pal.Web.Extensions
+@using Pal.Web.Models
+@using Pal.Core.Enums.Account
+@using Pal.Core.Domains.Languages
+@using Pal.Data.VMs.GenericColumns
+@inject Pal.Services.WebWorkContext.IWebWorkContext webWorkContext
+
+@inject Pal.Services.Configurations.IConfigurationService ConfigrationService
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Pal.Services.Caching.ICacheService<List<Language>> CacheService
+@inherits CustomBaseViewPage<TModel>
+
+@addTagHelper *, Syncfusion.EJ2
+

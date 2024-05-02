@@ -1,0 +1,421 @@
+﻿@using Pal.Data.DTOs.Account;
+@using Pal.Services.PalFunctions
+@model UserDTO;
+<link href="~/js/suncfusion/tab/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+<style>
+
+    .iti {
+        display: block;
+    }
+</style>
+@{
+    ViewData["Title"] = T("cp.views.users.update.title");
+    List<string> shouldOpen = new List<string>();
+    var roles = PalFunctions.GetDefaultRoles();
+    var languages = LanguageService.GetAllLanguages();
+}
+
+<div class="card card-outline card-primary">
+    <div>
+        <div class="card-header">
+            <div class="form-row">
+                <div class="col-auto mr-auto">
+                    @{ await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+                        {
+                            OnSave = "onSave(false)",
+                            BackToListhref = "/Admin/Account/UsersList",
+                        }); }
+                    </div>
+                    <div class="col-auto">
+                        <a class="btn btn-sm  btn-warning" onclick="ChangePassword('@Model.Id')">@T("btn.changePassword")&ensp;<i class="fas fa-lock"></i> </a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <form id="UserForm" asp-action="UserUpdate" onsubmit="event.preventDefault()" class="needs-validation was-validated">
+                    <div class="form-row">
+                        <input type="hidden" asp-for="@Model.Id" />
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="FullName">@T("modal.Account.FullName")</label>
+                            <input asp-for="FullName" type="text" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="UserName">@T("modal.Account.UserName")</label>
+                            <small class="text-danger field-validation-valid" id="UserNameValidation"></small>
+                            <input asp-for="UserName" onchange="CheckUserName(this.value)" type="text" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="PhoneNumber">@T("model.Phone")</label>
+                            <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                            <span id="error-msg" class="hide text-danger"></span>
+                            <input asp-for="PhoneNumber" type="number" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="WhatsappNumber">@T("model.Whatsapp")</label>
+                            <span id="valid-msg2" class="hide text-success">✓ Valid</span>
+                            <span id="error-msg2" class="hide text-danger"></span>
+                            <input asp-for="WhatsappNumber" type="number" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="WhatsappNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="Email">@T("modal.Account.Email")</label>
+                            <input asp-for="Email" onchange="CheckEmail(this.value)" type="email" class="rounded-0  form-control form-control-sm" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <small class="text-danger field-validation-valid" id="EmailValidation"></small>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="JobTitleId">@T("model.employee.jobTitle")</label>
+                            <select asp-for="JobTitleId" asp-items="ViewBag.cbJobTitles" class="form-control form-control-sm rounded-0" required></select>
+                            <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                        </div>
+                        @*<div class="form-group col-lg-6 col-md-6 col-sm-12">
+                            <label asp-for="Password">@T("modal.Account.Password")</label>
+                            <input asp-for="Password" type="password" class="rounded-0  form-control form-control-sm" required />
+                            <small class="text-danger field-validation-valid" id="PasswordValidation"></small>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+
+                        </div>*@
+                    </div>
+                    <br />
+                </form>
+                <h3>@T("cp.views.users.update.roles")</h3>
+                <div class="form-row">
+                    @foreach (var system in roles.GroupBy(a => a.SystemName))
+                    {
+                        <div class="col-lg-12">
+                            <div class="col-lg-12">
+                                <p>
+                                    <div class="form-control" type="button" data-toggle="collapse" data-target="#multiCollapseExample_@system.First().SystemName" aria-expanded="false" aria-controls="multiCollapseExample2">@T("role.title." + system.First().SystemName)</div>
+                                </p>
+                            </div>
+
+                            @*		<div>------@role.RoleName</div>*@
+                            <div class="col-lg-12" style="margin-top: -14px;">
+                                <div class="collapse multi-collapse show" id="multiCollapseExample_@system.First().SystemName">
+                                    <div class="card card-body" style="display: flex;align-items: center;align-content: center;flex-wrap: wrap;flex-direction: row;">
+                                        @foreach (var role in system)
+                                        {
+                                            <div class="col-lg-4">
+                                                <label value="hospital" class="col-lg-12 col-md-12 col-sm-12" style="display: flex; justify-content: space-between; align-items: center; background-color: #ededed; padding: 5px; margin-right:5px;">
+                                                    <div class="col-12">
+                                                        <div class="col-lg-3 col-md-3 col-sm-3" style="float:left; padding-left:5px">
+                                                            @if (@Model.Roles.Select(x => x.RoleCode).Contains(@role.RoleCode))
+                                                            {
+                                                                <input id="roleCheckBoxes" value="@role.RoleCode" type="checkbox" checked />
+                                                                shouldOpen.Add("multiCollapseExample_" + @system.First().SystemName);
+                                                            }
+                                                            else
+                                                            {
+                                                                <input id="roleCheckBoxes" value="@role.RoleCode" type="checkbox" />
+                                                            }
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-8 col-sm-8"><span>@T("role." + role.RoleName)</span></div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+
+
+    <script>
+        let EmailCheckValue;
+        let UserNameCheckValue;
+
+        //-----------------------
+        var input = document.querySelector("#PhoneNumber"),
+            errorMsg = document.querySelector("#error-msg"),
+            validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var phonenumberIti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (phonenumberIti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = phonenumberIti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+        //-----------------------------------------------------------
+        var Whatsappinput = document.querySelector("#WhatsappNumber"),
+            errorMsg2 = document.querySelector("#error-msg2"),
+            validMsg2 = document.querySelector("#valid-msg2");
+
+        var errorMap1 = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var WhatsappNumberiti = window.intlTelInput(Whatsappinput, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            //excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            initialCountry: "tr",
+            //localizedCountries: { 'de': 'Deutschland' },
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            Whatsappinput.classList.remove("error");
+            errorMsg2.innerHTML = "";
+            errorMsg2.classList.add("hide");
+            validMsg2.classList.add("hide");
+        };
+
+        // on blur: validate
+        Whatsappinput.addEventListener('blur', function () {
+            reset();
+            if (input.value.trim()) {
+                if (WhatsappNumberiti.isValidNumber()) {
+                    validMsg2.classList.remove("hide");
+                } else {
+                    Whatsappinput.classList.add("error");
+                    var errorCode = WhatsappNumberiti.getValidationError();
+                    errorMsg2.innerHTML = errorMap1[errorCode];
+                    errorMsg2.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        Whatsappinput.addEventListener('change', reset);
+        Whatsappinput.addEventListener('keyup', reset);
+        //-----------------------------------------------------------
+        function ChangePassword(e) {
+            console.log(e)
+            window.location.assign(`/admin/Dashboard/ChangePassword?UserId=${e}`);
+        }
+        //-----------------------------------------------------------
+        var passwordInput = document.getElementById("Password");
+        passwordInput.addEventListener('input', function () {
+            var passwordCheck = isPasswordSecure(document.getElementById("Password").value)
+            console.log(passwordCheck)
+            const error = document.querySelector('#PasswordValidation');
+            if (passwordCheck == 1) {
+                error.textContent = '';
+                return;
+            }
+            if (passwordCheck == 2) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 lowercase character';
+                return;
+            }
+            else if (passwordCheck == 3) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 uppercase character';
+                return;
+            }
+            else if (passwordCheck == 4) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 number';
+                return;
+            }
+            else if (passwordCheck == 5) {
+                error.textContent = ' ';
+                error.textContent = 'Password must include at least 1 special character in (!#$%^&*)';
+                return;
+            }
+            else if (passwordCheck == 6) {
+                error.textContent = ' ';
+                error.textContent = 'Password must has at least 8 characters';
+                return;
+            } else {
+                error.textContent = ' ';
+            }
+            //----------------------------------------------------------------------
+        });
+        //-----------------------------------------------------------
+        function CheckUserName(e) {
+            $.ajax({
+                type: "post",
+                url: `/Account/IsUserNameExist?userName=${e}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("UserNameValidation");
+                    if (res.responseType === 0) {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameCheckValue = 0
+
+                    } else {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameErrorSpan.textContent = 'User name Existing!';
+                        UserNameCheckValue = 1;
+
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //-----------------------------------------------------------
+        //-----------------------------------------------------------
+        function CheckEmail(e) {
+
+            $.ajax({
+                type: "post",
+                url: `/Account/IsEmailExist?email=${e}`,
+                contentType: false,
+                processData: false,
+
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("EmailValidation");
+                    if (res.responseType === 0) {
+                        UserNameErrorSpan.textContent = '';
+                        EmailCheckValue = 0;
+
+                    } else {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameErrorSpan.textContent = 'Email Existing!';
+                        EmailCheckValue = 1;
+
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //-----------------------------------------------------------
+        //------------------------------------------------
+        function onSave() {
+            //if (EmailCheckValue !== 0) return;
+            //if (UserNameCheckValue !== 0) return;
+            //if (isPasswordSecure(document.getElementById("Password").value) !== 0) return;
+
+            if (!$("#UserForm").valid())
+                return;
+
+            if (!phonenumberIti.isValidNumber())
+                return;
+            if (!WhatsappNumberiti.isValidNumber())
+                return;
+
+			var data = new FormData();
+
+			var rolesCodes = [];
+			var roles = document.querySelectorAll('#roleCheckBoxes');
+			roles.forEach((val, i) => {
+				if (val.checked) {
+					rolesCodes.push(val.value);
+				}
+			});
+
+			rolesCodes.forEach((val, i) => {
+				data.append('Roles[' + i + '][RoleCode]', val);
+			});
+
+			// readyupdata
+			data.append('Id', document.querySelector('#Id').value);
+			data.append('FullName', document.querySelector('#FullName').value);
+			data.append('UserName', document.querySelector('#UserName').value);
+			data.append('PhoneNumber', document.querySelector('#PhoneNumber').value);
+			data.append('WhatsappNumber', document.querySelector('#WhatsappNumber').value);
+			data.append('Email', document.querySelector('#Email').value);
+            data.append('JobTitleId', document.querySelector('#JobTitleId').value);
+			//data.append('Password', document.querySelector('#Password').value);
+
+
+			var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+			$.ajax({
+				headers: header,
+				type: "post",
+				url: "/admin/Account/UserUpdate",
+				contentType: false,
+				processData: false,
+				data: data,
+				success: function(message) {
+					if (message.responseType === 3) {
+						ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+					}
+					else if (message.responseType === 1) {
+						SuccessToast('@T("cp.alert.onSaveSuccess")');
+					}
+					else {
+						ErrorDialog('@T("cp.alert.error")', ' @T("cp.alert.onSaveFailde")');
+					}
+				},
+				error: function() {
+					alert('@T("cp.alert.error")');
+				}
+			});
+		}
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/ValidationRegister.js"></script>
+}

@@ -1,0 +1,136 @@
+﻿@using Pal.Data.VMs.Tour;
+@model TourListVM
+
+@{
+	var referenceId = Model.AdvisorId;
+}
+
+<section class="subheader" style="background-image: url('/images/about-us-main-الجولة-العقارية.jpg') ">
+	<div class="container">
+		<h1>@T("publicInterface.customers.toursDetails.title")</h1>
+		<div class="breadcrumb right">@T("global.home") <i class="fa fa-angle-right"></i> <a href="#" class="current">@T("publicInterface.customers.toursDetails.title")</a></div>
+		<div class="clear"></div>
+	</div>
+</section>
+
+<section class="module favorited-properties">
+	<div class="container" >
+
+		<div class="row" id="pageBody">
+			<partial name="Partials/_ProfileSidebar" model="new  Pal.Data.VMs.Customer.ProfileSidebarViewModel(Model?.ProfileSidebarViewModel?.CustomerImage)" />
+
+			<div class="col-lg-9 col-md-9" style=" z-index: 900;">
+				<table style="width: 100%; background-color: #3237468c;" class="my-properties-list favorite-properties-list">
+					<tr>
+						<th style="color:white;padding: 0 60px">@T("global.barcode")</th>
+                        <th style="color:white">@T("global.City")</th>
+						<th style="color:white">@T("btn.details")</th>
+						
+					</tr>
+                    <tr id="row-@Model.Id">
+                        <td class="property-title" style="padding: 0 60px;width: 40%;">
+                            <a style="color:white">@Model.Barcode</a><br />
+                        </td>
+                        <td class="property-title" style=" width: 30%; ">
+                            <i class="fa fa-map-marker icon"></i> <a style="color:white">@Model.CityName</a><br />
+                        </td>
+                        <td class="property-title" style="width: 30%;">
+                            @if (Model.AdvisorId > 0)
+                            {
+                                <a href="/Advisors/AdvisorProfile/@Model.AdvisorId"><p href="property-single.html"><i class="fas fa-user-tie"></i> @Model.AdvisorName</p></a>
+                                <p style="color:white"><i style="color: #3a464e " class="fas fa-phone-alt"></i> @Model.AdvisorPhone</p>
+
+                            }
+                            else
+                            {
+                                <a><p><i class="fas fa-user-tie"></i> @Model.AdvisorName</p></a>
+                            }
+                            <p style="color:white" class="property-address"><i class="fas fa-calendar-alt"></i><strong style="margin-left:10px">@Model.Date.ToString("dd-MM-yyyy")</strong></p>
+                            <p style="color:white"><i class="fa fa-clock icon "></i>@Model.Time </p>
+                            <p style="color: white"><i style="color: #5b5e5d;" class="fas fa-hourglass-half"></i>@Model.TourDuration</p>
+                        </td>
+                    </tr>
+				</table>
+			</div>
+
+			<div class="col-lg-9 col-md-9" style=" z-index: 900;">
+				<!-- end col-->
+
+                <table style="margin-top:20px" class="my-properties-list favorite-properties-list">
+                   <button onclick="onEdit(@Model.Id)" style="margin-top: 10px; background-color: #e8792f; color:white" class="btn btn-outline ">Edit</button>
+                    <tr>
+                        <th>@T("model.MainImage")</th>
+                        <th>@T("btn.details")</th>
+                        <th>@T("global.manage")</th>
+                    </tr>
+                    @foreach (var item in Model.TourDetails)
+                    {
+
+                        <tr id="row-@item.Id-@item.ReferenceType">
+                            <td class="property-title" style=" width: 50%;">
+                                <a href="#" class="property-img" target="_blank">
+                                    <img style=" object-fit: contain; width:84%" src="@item.Image" alt="" />
+                                </a>
+                            </td>
+                            <td class="property-title" style="width: 50%">
+                                <a href="property-single.html">@item.Title</a><br />
+                                <p class="property-address"><i class="fa fa-map-marker icon"></i>@item.Address</p>
+                                <p><strong>$@item.Price</strong></p>
+                            </td>
+                            <td class="property-actions">
+                                <a href="@item.Link" style=" display: flex; "><i class="fa fa-eye icon"></i>@T("btn.details")</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+			</div><!-- end col -->
+		</div><!-- end row -->
+        
+	</div>
+	</div><!-- end container -->
+</section>
+
+@section Scripts{
+	<script src="~/lib/ratingPlugin/ratingPlugin.js"></script>
+	<script src="~/js/publicUI/reviews.js"></script>
+    <script>
+		  function getReviews() {
+            $.ajax({
+                type: "get",
+                url: "/RatingAndComments/GetRatingAndCommentForSpecificType?referenceType=13" + "&referenceId=" + @Model.AdvisorId,
+                success: function (data) {
+                    $('#pageBody').append(data);
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+    getReviews();
+		function addComment() {
+			AddComment(@Model.AdvisorId, 13, rate, '@T("publicInterface.alert.addComment.IncompleteInfo.title")', '@T("publicInterface.alert.addComment.IncompleteInfo.subtitle")', '@T("cp.alert.onSaveSuccess")')
+        }
+
+        //-------------------------------------------------------------------------
+
+        function onEdit(id) {
+            console.log('sds')
+             $.ajax({
+                 type: "post",
+                 url: "/Tour/EditeSavedTour/"+id,
+                success: function (data) {
+                    if (data.responseType === 1) {
+                        window.location.assign('/Tour')
+                    }
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+}
+

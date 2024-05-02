@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/14/2022 11:30:48" ReportInfo.Modified="10/15/2022 13:19:22" ReportInfo.CreatorVersion="2022.3.0.0">
+  <Dictionary>
+    <Parameter Name="Barcode" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="57"/>
+    <PageHeaderBand Name="PageHeader1" Top="61" Width="718.2" Height="38.1"/>
+    <DataBand Name="Data1" Top="103.1" Width="718.2" Height="371.15">
+      <BarcodeObject Name="Barcode1" Left="160.65" Width="380.6" Height="371.15" AutoSize="false" Text="[Barcode]" ShowText="false" AllowExpressions="true" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="478.25" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

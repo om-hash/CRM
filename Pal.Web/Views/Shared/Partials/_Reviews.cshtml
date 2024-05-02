@@ -1,0 +1,110 @@
+﻿@using Pal.Data.DTOs.RatingAndComment
+@model List<RateingAndCommentsDTO>
+@{
+    var count = Model.Count;
+    var x = 0;
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="widget property-single-item agent-properties">
+        <h4>
+            <span>@T("global.reviews")</span> <img class="divider-hex" src="~/images/divider-half.png" alt="" />
+            <span class="divider-fade"></span>
+        </h4>
+        <div class="row">
+            <div class="blog-comment">
+                <ul class="comments" id="reviewsList">
+                    
+                        <li class="clearfix">
+                            <div class="post-comments">
+                                <p class="meta">@T("global.comment"): <i class="pull-right"><a style="cursor: pointer" onclick="addComment()"><small>@T("global.send")</small></a></i></p>
+                                <textarea id="comment" placeholder="@T("global.yourComment")..."></textarea>
+                                <div class="row lead">
+                                    <div id="rateInput"></div>
+                                </div>
+                            </div>
+                        </li>
+                    
+                    @foreach (var review in Model)
+                    {
+                        <li class="clearfix">
+                            <div class="post-comments">
+                                <p class="meta">@review.CommentedDate.ToShortDateString() <a>@review.CommentedBy</a>:</p>
+                                <p>
+                                    @review.Content
+                                </p>
+                                <div id="rateInput-@x" data-rating='@review.Rate'></div>
+                            </div>
+                        </li>
+                        ++x;
+                    }
+
+                </ul>
+            </div>
+
+        </div><!-- end row -->
+
+    </div><!-- end reviews -->
+}
+
+else if (count != 0)
+{
+<div class="widget property-single-item agent-properties">
+    <h4>
+        <span>@T("global.reviews")</span> <img class="divider-hex" src="~/images/divider-half.png" alt="" />
+        <span class="divider-fade"></span>
+    </h4>
+    <div class="row">
+        <div class="blog-comment">
+            <ul class="comments" id="reviewsList">                
+                @foreach (var review in Model)
+                {
+                    <li class="clearfix">
+                        <div class="post-comments">
+                            <p class="meta">@review.CommentedDate.ToShortDateString() <a>@review.CommentedBy</a>:</p>
+                            <p>
+                                @review.Content
+                            </p>
+                            <div id="rateInput-@x" data-rating='@review.Rate'></div>
+                        </div>
+                    </li>
+                    ++x;
+                }
+            </ul>
+        </div>
+
+    </div><!-- end row -->
+
+</div><!-- end reviews -->
+}
+
+<script src="~/lib/ratingPlugin/ratingPlugin.js"></script>
+<script>
+
+    $(function () {
+        var ratings = JSON.parse('@Html.Raw(Json.Serialize(@Model))')
+        for (var i = 0; i < @count; ++i) {
+            $('#rateInput-' + i).starrr({
+                readOnly: true,
+                rating: ratings[i].rate,
+            })
+
+        }
+    });
+
+    var rate = 0
+
+    $(function () {
+        return $("#rateInput").starrr();
+    });
+
+
+
+    $('#rateInput').starrr({
+        change: function (e, value) {
+            rate = value
+            console.log(rate)
+        }
+    })
+</script>
+

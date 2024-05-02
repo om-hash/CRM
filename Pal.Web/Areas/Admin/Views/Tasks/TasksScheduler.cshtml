@@ -1,0 +1,221 @@
+@using Pal.Data.DTOs.Employees
+<link href="~/js/suncfusion/scheduler/bootstrap5.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+@{
+    ViewData["Title"] = T("Task Scheduler");
+}
+<style>
+    .e-popup-footer {
+        padding: 0.75rem 1.25rem;
+        background-color: rgba(0,0,0,.03);
+        border-top: 0 solid rgba(0,0,0,.125);
+    }
+
+    .e-quick-popup-wrapper {
+        border-top: 3px solid #007bff;
+    }
+</style>
+
+<div class="card card-outline card-primary">
+
+    <div class="card-header">
+        <div>
+            <div class="form-row col-12">
+                @foreach (var emp in (List<EmployeesList>)ViewBag.Employees)
+                {
+                    <div>
+                        @emp.FullName
+                        <input type="checkbox" checked data-toggle="toggle" data-size="xs" onchange="onEmpChange(@emp.Id,this.checked)">
+                        &emsp;
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="control-section">
+            <div class="">
+                <div class="schedule-container">
+
+                    <ejs-schedule id="schedule" width="100%" height="780px" selectedDate="DateTime.Now" currentView="TimelineDay"
+                                  dragStop="onDragStop" dragStart="onDragStop" actionBegin="onActionBegin" cellDoubleClick="cellDoubleClick">
+
+                        <e-schedule-quickinfotemplates header="#header-template" content="#content-template" footer="#footer-template">
+                        </e-schedule-quickinfotemplates>
+
+                        <e-schedule-group resources="@ViewBag.Resources" enableCompactView="true">
+                        </e-schedule-group>
+
+
+                        <e-schedule-resources>
+
+                            <e-schedule-resource dataSource="@ViewBag.Employees"
+                                                 field="EmployeeId" title="Employee" name="Employees" textField="FullName"
+                                                 idField="Id" colorField="Color"
+                                                 allowMultiple="true">
+                            </e-schedule-resource>
+
+                        </e-schedule-resources>
+
+
+                        <e-schedule-views>
+                            <e-schedule-view option="Day"></e-schedule-view>
+                            <e-schedule-view option="Week"></e-schedule-view>
+                            <e-schedule-view option="Month"></e-schedule-view>
+                            <e-schedule-view option="TimelineDay"></e-schedule-view>
+                            <e-schedule-view option="TimelineWeek"></e-schedule-view>
+                            <e-schedule-view option="TimelineMonth"></e-schedule-view>
+                            <e-schedule-view option="Agenda"></e-schedule-view>
+                            <e-schedule-view option="MonthAgenda"></e-schedule-view>
+
+                        </e-schedule-views>
+                        <e-schedule-eventsettings dataSource="@ViewBag.Tasks"></e-schedule-eventsettings>
+                    </ejs-schedule>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script id="header-template" type="text/x-template">
+    <div class="  card-header ">
+        <div class="quick-info-header-content" style="">
+            <div class="quick-info-title">${if (elementType == "cell")}@T("Add Task")${else}@T("Task Details")${/if}</div>
+            <div class="duration-text">${getHeaderDetails(data)}</div>
+        </div>
+    </div>
+</script>
+
+<script id="content-template" type="text/x-template">
+    <div class=" ">
+        ${if (elementType == "cell")}
+        <div class="e-cell-content">
+            <h2>@T("No Tasks Found!")</h2>
+        </div>
+        ${else}
+        <div class="event-content">
+            <div class="form-group" style="font-size: 1.1rem; display: flex; text-align: center; flex-direction: column; font-weight: bold;">
+                <span>${Subject}</span>
+            </div>
+            <div class="meeting-subject-wrap">
+                <label>@T("Status")</label>:&emsp;
+                <span>${Status}</span>
+            </div>
+            <div class="notes-wrap">
+                <label>@T("Proirity")</label>:&emsp;
+                <span>${Proirity}</span>
+            </div>
+        </div>
+        ${/if}
+    </div>
+</script>
+
+<script id="footer-template" type="text/x-template">
+    <div class="  ">
+        ${if (elementType == "cell")}
+        <div class="cell-footer">
+            <a href="/Admin/Tasks/TaskAdd" target="_blank" class="btn btn-sm btn-secondary">@T("btn.add")</a>
+        </div>
+        ${else}
+        <div class="event-footer">
+            <button class="btn btn-sm btn-danger">@T("btn.delete")</button>
+            &emsp;
+            <a class="btn btn-sm btn-secondary" href="/Admin/Tasks/TaskDetails/${Id}" target="_blank">@T("btn.details")</a>  
+            &emsp;
+            <a class="btn btn-sm btn-primary" href="/Admin/Tasks/TaskUpdate/${Id}" target="_blank">@T("btn.update")</a>
+        </div>
+        ${/if}
+    </div>
+</script>
+
+
+
+
+
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/scheduler/scheduler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+    <script type="text/javascript">
+
+        var intl = new ej.base.Internationalization();
+        var employeeData = [];
+
+        //----------------------------------------------
+        function onViewDetails(id) {
+            try {
+
+                $('#taskContentModal').modal('show');
+
+            } catch (e) {
+
+            }
+        }
+
+
+        //----------------------------------------------
+        function onEmpChange(empId, checked) {
+            var scheduleObj = document.getElementById('schedule').ej2_instances[0];
+            if (employeeData.length < 1)
+                employeeData = [...scheduleObj.resourceCollection[0].dataSource];
+
+            var resourceData = [...employeeData].filter(function (emp) { return emp.Id === empId; });
+            if (checked) {
+                scheduleObj.addResource(resourceData[0], 'Employees', empId - 1);
+            } else {
+                scheduleObj.removeResource(empId, 'Employees');
+            }
+        }
+
+        //----------------------------------------------
+        function onDragStop(e) {
+            e.cancel = true;
+        }
+
+        //----------------------------------------------
+        function onResizeStop(e) {
+            e.cancel = true;
+        }
+
+        //----------------------------------------------
+        function onActionBegin(e) {
+            //e.cancel = true;
+        }
+
+        //----------------------------------------------
+        function onPopupOpen(e) {
+            //e.cancel = true;
+        }
+
+        //----------------------------------------------
+        function onEventCheck(e) {
+            return true;
+        }
+
+
+        //----------------------------------------------
+        function cellDoubleClick(e) {
+            e.cancel = true;
+        }
+        //----------------------------------------------
+        function getHeaderDetails(data) {
+            return intl.formatDate(data.StartTime, { type: 'date', skeleton: 'full' }) + ' (' +
+                intl.formatDate(data.StartTime, { skeleton: 'hm' }) + ' - ' + intl.formatDate(data.EndTime, { skeleton: 'hm' }) + ')';
+        };
+    </script>
+
+
+
+
+    <ejs-scripts></ejs-scripts>
+
+
+}
+
+
+
+

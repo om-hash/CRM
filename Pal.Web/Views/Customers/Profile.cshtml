@@ -1,0 +1,186 @@
+﻿@model Pal.Web.Models.Customer.CustomerProfileViewModel
+@{
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+}
+<style>
+    .changingBtn {
+        height: 42px;
+        background-color: #e8792f;
+        color:white;
+    }
+</style>
+<section class="subheader" style="background-image: url('/images/Members------main-photo-B.jpg') ">
+    <div class="container">
+        <h1>Profile</h1>
+        <div class="breadcrumb right">Home <i class="fa fa-angle-right"></i> <a href="#" class="current">Profile</a></div>
+        <div class="clear"></div>
+    </div>
+</section>
+
+<section class="module favorited-properties">
+    <div class="container">
+
+        <div class="row">
+            <partial name="Partials/_ProfileSidebar" model="new  Pal.Data.VMs.Customer.ProfileSidebarViewModel(Model.MainImage)" />
+            <div class="col-lg-9 col-md-9">
+
+                <form asp-action="UpdateMyInfo" method="post" onsubmit="event.preventDefault()" id="myForm">
+                    <div class="row">
+
+                        <div class="col-lg-9">
+                            <input type="hidden" asp-for="MainImage" />
+
+                            <input type="file" id="MainImageFile" style="display: none;" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview');" />
+                            <div class="form-block ">
+                                <label>@T("model.Name")</label>
+                                <input class="border" type="text" name="name" asp-for="@Model.FullName" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            @if (Model.IsEmailVerified)
+                            {
+                                <div class="form-block">
+                                    <label>@T("model.Email")</label>
+                                    <div style="display:flex">
+
+                                        <input class="border" type="text" name="email" value="@Model.Email" disabled /><button onclick="changEmail('@Model.UserId')" class="btn btn-sm  changingBtn">@T("btn.change")</button>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-block">
+                                    <label>@T("model.Email")</label>
+                                    <small class="text-danger">@T("model.EmailNeedVerification")</small>
+                                    <div style="display:flex">
+
+                                        <input class="border" type="text" name="email" value="@Model.Email" disabled /><button onclick="changEmail('@Model.UserId')" class="btn btn-sm  changingBtn">@T("btn.change")</button>
+                                    </div>
+                                </div>
+                            }
+
+
+                            <div class="form-block">
+                                <label>@T("model.Customer.PhoneNumber")</label>
+                                <div style="display:flex">
+                                    <input class="border" type="text" name="phone" value="@Model.PhoneNumber" disabled /><button onclick="changPhone('@Model.UserId')" class="btn btn-sm changingBtn">@T("btn.change")</button>
+                                </div>
+                            </div>
+
+                            <div class="form-block">
+                                <label>@T("model.Customer.WhatsappNumber")</label>
+                                <div style="display:flex">
+                                    <input class="border" type="text" name="phone" value="@Model.WhatsappNumber" id="WhatsappNumber" />
+                                </div>
+                            </div>
+
+                            <div class="form-block">
+                                <label asp-for="NationalityId">@T("model.Customer.NationalityId")</label>
+                                <select asp-for="NationalityId" asp-items="ViewBag.cbNationalities" class="form-control"></select>
+                                <span asp-validation-for="NationalityId" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-block">
+                                <label asp-for="CountryId">@T("model.Customer.CountryId")</label>
+                                <select asp-for="CountryId" asp-items="ViewBag.cbCountry" class="form-control"></select>
+                                <span asp-validation-for="CountryId" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="edit-avatar">
+                                <a href="#"  class="hide button small" style="width: 100%; text-align: center; ">Change Avatar</a>
+                            </div>
+                            <div class="edit-avatar">
+                                <a href="#"  class="hide button small" style="width: 100%; text-align: center; ">Change Password</a>
+                            </div>
+
+                            <div class="edit-avatar">
+                                <a href="#"  class="hide button small" style="width: 100%; text-align: center; ">Change Phone Number</a>
+                            </div>
+                        </div>
+                    </div><!-- end row -->
+                    
+                    <div class="form-block">
+                        <div onclick="onSaveOyInfo()" class="button button-icon"><i class="fa fa-check"></i>Save Changes</div>
+                        <div onclick="onChangPassword('@Model.UserId')" class="button button-icon"><i class="fa fa-lock"></i>@T("btn.changePassword")</div>
+                    </div>
+
+                </form>
+
+            </div><!-- end col -->
+        </div><!-- end row -->
+
+    </div><!-- end container -->
+</section>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(function () {
+            $("#mainImageLink").on('click', function (e) {
+                e.preventDefault();
+                $("#MainImageFile:hidden").trigger('click');
+            });
+        });
+
+        //-------------------------------------------------------------
+        function showImgPreview(inputEvent, imgElementId) {
+            if (inputEvent.files.length > 0) {
+                var src = URL.createObjectURL(inputEvent.files[0]);
+                var preview = document.getElementById(imgElementId);
+                preview.src = src;
+                preview.style.display = 'block';
+            }
+        };
+
+        function changEmail(e) {
+            window.location.assign(`/Account/ChangeCustomerEmail/${e}`)
+        }
+        function changPhone(e) {
+            window.location.assign(`/Account/ChangeCustomerPhoneNumber/${e}`)
+        }
+        function onChangPassword(e) {
+            window.location.assign(`/Account/ChangeCustomerPassword/${e}`)
+        }
+
+
+
+        function onSaveOyInfo() {
+
+            if (!$('#myForm').valid())
+                return;
+
+            if (!$('#FullName').val()) {
+                // Error
+                return;
+            }
+
+            var data = new FormData();
+            data.append('FullName', $('#FullName').val());
+            data.append('NationalityId', $('#NationalityId').val());
+            data.append('CountryId', $('#CountryId').val());
+            data.append('WhatsappNumber', $('#WhatsappNumber').val());
+            data.append('MainImage', $('#MainImage').val());
+            data.append('MainImageFile', document.querySelector('#MainImageFile').files[0]);
+
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                url: '/Customers/UpdateMyInfo',
+                headers:header,
+                type: 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+
+            });
+        }
+    </script>
+}

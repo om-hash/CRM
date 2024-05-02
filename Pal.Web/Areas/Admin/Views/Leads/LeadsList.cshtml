@@ -1,0 +1,160 @@
+﻿@{
+    ViewData["Title"] = T("cp.views.leads.list.title");
+}
+
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/customGridStyle.css" rel="stylesheet" />
+
+
+<form asp-action="LeadDelete" method="post">
+</form>
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <a class="btn btn-sm btn-primary" asp-action="LeadAdd">@T("btn.add")</a>
+@*        <a class="btn btn-sm btn-primary" onclick="document.querySelector('#UploadList').click()">@T("btn.addList")</a>
+        <input id="UploadList" onchange="UploadList(this)" type="file" hidden />*@
+    </div>
+
+    <div class="card-body">
+        <div>
+
+            @{
+
+
+                var gridModel = new Pal.Web.Models.GridViewModel
+                {
+                    GridId = "CustomersGrid",
+                    AllowToShowDetails = true,
+                    Url = "/Admin/Leads/LeadsPaginatedList",
+                    Columns = new()
+                    {
+                        new() { Field = "id", HeaderText = "#", Width = "100", Visiable = false },
+                        new() { Field = "fullName", HeaderText = T("model.Customer.FullName").ToString(), Width = "100" },
+                        new() { Field = "nationalityName", HeaderText = T("model.Customer.NationalityId").ToString(), Width = "100" },
+                        new() { Field = "phoneNumber", HeaderText = T("model.Customer.PhoneNumber").ToString(), Width = "100" },
+                        new() { Field = "countryName", HeaderText = T("global.Country").ToString(), Width = "100" },
+                        //new() { Field = "customerStatusName", HeaderText = T("model.Customer.CustomerStatus").ToString(), Width = "100", Visiable = false },
+                        new() { Field = "email", HeaderText = T("model.lead.Email").ToString(), Width = "100" },
+                        //new() { Field = "registerdByAdmin", HeaderText = T("model.lead.RegisterdByAdmin").ToString(), Width = "100" },
+                        new() { Field = "createdBy", HeaderText = T("model.lead.CreatedBy").ToString(), Width = "100" },
+                        //new() { Field = "lastLogInDate", HeaderText = T("model.lead.LastLogInDate").ToString(), Width = "100" },
+                        //new() { Field = "facebook", HeaderText = T("model.lead.Facebook").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "fullAddress", HeaderText = T("model.lead.FullAddress").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "instagram", HeaderText = T("model.lead.Instagram").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "isLead", HeaderText = T("model.lead.IsLead").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "LeadRatingName", HeaderText = T("model.lead.LeadRating").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "LeadSourceName", HeaderText = T("model.lead.LeadSource").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "LeadStatusName", HeaderText = T("model.lead.LeadStatus").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "registerDate", HeaderText = T("model.lead.RegisterDate").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "twitterId", HeaderText = T("model.lead.Twitter").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "whatsappNumber", HeaderText = T("model.Customer.WhatsappNumber").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "workCompany", HeaderText = T("model.lead.WorkCompany").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "FollowedByEmpName", HeaderText = T("model.lead.FollowedByEmpId").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "RegionName", HeaderText = T("global.Region").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "CityName", HeaderText = T("global.City").ToString(), Width = "100", Visiable = false },
+                        //new() { Field = "customerStatusName", HeaderText = T("model.Customer.CustomerStatus").ToString(), Width = "100" },
+                    },
+                };
+
+                await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+            }
+
+
+
+        </div>
+    </div>
+    @*<div class="card-footer">
+        <a class="btn btn-sm btn-primary" asp-action="LeadAdd">@T("btn.add")</a>
+    </div>*@
+</div>
+
+
+@section Scripts{
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn": 
+                    window.location.assign('/Admin/Leads/LeadUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                         title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+                case "DetalisBtn":
+                    window.location.assign("/Admin/Customers/CustomerDetails/" + args.rowData.id);
+                    break;
+            }
+        }
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/Admin/Leads/LeadDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                           '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                          '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+        function UploadList(input) {
+          var files = input.files;
+          var formData = new FormData();
+          formData.append("ExcelFile", files[0]);
+
+          $.ajax(
+            {
+              type: "POST",
+              url: "/UploadList",
+              data: formData,
+              cache: false,
+              processData: false,
+              contentType: false,
+              success: function (data) {
+                alert("Files Uploaded!");
+              }
+            }
+          );
+
+        }
+    </script>
+}

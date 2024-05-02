@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Pal.Data.DTOs.RealEstate.RealEstateListDTO>
+@*@{
+        var gridModel = new Pal.Web.Models.GridViewModel
+        {
+            GridId = "realEstatesGrid",
+            Model = Model,
+            AllowToEdit = false,
+            IsAllowToDelete = false,
+            IsInformationManaged = false,
+
+            Columns = new()
+            {
+                        new() { Field = "RealEstateName", HeaderText = T("model.Title").ToString(), Width = "100" },
+                        new() { Field = "RoomsCountName", HeaderText = T("model.RealEstate.RoomsCountId").ToString(), Width = "50" },
+                        new() { Field = "Price", HeaderText = T("model.RealEstate.Price").ToString(), Width = "50" },
+                        new() { Field = "SoldQuantity", HeaderText = T("model.RealEstate.SoldQuantity").ToString(), Width = "100" },
+
+                    }
+        };
+
+        await Html.RenderPartialAsync("_GridView", gridModel);
+    }
+
+
+    <ejs-scripts></ejs-scripts>*@
+<div class="control-section12342" style="margin-top:10px">
+
+    <ejs-grid id="RealEstateGridView2" dataSource="Model" gridLines="Horizontal"  height="auto" width="auto" allowFiltering="true"  toolbar="@(new List<string>() {"Search","ColumnChooser" })">
+        <e-grid-pagesettings pageSizes="new []{ 5,10,20,50,100}" pageSize="5"></e-grid-pagesettings>
+        <e-grid-filtersettings showFilterBarStatus="true" showFilterBarOperator="true" type="Excel"></e-grid-filtersettings>
+        <e-grid-columns>
+            <e-grid-column field="RealEstateName" headerText="@T("model.Title")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="RoomsCountName" headerText="@T("model.RealEstate.RoomsCountId")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="Price" headerText="@T("model.RealEstate.Price")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="SoldQuantity" disableHtmlEncode="false" template="#SoldQuantity" width="150" type="text"  headerText="@T("model.RealEstate.SoldQuantity")" textAlign="Justify"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+
+</div>
+
+<script id="SoldQuantity" type="text/x-template">
+    <div style="display:flex">
+        <div>
+            <button onclick="decreaseSoldQuntity(value)" value="${Id}" class="btn btn-danger">-</button>
+        </div>
+        <div style="padding:5px 25px 5px 25px; ">
+            <span id="quan-${Id}">${SoldQuantity}</span>
+        </div>
+        <div>
+            <button onclick="increaseSoldQuntity(value)" value="${Id}" class="btn btn-success">+</button>
+        </div>
+    </div>
+</script>
+
+
+<ejs-scripts></ejs-scripts>
+

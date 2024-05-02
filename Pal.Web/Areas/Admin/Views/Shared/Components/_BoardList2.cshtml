@@ -1,0 +1,18 @@
+﻿@using Pal.Data.DTOs.Statistics;
+@model List<MostCustomersActiveDTO>;
+
+<div class="control-section12342" style="margin-top:10px">
+
+    <ejs-grid id="CustomersModel" dataSource="Model"  gridLines="Horizontal" height="auto" width="auto">
+        <e-grid-pagesettings pageSizes="new []{ 10,20,50,100}" pageSize="10"></e-grid-pagesettings>
+        <e-grid-columns>
+            <e-grid-column field="CustomerId" headerText="#" textAlign="Center" width="100"></e-grid-column>
+            <e-grid-column field="CustomerName" headerText="@T("cp.views.Dashboard.list.name")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="CustomerPhone" headerText="@T("cp.views.Dashboard.list.phone")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="ActionsCount" headerText="@T("cp.views.Dashboard.list.actionCount")" textAlign="Center" width="130"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+
+</div>
+
+<ejs-scripts></ejs-scripts>

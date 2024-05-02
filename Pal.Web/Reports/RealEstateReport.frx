@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/17/2022 01:24:27" ReportInfo.Modified="10/18/2022 03:52:01" ReportInfo.CreatorVersion="2022.3.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void Picture1_BeforePrint(object sender, EventArgs e)
+    {
+      string URL1;
+
+      URL1=((String)Report.GetColumnValue(&quot;RealEstate.MainImgUrl&quot;));
+      //URL1+=&quot;&amp;w=&quot;+Convert.ToInt32(PropertyPicture.Width).ToString()+&quot;&amp;h=&quot;+Convert.ToInt32(PropertyPicture.Height).ToString();
+      Picture1.ImageLocation=URL1;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary/>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="58.4">
+      <TextObject Name="Text1" Left="255.15" Top="9.45" Width="217.35" Height="37.8" Text="Property detials" Font="Arial, 20.25pt"/>
+      <TextObject Name="Text73" Left="538.65" Top="18.9" Width="170.1" Height="28.35" Text="[Date]" Font="Arial, 10pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="62.4" Width="718.2" Height="179.55">
+      <TextObject Name="Text3" Left="179.55" Top="9.45" Width="396.9" Height="28.35" Text="[RealEstate.Title]" Font="Arial, 11pt"/>
+      <TextObject Name="Text5" Left="179.55" Top="56.7" Width="396.9" Height="37.8" Text="[RealEstate.FullAddress]" Font="Arial, 11pt"/>
+      <TextObject Name="Text52" Left="179.55" Top="108.4" Width="160.65" Height="28.35" Text="[RealEstate.Price]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.CurrencySymbol="$" Format.PositivePattern="0" Format.NegativePattern="0" Font="Arial, 11pt"/>
+      <BarcodeObject Name="Barcode1" Left="576.45" Top="9.45" Width="132" Height="132" Text="[RealEstate.QrCode]" ShowText="false" AllowExpressions="true" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+      <TextObject Name="Text63" Left="9.45" Top="9.45" Width="170.1" Height="28.35" Text="Proprty name:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text64" Left="9.45" Top="56.7" Width="170.1" Height="28.35" Text="Address:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text65" Left="9.45" Top="108.4" Width="170.1" Height="28.35" Text="Price:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text69" Left="9.45" Top="151.2" Width="170.1" Height="28.35" Text="Nationalty Support:" Font="Arial Black, 11pt"/>
+      <CheckBoxObject Name="CheckBox1" Left="207.9" Top="153.2" Width="18.9" Height="18.9" Fill.Color="Gainsboro" Checked="false" Expression="[RealEstate.IsNationaltySupport]"/>
+      <TextObject Name="Text70" Left="179.55" Top="108.4" Width="160.65" Height="28.35" Text="[RealEstate.Price]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.CurrencySymbol="$" Format.PositivePattern="0" Format.NegativePattern="0" Font="Arial, 11pt"/>
+      <TextObject Name="Text71" Left="9.45" Top="108.4" Width="170.1" Height="28.35" Text="Price:" Font="Arial Black, 11pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="245.95" Width="718.2" Height="756">
+      <TextObject Name="Text6" Left="9.45" Top="18.9" Width="170.1" Height="28.35" Text="Project name" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text7" Left="189" Top="18.9" Width="160.65" Height="28.35" Text="[RealEstate.ProjectName]" Font="Arial, 11pt"/>
+      <TextObject Name="Text10" Left="9.45" Top="66.15" Width="170.1" Height="28.35" Text="Propety type" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text11" Left="189" Top="66.15" Width="160.65" Height="28.35" Text="[RealEstate.RealEstateType]" Font="Arial, 11pt"/>
+      <TextObject Name="Text14" Left="9.45" Top="113.4" Width="170.1" Height="28.35" Text="Rooms count" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text15" Left="189" Top="113.4" Width="160.65" Height="28.35" Text="[RealEstate.RoomsCount]" Font="Arial, 11pt"/>
+      <TextObject Name="Text18" Left="9.45" Top="160.65" Width="170.1" Height="28.35" Text="Completion Date" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text19" Left="189" Top="160.65" Width="160.65" Height="28.35" Text="[RealEstate.CompletionDate]" Format="Date" Format.Format="d" Font="Arial, 11pt"/>
+      <TextObject Name="Text22" Left="9.45" Top="207.9" Width="170.1" Height="28.35" Text="Service fees" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text23" Left="189" Top="207.9" Width="160.65" Height="28.35" Text="[RealEstate.Proceeds]" Font="Arial, 11pt"/>
+      <TextObject Name="Text26" Left="9.45" Top="255.15" Width="170.1" Height="28.35" Text="Sold Quantity" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text27" Left="189" Top="255.15" Width="160.65" Height="28.35" Text="[RealEstate.SoldQuantity]" Font="Arial, 11pt"/>
+      <TextObject Name="Text28" Left="378" Top="255.15" Width="160.65" Height="28.35" Text="Total Area" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text29" Left="538.65" Top="255.15" Width="160.65" Height="28.35" Text="[RealEstate.AreaTotal]" Font="Arial, 11pt"/>
+      <TextObject Name="Text30" Left="9.45" Top="302.4" Width="170.1" Height="28.35" Text="Heating Type" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text31" Left="189" Top="302.4" Width="160.65" Height="28.35" Text="[RealEstate.HeatingType]" Font="Arial, 11pt"/>
+      <TextObject Name="Text32" Left="378" Top="302.4" Width="160.65" Height="28.35" Text="Net Area" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text33" Left="538.65" Top="302.4" Width="160.65" Height="28.35" Text="[RealEstate.AreaNet]" Font="Arial, 11pt"/>
+      <TextObject Name="Text34" Left="9.45" Top="349.65" Width="170.1" Height="28.35" Text="Air Condition" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text35" Left="189" Top="349.65" Width="160.65" Height="28.35" Text="[RealEstate.AirConditionType]" Font="Arial, 11pt"/>
+      <TextObject Name="Text36" Left="378" Top="349.65" Width="160.65" Height="28.35" Text="Floors Count" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text37" Left="538.65" Top="349.65" Width="160.65" Height="28.35" Text="[RealEstate.FloorsCount]" Font="Arial, 11pt"/>
+      <LineObject Name="Line1" Top="661.5" Width="756"/>
+      <TextObject Name="Text39" Left="9.45" Top="396.9" Width="170.1" Height="28.35" Text="View Type" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text40" Left="189" Top="396.9" Width="160.65" Height="28.35" Text="[RealEstate.ViewType]" Font="Arial, 11pt"/>
+      <TextObject Name="Text41" Left="378" Top="396.9" Width="160.65" Height="28.35" Text="Quantity" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text42" Left="538.65" Top="396.9" Width="160.65" Height="28.35" Text="[RealEstate.Quantity]" Font="Arial, 11pt"/>
+      <TextObject Name="Text43" Left="9.45" Top="444.15" Width="170.1" Height="28.35" Text="Balconie Direction" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text44" Left="189" Top="444.15" Width="160.65" Height="28.35" Text="[RealEstate.BalconieDirection]" Font="Arial, 11pt"/>
+      <TextObject Name="Text45" Left="378" Top="444.15" Width="160.65" Height="28.35" Text="Bathrooms Count" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text46" Left="538.65" Top="444.15" Width="160.65" Height="28.35" Text="[RealEstate.BathRoomsCount]" Font="Arial, 11pt"/>
+      <TextObject Name="Text47" Left="9.45" Top="500.85" Width="170.1" Height="28.35" Text="Meter Avg. Price" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text48" Left="189" Top="500.85" Width="160.65" Height="28.35" Text="[RealEstate.MeterAvgPrice]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.CurrencySymbol="$" Format.PositivePattern="0" Format.NegativePattern="0" Font="Arial, 11pt"/>
+      <TextObject Name="Text49" Left="378" Top="500.85" Width="160.65" Height="28.35" Text="WC Count" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text50" Left="538.65" Top="500.85" Width="160.65" Height="28.35" Text="[RealEstate.WCCount]" Font="Arial, 11pt"/>
+      <TextObject Name="Text53" Left="9.45" Top="557.55" Width="170.1" Height="28.35" Text="Balconies Count" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text54" Left="189" Top="557.55" Width="160.65" Height="28.35" Text="[RealEstate.BalconiesCount]" Font="Arial, 11pt"/>
+      <TextObject Name="Text55" Left="9.45" Top="614.25" Width="170.1" Height="28.35" Text="Dues" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text56" Left="189" Top="614.25" Width="160.65" Height="28.35" Text="[RealEstate.Dues]" Font="Arial, 11pt"/>
+      <TextObject Name="Text57" Left="378" Top="557.55" Width="160.65" Height="28.35" Text="Installments" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text58" Left="538.65" Top="557.55" Width="160.65" Height="28.35" Text="[RealEstate.InstallmentsCount]" Font="Arial, 11pt"/>
+      <TextObject Name="Text59" Left="378" Top="614.25" Width="160.65" Height="28.35" Text="Payment Type" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text61" Left="9.45" Top="670.95" Width="113.4" Height="28.35" Text="Featurs:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text62" Left="151.2" Top="672.4" Width="548.1" Height="28.35" Text="[RealEstate.Features]" Font="Arial, 11pt"/>
+      <PictureObject Name="Picture1" Left="359.1" Top="9.45" Width="349.65" Height="236.25" Hyperlink.Value="https://www.google.com/url?sa=i&amp;url=https%3A%2F%2Ftime.com%2F5660278%2Fsmartphone-camera-picture-tips%2F&amp;psig=AOvVaw3ACmbCPyonifUyRi-P_mXl&amp;ust=1666172433335000&amp;source=images&amp;cd=vfe&amp;ved=0CAwQjRxqFwoTCNCkuJG-6foCFQAAAAAdAAAAABAE" BeforePrintEvent="Picture1_BeforePrint" Image=""/>
+      <TextObject Name="Text66" Left="538.65" Top="614.25" Width="160.65" Height="28.35" Text="[RealEstate.PaymentType]" Font="Arial, 11pt"/>
+      <TextObject Name="Text67" Left="9.45" Top="718.2" Width="141.75" Height="28.35" Text="Extra Features:" Font="Arial Black, 11pt"/>
+      <TextObject Name="Text68" Left="151.2" Top="718.2" Width="548.1" Height="28.35" Text="[RealEstate.ExtraFeatures1]" Font="Arial, 11pt"/>
+      <LineObject Name="Line2" Width="756"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1005.95" Width="718.2" Height="28.35">
+      <TextObject Name="Text72" Left="349.65" Top="9.45" Width="94.5" Height="18.9" Text="[Page#]" Font="Arial, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

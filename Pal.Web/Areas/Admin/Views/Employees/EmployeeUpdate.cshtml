@@ -1,0 +1,200 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Employees.EmployeeDTO
+@{
+    ViewData["Title"] = T("cp.views.employees.update.title");
+
+    var languages = LanguageService.GetAllLanguages();
+}
+<link href="~/js/suncfusion/dropdownlist/bootstrap4.min.css" rel="stylesheet" />
+
+@*<br />
+
+<div class="form-row col-12">
+    <div class="col-auto mr-auto">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                //OnSaveAndNew = "onSave(true)",
+                BackToListhref = "/Admin/Employees/EmployeesList",
+            });
+
+        }
+    </div>
+</div>*@
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Employees/EmployeesList",
+            });
+        }
+    </div>
+
+    <div class="card-body">
+        <div>
+
+            <form id="myForm" onsubmit="StopSubment(event)" asp-action="EmployeeUpdate" class="needs-validation was-validated">
+                <input hidden asp-for="Id" />
+
+                <div class="form-row">
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="UserType">@T("model.employee.userType")</label>
+                        <select asp-for="UserType" class="form-control form-control-sm rounded-0" onchange="onUserTypeChange()">
+                            <option value="0">@T("enum.userType.admin")</option>
+                            <option value="6">@T("enum.userType.lawyer")</option>
+                            <option value="4">@T("enum.userType.advisor")</option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="UserId">@T("model.employee.userId")</label>
+                        <select asp-for="UserId" asp-items="ViewBag.cbUsers" class="form-control form-control-sm rounded-0" required></select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="JobTitleId">@T("model.employee.jobTitle")</label>
+                        <select asp-for="JobTitleId" asp-items="ViewBag.cbJobTitles" class="form-control form-control-sm rounded-0" required></select>
+                        <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="FullName">@T("model.Employee.FullName")</label>
+                        <input required asp-for="FullName" class="form-control form-control-sm rounded-0" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="Email">@T("model.Employee.Email")</label>
+                        <input required asp-for="Email" class="form-control form-control-sm rounded-0" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label asp-for="PhoneNumber">@T("model.Employee.PhoneNumber")</label>
+                        <input asp-for="PhoneNumber" class="form-control form-control-sm rounded-0" required/>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                @*@foreach (var item in ViewBag.editableColumns)
+                {
+                    <div class="form-group col-lg-3 col-md-6 col-sm-12">
+                        <label name="@item">@item</label>
+                        <input data-new="true" name="@item" class="form-control form-control-sm rounded-0" required />
+                        <span asp-validation-for="@item" class="text-danger"></span>
+                    </div>
+                }*@
+            </form>
+        </div>
+    </div>
+    @*<div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Employees/EmployeesList",
+            });
+        }
+    </div>*@
+</div>
+
+<hr />
+
+@section Scripts{
+
+    <script>
+        function StopSubment(e) {
+            e.preventDefault();
+
+        }
+        //----------------------------------------------------------------------
+        function onSave(saveAndNew) {
+
+            if (!$("#myForm").valid()) {
+                return;
+            }
+            // readyupdata
+            var data = new FormData();
+            data.append('Id', $('#Id').val());
+            data.append('FullName', $('#FullName').val());
+            data.append('UserType', $('#UserType').val());
+            data.append('UserId', $('#UserId').val());
+            data.append('JobTitleId', $('#JobTitleId').val());
+            data.append('Email', $('#Email').val());
+            data.append('PhoneNumber', $('#PhoneNumber').val());
+            let jsonObj = {};
+            document.querySelectorAll("[data-new='true']").forEach((elm) => {
+                jsonObj[elm.name] = elm.value;
+            });
+            data.append('GCols', JSON.stringify(jsonObj));
+
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                type: "post",
+                headers: header,
+                url: "/Admin/Employees/EmployeeUpdate",
+                processData: false,
+                contentType: false,
+                data: data,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }else {
+                        ErrorToast('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+					}
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+
+    </script>
+
+
+    <script>
+        $(function () {
+            onUserTypeChange()
+        })
+
+
+        function onUserTypeChange() {
+            var userType = $('#UserType').val();
+            var userId = '@(Model.UserId)';
+
+            $.ajax({
+                type: "get",
+                url: "/Admin/Employees/GetUsersAsLookupByUserType?userType=" + userType + "&userId=" + userId,
+                success: function (data) {
+                    if (data.responseType == 1) {
+                        $('#UserId').html('')
+                        console.log(data)
+                        for (var i in data.result) {
+                            $('#UserId').append('<option value="' + data.result[i].id + '">' + data.result[i].name + '</option>');
+                        }
+                    }
+
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/dropdownlist/dropdownlist.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

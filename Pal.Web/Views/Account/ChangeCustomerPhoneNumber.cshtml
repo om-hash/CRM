@@ -1,0 +1,184 @@
+﻿@model string;
+@{
+    ViewData["Title"] = T("publicInterface.resetEmail.title");
+    var userId = ViewBag.UserId;
+}
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+<section class="module login">
+    <div class="container">
+        <div class="row">
+
+            <input id="userId" type="hidden" value="@userId" />
+            <div class="col-lg-4 col-lg-offset-4">
+                <h4>@T("publicInterface.resetPhone.title")</h4>
+                <h5>@T("publicInterface.resetPhone.subTitle")</h5>
+
+                <div class="divider"></div>
+                @*@Html.ValidationSummary(false, "", new { @class = "text-danger" })*@
+                <div class="form-group">
+                    <label>@T("publicInterface.resetPhone.phoneNumber")</label>
+                    <span id="valid-msg" class="hide text-success">✓ Valid</span>
+                    <span id="error-msg" class="hide text-danger"></span>
+                    @*<input class="form-control"  type="tel" required />*@
+                    <input type="tel" id="Phone" class="form-control" required />
+                </div>
+                <div class="form-group" id="codeConfirmationSection" style="display:none">
+                    <label>@T("publicInterface.resetPhone.confimationCode")</label>
+                    <input type="text" id="code" class="form-control" />
+                </div>
+                <div class="form-block">
+                    <button class="button button-icon" id="confirmNumber" onkeypress="return event.keyCode != 13;"  onclick="sendCode(this)"><i class="fa fa-angle-right"></i>@T("btn.sendCode")</button>
+                    <button class="button button-icon hidden" id="confirmCode" onkeypress="return event.keyCode != 13;" onclick="changePhone()"><i class="fa fa-angle-right"></i>@T("btn.save")</button>
+                </div>
+                <div class="divider" style=" margin-bottom: 103px;"></div>
+            </div>
+
+        </div><!-- end row -->
+    </div>
+
+
+</section>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+
+        var input = document.querySelector("#Phone"),
+         errorMsg = document.querySelector("#error-msg"),
+        validMsg = document.querySelector("#valid-msg");
+
+        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number", "Invalid number"];
+
+        var iti = window.intlTelInput(input, {
+            allowDropdown: true,
+            autoHideDialCode: false,
+            autoPlaceholder: "on",
+            /*dropdownContainer: document.body,*/
+            excludeCountries: ["us"],
+            formatOnDisplay: false,
+            //geoIpLookup: function(callback) {
+            //  $.get("http://ipinfo.io", function() {}, "jsonp").always(function(resp) {
+            //    var countryCode = (resp && resp.country) ? resp.country : "";
+            //    callback(countryCode);
+            //  });
+            //},
+            /*   hiddenInput: "full_number",*/
+            /*initialCountry: "auto",*/
+            initialCountry: "tr",
+            nationalMode: false,
+            /* onlyCountries: ['us', 'gb', 'ch', 'ca', 'do'],*/
+            placeholderNumberType: "MOBILE",
+
+            separateDialCode: true,
+
+            utilsScript: "/lib/intl-tel-input/js/utils.js",
+        });
+        var reset = function () {
+            input.classList.remove("error");
+            errorMsg.innerHTML = "";
+            errorMsg.classList.add("hide");
+            validMsg.classList.add("hide");
+        };
+
+        // on blur: validate
+        input.addEventListener('blur', function () {
+            console.log('fdsfsdfsdfs');
+            reset();
+            if (input.value.trim()) {
+                if (iti.isValidNumber()) {
+                    validMsg.classList.remove("hide");
+                } else {
+                    input.classList.add("error");
+                    var errorCode = iti.getValidationError();
+                    errorMsg.innerHTML = errorMap[errorCode];
+                    errorMsg.classList.remove("hide");
+                }
+            }
+        });
+
+        //// on keyup / change flag: reset
+        input.addEventListener('change', reset);
+        input.addEventListener('keyup', reset);
+
+        //--------------------------------------------------------------------
+        function sendCode(e) {
+            console.log("hello")
+           
+            //if (!$("#myForm").valid()) {
+            //    return;
+            //}
+
+            var phone = iti.getNumber();
+            if (phone == null) {
+                return;
+            }
+            if (!iti.isValidNumber()) {
+                return;
+            }
+
+            $("#confirmNumber").attr("disabled", "true")
+            $("#Phone").attr("disabled", "true")
+            var data = new FormData();
+            data.append('phoneNumber', iti.getNumber());
+     
+              $.ajax({
+                type: "post",
+                url: `/Account/SendPhoneVerificationSms`,
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        $("#codeConfirmationSection").css("display", "block")
+                        $("#confirmNumber").addClass("hidden")
+                        $("#confirmCode").removeClass("hidden")
+                    } else {
+                        $("#confirmNumber").attr("disabled", "false")
+                        $("#Phone").attr("disabled", "false")
+                        ErrorDialog(res.responseText);
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //--------------------------------------------------------------
+        function changePhone() {
+
+            if ($("#code").val() == "")
+                return;
+            var data = new FormData();
+            data.append('Id', document.querySelector('#userId').value);
+            data.append('VerificationCode', document.querySelector('#code').value);
+            data.append('phoneNumber', iti.getNumber());
+
+
+            var userId = document.querySelector('#userId').value;
+            pleaseWaitDialog.show();
+            $.ajax({
+                type: "post",
+                url: `/Account/ChangeCustomerPhoneNumber`,
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        console.log(userId);
+                        SuccessDialog('@T("publicInterface.view.changeCustomerPhone.SuccessDialog")');
+                        setTimeout(() => { window.location.assign("/Customers/Profile") }, 2000)
+                    } else {
+                        ErrorDialog(res.responseText);
+                        pleaseWaitDialog.hide();
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+
+        }
+    </script>
+
+}

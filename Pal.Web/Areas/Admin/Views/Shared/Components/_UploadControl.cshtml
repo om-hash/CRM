@@ -1,0 +1,303 @@
+﻿@model UploadControlViewModel
+<!-- Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <input type="text" hidden id="uploadReferenceId" value="@Model.ReferenceId" />
+    <input type="text" hidden id="uploadReferenceTypeString" value="@Model.ReferenceType.ToString()" />
+    <input type="text" hidden id="uploadReferenceType" value="@Model.ReferenceType.ToString()" />
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">@Model.ReferenceTitle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div style="display:flex">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-primary" type="button" id="btnAdd" onclick="$('#fileChooser').click()">Add Files</button>
+                                <button class="btn btn-success" id="btnStart" type="button" onclick="startUpload();">Start Upload</button>
+                            </div>
+
+                            <div>
+                                <button class="btn btn-warning" id="btnRemovex" type="button" onclick="removeAllFiles(true)">Remove Completed</button>
+                                <button class="btn btn-danger" id="btnRemove" type="button" onclick="removeAllFiles()">Remove All</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">File Name</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <input type="file" style="display:none" id="fileChooser" onchange="onFileChooserChange()" multiple accept="image/* , .mp4" />
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Templates *@
+<div>
+    <div id="uploadStatusWaitting" style="display:none">
+        <div class="text-secondary text-bold">
+            Waitting..
+        </div>
+    </div>
+
+    <div id="uploadStatusProgress" style="display:none">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" id="uploadProgressBar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+    </div>
+
+    <div id="uploadStatusDone" style="display:none">
+        <div class="text-success text-bold">
+            Done
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="/lib/azurestoragejs-3.0.100/bundle/azure-storage.blob.min.js"></script>
+<script src="~/js/compressor.js"></script>
+<script type="text/javascript">
+    var FilesToUpload = [];
+    var SasDetails = {};
+    // now create calculateValues function here
+    function calculateValues(file, v, w, h, id) {
+        var outputQuality = ((100 - v) / 100);
+        var outputWidth = w * outputQuality;
+        var outputHeight = h * outputQuality;
+        // now craete a function to compress
+        return Compress(file, outputQuality, outputWidth, outputHeight, id);
+    }
+    function Compress(file, q, w, h, id) {
+
+        var compressedFile = new Compressor(file, {
+            quality: q,
+            width: w,
+            height: h,
+            success(result) {
+                console.log(result)
+                uploadBlob(result, id);
+
+            },
+            error(err) {
+                console.log(err.message);
+            }
+        })
+
+        return compressedFile;
+    }
+    //------------------------------------------------------------------
+    function onFileChooserChange() {
+        Array.from($('#fileChooser').get(0).files).forEach((file, i) => {
+            var id = FilesToUpload.length;
+            FilesToUpload.push({
+                id: id,
+                status: 0,
+                file: file,
+            });
+            $('#tableBody').append(`
+                    <tr id="tr${id}">
+                        <td>${file.name}</td>
+                        <td id='uploadStatus${id}'><div class="text-secondary text-bold">Waitting..</div></td>
+                    </tr>
+                `);
+        });
+    }
+
+
+    //------------------------------------------------------------------
+    function removeAllFiles(onlyCompleted) {
+        if (confirm("Are You Sure ?")) {
+            FilesToUpload.forEach((a, i) => {
+                if (onlyCompleted) {
+                    if (a.status == 2) $('#tr' + a.id).html('');
+                } else {
+                    if (a.status !== 1) $('#tr' + a.id).html('');
+                }
+            });
+            if (onlyCompleted)
+                FilesToUpload = FilesToUpload.filter(a => a.status != 2);
+            else
+                FilesToUpload = FilesToUpload.filter(a => a.status == 1);
+
+            /*$('#tableBody').html('');*/
+        }
+
+    }
+
+    //------------------------------------------------------------------
+    function displayProcess(process, i) {
+        var elementId = 'uploadProgressBar' + i;
+        document.getElementById(elementId).style.width = process + '%';
+        document.getElementById(elementId).innerHTML = process + '%';
+    }
+
+
+
+    //------------------------------------------------------------------
+    async function startUpload() {
+        if (FilesToUpload.length < 1) return;
+        //$('#btnAdd').prop('disabled', true);
+        //$('#btnRemove').attr('disabled', true);
+        SasDetails = await getSas();
+
+        FilesToUpload.forEach((elemnt) => {
+            if (elemnt.status == 0) {
+                console.log(elemnt);
+                $('#uploadStatus' + elemnt.id).html(`
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="uploadProgressBar${elemnt.id}" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                            `);
+                elemnt.status = 1;
+                calculateValues(elemnt.file, 60, 6000, 6000, elemnt.id)
+
+                
+
+                console.log(FilesToUpload);
+            }
+
+        })
+    }
+
+
+    //------------------------------------------------------------------
+    function uploadBlob(file, i) {
+        console.log(file)
+        var randomname = randomName();
+        displayProcess(1, i);
+        // TODO: Call API to get URL, SAS Token, Container name
+        var blobUri = SasDetails.accountUrl;// 'https://insaattan.blob.core.windows.net';
+        var containerName = SasDetails.containerName;// 'userfiles';
+        var sasToken = SasDetails.sasToken;// '?sv=2020-08-04&ss=bfqt&srt=sco&sp=rwdlacupitfx&se=2022-05-06T04:31:44Z&st=2022-04-29T20:31:44Z&spr=https&sig=upshty%2FyKmb4Z1TncKT7ug4Nhps%2FBdTDLgu%2BHtGgzZk%3D';
+
+        var blobService = AzureStorage.Blob.createBlobServiceWithSas(blobUri, sasToken);
+
+
+
+        var customBlockSize = file.size > 1024 * 1024 * 32 ? 1024 * 1024 * 1 : 1024 * 512;
+        blobService.singleBlobPutThresholdInBytes = customBlockSize;
+
+        var finishedOrError = false;
+
+        var mediaType = 'others';
+        if (file.type.toLowerCase().indexOf("video") >= 0)
+            mediaType = 'Videos';
+
+        if (file.type.toLowerCase().indexOf("image") >= 0)
+            mediaType = 'Photos';
+
+
+        var blobName = `${$('#uploadReferenceTypeString').val()}/${$('#uploadReferenceId').val()}/${mediaType}/${randomname}`;
+        var speedSummary = blobService.createBlockBlobFromBrowserFile(containerName, blobName, file, { blockSize: customBlockSize }, function (error, result, response) {
+            console.log(result)
+            console.log(response)
+            finishedOrError = true;
+            if (error) {
+                alert('Error');
+            } else {
+                var downloadLink = blobService.getUrl(containerName, blobName);
+                finishUploadingFile(i, downloadLink, mediaType);
+                displayProcess(100, i);
+            }
+        });
+
+        function refreshProgress() {
+            setTimeout(function () {
+                if (!finishedOrError) {
+                    var process = speedSummary.getCompletePercent();
+                    displayProcess(process, i);
+                    refreshProgress();
+                }
+            }, 200);
+        }
+
+        refreshProgress();
+    }
+
+
+
+
+    //------------------------------------------------------------------
+    async function getSas() {
+        return $.ajax({
+            url: '/Admin/Attachments/SASToken',
+            type: 'GET',
+            dataType: 'json',
+            //success: function (res) {
+            //    console.log(res);
+            //}
+        });
+    }
+
+
+    //------------------------------------------------------------------
+    function finishUploadingFile(i, downloadLink, mediaType) {
+        FilesToUpload.forEach(a => {
+            if (a.id == i) a.status = 2;
+        });
+        setTimeout(() => {
+            $('#uploadStatus' + i).html(`
+                            <div class="text-success text-bold">
+                                Done
+                            </div>
+                        `);
+        }, 1000);
+
+        var formData = new FormData();
+        formData.append('ReferenceType', $('#uploadReferenceType').val());
+        formData.append('ReferenceId', $('#uploadReferenceId').val());
+        formData.append('FileName', downloadLink);
+        formData.append('MediaType', mediaType);
+
+        $.ajax({
+            url: '/Admin/Attachments/LinkNewAttachment',
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            //headers: header,
+            data: formData,
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (e) {
+                console.error(e);
+            }
+        });
+    }
+    //--------------------------------------------------------------------------
+    function randomName() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 20; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+
+</script>
+

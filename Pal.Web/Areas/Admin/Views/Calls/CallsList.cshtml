@@ -1,0 +1,171 @@
+﻿@{
+    ViewData["Title"] = T("cp.views.Call.list.title");
+}
+
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/customGridStyle.css" rel="stylesheet" />
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="update-form" data-toggle="tab" href="#updateForm" role="tab" aria-controls="updateForm" aria-selected="true">@T("cp.views.call.list.taps.doneCall")</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">@T("cp.views.call.list.taps.scheduledCalls")</a>
+    </li>
+
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="updateForm" role="tabpanel" aria-labelledby="update-form">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+
+                <a class="btn btn-sm btn-primary" asp-action="CallAdd">@T("btn.add")</a>
+
+            </div>
+            <div class="card-body">
+                <form asp-action="CallDelete" method="post">
+                </form>
+
+
+                @{
+
+
+                    var gridModel = new Pal.Web.Models.GridViewModel
+                    {
+                        GridId = "CallDoneGrid",
+                        //Model = Model.DoneCalls,
+                        Url = "/Admin/Calls/DoneCallsPaginatedList",
+                        Columns = new()
+                        {
+                    new() { Field = "id", HeaderText = "#", Width = "100" },
+                    new() { Field = "employeeName", HeaderText = T("model.Call.EmployeeId").ToString(), Width = "100" },
+                    new() { Field = "customerName", HeaderText = T("model.Call.CustomerId").ToString(), Width = "100" },
+                    new() { Field = "callStatusName", HeaderText = T("model.Call.CallStatusId").ToString(), Width = "100" },
+                    new() { Field = "callPurposeName", HeaderText = T("model.Call.CallPurposeId").ToString(), Width = "100" },
+                    new() { Field = "callStart", HeaderText = T("model.Call.CallStart").ToString(), Width = "100" },
+                    new() { Field = "duration", HeaderText = T("model.Call.Duration").ToString(), Width = "100" },
+                    new() { Field = "callTypeName", HeaderText = T("model.Call.CallTypeId").ToString(), Width = "100", Visiable = false },
+                    new() { Field = "callResultName", HeaderText = T("model.Call.CallResultId").ToString(), Width = "100", Visiable = false },
+                    new() { Field = "subject", HeaderText = T("model.Call.Subject").ToString(), Width = "100", Visiable = false },
+                    new() { Field = "callDetails", HeaderText = T("model.Call.CallDetails").ToString(), Width = "100", Visiable = false },
+                },
+                    };
+
+                    await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+                }
+
+
+            </div>
+            @*<div class="card-footer">
+                <a class="btn btn-sm btn-primary" asp-action="CallAdd">@T("btn.add")</a>
+            </div>*@
+        </div>
+    </div>
+    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+
+                @*<a class="btn btn-dark" asp-action="CallSchedule">@T("btn.Schedule")</a>*@
+                <a class="btn btn-sm btn-primary" asp-action="CallAdd">@T("btn.add")</a>
+
+            </div>
+            <div class="card-body">
+                @{
+
+
+                    var gridModel2 = new Pal.Web.Models.GridViewModel
+                    {
+                        GridId = "CallScheduleGrid",
+                        //Model = Model.ScheduledCalls,
+                        Url = "/Admin/Calls/ScheduledCallsPaginatedList",
+
+                        Columns = new()
+                        {
+                            new() { Field = "id", HeaderText = "#", Width = "100" },
+                            new() { Field = "employeeName", HeaderText = T("model.Call.EmployeeId").ToString(), Width = "100" },
+                            new() { Field = "customerName", HeaderText = T("model.Call.CustomerId").ToString(), Width = "100" },
+                            new() { Field = "subject", HeaderText = T("model.Call.Subject").ToString(), Width = "100" },
+                            new() { Field = "callPurposeName", HeaderText = T("model.Call.CallPurposeId").ToString(), Width = "100" },
+                            new() { Field = "callStart", HeaderText = T("model.Call.CallStart").ToString(), Width = "100" },
+                            new() { Field = "callTypeName", HeaderText = T("model.Call.CallTypeId").ToString(), Width = "100" },
+                            new() { Field = "callStatusName", HeaderText = T("model.Call.CallStatusId").ToString(), Width = "100", Visiable = false },
+                            new() { Field = "duration", HeaderText = T("model.Call.Duration").ToString(), Width = "100", Visiable = false },
+                            new() { Field = "callResultName", HeaderText = T("model.Call.CallResultId").ToString(), Width = "100", Visiable = false },
+                            new() { Field = "callDetails", HeaderText = T("model.Call.CallDetails").ToString(), Width = "100", Visiable = false },
+                        },
+                    };
+
+                    await Html.RenderPartialAsync("_PaginatedGridView", gridModel2);
+                }
+            </div>
+            @*<div class="card-footer">
+                <a class="btn btn-sm btn-primary" asp-action="CallAdd">@T("btn.add")</a>
+            </div>*@
+        </div>
+    </div>
+</div>  
+@section Scripts{
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Calls/CallUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                         title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+            }
+        }
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/Admin/Calls/CallDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                           '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                          '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+}

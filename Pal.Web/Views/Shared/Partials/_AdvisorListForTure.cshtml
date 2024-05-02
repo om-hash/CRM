@@ -1,0 +1,66 @@
+﻿@using Pal.Data.DTOs.Advisors;
+@model IEnumerable<AdvisorListDTO>
+<div class="row">
+    <table class="property-submit-title">
+        <tr>
+            <td><span class="property-submit-num">2</span></td>
+            <td>
+                <h4>@T("publicInterface.views.newTour.thirdPage.title")</h4>
+                <p>@T("publicInterface.views.newTour.thirdPage.subtitle")</p>
+            </td>
+        </tr>
+    </table>
+    <span style="display:none; margin-bottom:20px" class="text-danger" id="errorSelect">Please Select Advisor!!</span>
+    @if (Model != null)
+        @foreach (var advisor in Model)
+        {
+            <div onclick="AdvisorChoose(@advisor.Id)" id="advisor-@advisor.Id" class="col-lg-4 col-md-4 deleteColor">
+                <div class="team-member shadow-hover">
+                    <div class="team-member-img">
+                        @*<p>
+                                @if (!string.IsNullOrEmpty(advisor.WhatsApp))
+                                {
+                                    <i class="fa fa-whatsapp" style="color:white;margin-right:10px"></i>
+
+                                    @advisor.WhatsApp
+
+                                    <br />
+                                }
+                                @if (!string.IsNullOrEmpty(advisor.Phone))
+                                {
+                                    <i class="fa fa-phone" style="color:white;margin-right:10px"></i>
+
+                                    @advisor.Phone
+
+                                    <br />
+                                }
+                                @if (!string.IsNullOrEmpty(advisor.Email))
+                                {
+                                    <i class="fa fa-envelope" style="color:white;margin-right:10px"></i>
+
+                                    @advisor.Email
+                                }
+                            </p>*@
+                        <div class="img-overlay"></div>
+                        <div class="img-fade"></div>
+                        @if (advisor.Image != null)
+                        {
+
+                        <img src="@advisor.Image" alt="Advisor Image" />
+                        }
+                        else
+                        {
+                        <img src="~/images/149071.png" alt="Advisor Image" />
+
+                        }
+                    </div>
+                    <div class="team-member-content">
+                        <img class="hex" src="images/hexagon.png" alt="" />
+                        <h4>@advisor.FullName</h4>
+                        <p><strong>@T("model.Advisor.SpeakingLanguages")</strong> <p>@advisor.SpeakingLanguages.Replace(",", " , ")</p></p>
+                        <p><strong>@T("model.Advisor.Experience")</strong>: @advisor.Experience</p>
+                    </div>
+                </div>
+            </div>
+        }
+</div>

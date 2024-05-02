@@ -1,0 +1,42 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-lg-7 col-md-7">
+            <h3>@T("publicUI.home.newsletter.title")</h3>
+            <p>@T("publicUI.home.newletter.subtitle")</p>
+        </div>
+        <form class="col-lg-5 col-md-5" onsubmit="event.preventDefault()">
+            <div class="newsletter-form">
+                <input type="email" id="email" placeholder="Your email..." />
+                <button type="submit" onclick="Register()"><i class="fa fa-send"></i></button>
+            </div>
+        </form>
+    </div><!-- end row -->
+</div><!-- end container -->
+
+<script src="~/js/site.js"></script>
+<script>
+
+
+    function Register() {
+        var re = /\S+@@\S+\.\S+/;
+       
+        var email = $("#email").val();
+        var valid = re.test(email);
+        if (!valid)
+            return;
+        
+        $.ajax({
+            type: "post",
+            url: `/admin/Newspaper/RegisterEmail?email=${email}`,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                SuccessDialog('@T("publicInterface.newspaper.successRegister")');
+            },
+            error: function (e) {
+                console.error(e);
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,264 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Languages.LanguageCreateDTO;
+<link href="~/js/suncfusion/tab/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<br />
+@{
+
+    await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+    {
+        OnSave = "onSave(false)",
+        BackToListhref = "/Admin/Languages/LanguageList",
+    });
+}
+<hr />
+@{
+    var languages = LanguageService.GetAllLanguages();
+}
+<div>
+    <form id="LanguageForm" asp-action="LanguageAdd">
+        <h3>@T("cp.views.languages.update.title")</h3>
+        <div class="form-row">
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <input asp-for="Id" type="hidden" class="form-control" />
+                <label asp-for="Name">@T("model.Language.Name")</label>
+                <input asp-for="Name" type="text" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <label asp-for="Culture">@T("model.Language.Culture")</label>
+                <input asp-for="Culture" type="text" class="form-control" />
+                <span asp-validation-for="Culture" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <label asp-for="Shortcut">@T("model.Language.Shortcut")</label>
+                <input asp-for="Shortcut" class="form-control" />
+                <span asp-validation-for="Shortcut" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                <input asp-for="IsRtl" type="checkbox" class="form-group">
+                <label asp-for="IsRtl">@T("model.Language.IsRtl")</label>
+                <span asp-validation-for="IsRtl" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                <input asp-for="IsActive" type="checkbox" class="form-group">
+                <label asp-for="IsActive">@T("model.Language.IsActive")</label>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+    <form asp-action="LanguageDelete"></form>
+</div>
+<div class="btn btn-primary" onclick="$('#newResourceValueModal').modal('show')"> Add </div>
+<br />
+<br />
+<div class="form-row">
+    @{
+        var gridModel = new Pal.Web.Models.GridViewModel
+        {
+            GridId = "LanguageUpdateGrid",
+            IsAllowToDelete = false,
+            Model = Model.LanguageStringResourceDTOs,
+            Columns = new()
+            {
+                    new() { Field = "Id", HeaderText = "#", Width = "100" },
+                    new() { Field = "ResourceName", HeaderText = T("model.LanguageStringResource.ResourceName").ToString(), Width = "100" },
+                    new() { Field = "ResourceValue", HeaderText = T("model.LanguageStringResource.ResourceValue").ToString(), Width = "100" },
+                    new() { Field = "TextStringResourceGroup", HeaderText = @T("model.Language.StringResourceGroup").ToString(), Width = "100" },
+                    new() { Field = "LanguageId", HeaderText = T("model.Language.LanguageId").ToString(), Width = "100" },
+                }
+        };
+
+        await Html.RenderPartialAsync("_GridView", gridModel);
+    }
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span class="text-danger" id="errorspan"></span>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Value</label>
+                        <input id="stringValue" type="text" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="Save_Changes" class="btn btn-primary Save_number">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- New Resource Modal -->
+<div class="modal fade" id="newResourceValueModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span class="text-danger" id="errorspan"></span>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label>key</label>
+                        <input id="newResourcekey" type="text" class="form-control">
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Value en</label>
+                        <input id="newResourceValue" type="text" class="form-control">
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Value ar</label>
+                        <input id="newResourceValue2" type="text" class="form-control">
+                    </div>
+                    <div class="form-group col-12">
+                        <label>Value tr</label>
+                        <input id="newResourceValue3" type="text" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="onAddNewResourceValue();" class="btn btn-primary ">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script>
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    $('#stringValue').val(args.rowData.ResourceValue);
+                    $('#exampleModalCenter').modal('show');
+                    $('#Save_Changes')[0].setAttribute('onclick', 'onUpdate(' + args.rowData.Id + ')')
+                    break;
+            }
+        }
+
+        //------------------------------------------------------------------------------------------
+        function onUpdate(id) {
+            $.ajax({
+                type: "post",
+                url: `/admin/Languages/StringResourceUpdate?id=${id}&value=${document.querySelector('#stringValue').value}`,
+                contentType: false,
+                processData: false,
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+        }
+
+        //------------------------------------------------------------------------------------------
+        function onAddNewResourceValue() {
+            console.log($('#newResourcekey').val(), $('#newResourceValue').val())
+            if (!$('#newResourcekey').val() || !$('#newResourceValue').val() ) {
+                return;
+            }
+
+            var url = '/Admin/Languages/AddNewResource?';
+            url += `ResourceKey=${$('#newResourcekey').val()}`;
+            url += `&ResourceValue=${$('#newResourceValue').val()}`
+            url += `&ResourceValue2=${$('#newResourceValue2').val()}`
+            url += `&ResourceValue3=${$('#newResourceValue3').val()}`
+            
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                url: url,
+                type:'POST',
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                        $('#newResourcekey').val('');
+                        $('#newResourceValue').val('');
+                        $('#newResourceValue2').val('');
+                        $('#newResourceValue3').val('');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            })
+        }
+    </script>
+
+    <script>
+        //------------------------------------------------------------------------------------------
+        function onSave(saveAndNew) {
+            $("#LanguageForm").valid();
+
+            // readyupdata
+            var data = new FormData();
+            data.append('Name', document.querySelector('#Name').value);
+            data.append('Id', document.querySelector('#Id').value);
+            data.append('Shortcut', document.querySelector('#Shortcut').value);
+            data.append('Culture', document.querySelector('#Culture').value);
+            data.append('IsRtl', $('#IsRtl').prop('checked'));
+            data.append('IsActive', $('#IsActive').prop('checked'));
+
+            // ajax
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                type: "post",
+                url: "/admin/Languages/LanguageUpdate",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onUpdateSuccess")');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")', '@T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

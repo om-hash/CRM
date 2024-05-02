@@ -1,0 +1,184 @@
+﻿@{
+    ViewData["Title"] = T("cp.account.view.PhoneNumberVerification.title");
+}
+
+<style>
+    #wrapper {
+        margin: 100px 0;
+        font-family: Lato;
+        font-size: 1.5rem;
+        text-align: center;
+        box-sizing: border-box;
+        color: #333;
+    }
+
+        #wrapper #dialog {
+            border: solid 1px #ccc;
+            margin: 10px auto;
+            padding: 20px 30px;
+            display: inline-block;
+            box-shadow: 0 0 4px #ccc;
+            background-color: #FAF8F8;
+            overflow: hidden;
+            position: relative;
+            max-width: 450px;
+        }
+
+            #wrapper #dialog h3 {
+                margin: 0 0 10px;
+                padding: 0;
+                line-height: 1.25;
+            }
+
+            #wrapper #dialog span {
+                font-size: 90%;
+            }
+
+            #wrapper #dialog #form {
+                margin: 25px auto 0;
+            }
+
+                #wrapper #dialog #form input {
+                    margin: 0 5px;
+                    text-align: center;
+                    line-height: 80px;
+                    font-size: 50px;
+                    border: solid 1px #ccc;
+                    box-shadow: 0 0 5px #ccc inset;
+                    outline: none;
+                    transition: all 0.2s ease-in-out;
+                    border-radius: 3px;
+                }
+
+                    #wrapper #dialog #form input:focus {
+                        border-color: #e8792f;
+                        box-shadow: 0 0 5px #e8792f inset;
+                    }
+
+                    #wrapper #dialog #form input::-moz-selection {
+                        background: transparent;
+                    }
+
+                    #wrapper #dialog #form input::selection {
+                        background: transparent;
+                    }
+
+            #wrapper #dialog button {
+                margin: 30px 0 50px;
+                width: 100%;
+                padding: 6px;
+                background-color: #e8792f;
+                border: none;
+                text-transform: uppercase;
+            }
+
+                #wrapper #dialog button.close {
+                    border: solid 2px;
+                    border-radius: 30px;
+                    line-height: 19px;
+                    font-size: 120%;
+                    width: 22px;
+                    position: absolute;
+                    right: 5px;
+                    top: 5px;
+                }
+
+            #wrapper #dialog div {
+                position: relative;
+                z-index: 1;
+            }
+
+            #wrapper #dialog img {
+                position: absolute;
+                bottom: -70px;
+                right: -63px;
+            }
+</style>
+
+
+<form asp-action="CheckSmsVerification" id="myForm" method="post">
+    <input hidden value="@ViewBag.userId" id="userId" />
+    <div id="wrapper">
+        <div id="dialog">
+            <h3>@T("publicInterface.account.phoneVerification.Title1") <span dir="ltr">(@ViewBag.userPhoneNumber)</span></h3>
+            <span>@T("publicInterface.account.phoneVerification.Title2")</span>
+            <div id="form">
+                <input id="verificationCode" type="text" maxLength="6" size="6" min="00000" max="999999" pattern="[0-9]{6}" />
+            </div>
+
+            <button class=" btn-block button">@T("btn.verify")</button>
+
+            <div>
+                @T("publicInterface.account.phoneVerification.Title3")<br />
+                <div class="button" onclick="onResendCode()">@T("btn.sendCodeAgain")</div><br />
+                @*<a href="#">@T("btn.changePhoneNumber")</a>*@
+            </div>
+        </div>
+    </div>
+
+</form>
+
+
+@section Scripts{
+    <script>
+        $('#myForm').on('submit', function (e) {
+            e.preventDefault();
+            var userId = $('#userId').val();
+            var code = $('#verificationCode').val();
+            if (!code)
+                return;
+
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            pleaseWaitDialog.show();
+            $.ajax({
+                headers: header,
+                url: `/Account/CheckRegisterSmsVerification?userId=${userId}&code=${code}&tokenType=0`,
+                type: 'post',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.responseType !== 1) {
+                        ErrorDialog('Phone Number Verification', 'The code you have written is wrong.')
+                    } else {
+                        location.assign('/Admin/Dashboard');
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                },
+                complete: function () {
+                    pleaseWaitDialog.hide();
+                }
+            });
+        });
+
+        //---------------------------------------------------------------
+        //function onResendCode() {
+
+        //    var userId = $('#userId').val();
+
+        //    var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+        //    pleaseWaitDialog.show();
+        //    $.ajax({
+        //        headers: header,
+        //        url: '/Account/ResendPhoneVerificationSms?userId=' + userId,
+        //        type: 'post',
+        //        dataType: 'json',
+        //        success: function (res) {
+        //            if (res.responseType !== 1) {
+        //                ErrorDialog('Phone Number Verification', 'The phone number you have written is wrong.')
+        //            } else {
+        //                SuccessDialog('Success', 'We have sent an another code to your phone number!');
+        //            }
+        //        },
+        //        error: function (e) {
+        //            console.error(e);
+        //        },
+        //        complete: function () {
+        //            pleaseWaitDialog.hide();
+        //        }
+        //    });
+
+        //}
+
+    </script>
+}

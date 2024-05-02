@@ -1,0 +1,42 @@
+﻿@using Pal.Data.VMs.Customer
+
+@model ProfileSidebarViewModel
+
+    <style>
+        .homeIcone {
+            color: #3a464e !important;
+        }
+    </style>
+<div class="col-lg-3 col-md-3 sidebar-left">
+    <div class="widget member-card">
+        <div class="member-card-header">
+            <a class="member-card-avatar" id="mainImageLink">
+                @if (Model.CustomerImage != null)
+                {
+                    <img src="@Model.CustomerImage" alt="" id="mainImgPreview"/>
+
+                }
+                else
+                {
+                    <img src="/images/profile-img.png" alt="" id="mainImgPreview"/>
+                }
+
+            </a>
+            <h3>@Model.CustomerName</h3>
+            <p><i class="fa fa-envelope icon"></i>@Model.Email</p>
+        </div>
+        <div class="member-card-content">
+            <img class="hex" src="images/hexagon.png" alt="" />
+            <ul>
+                <li class="@(Model.ViewName == "profile" ? "active" : "")"><a asp-controller="Customers" asp-action="Profile"><i class="fa fa-user icon"></i>@T("publicInterface.profile.Sidebar.profile")</a></li>
+                <li class="@(Model.ViewName == "my tours" ? "active" : "")"><a  asp-controller="Customers" asp-action="Tours" ><i class="fa fa-home icon homeIcone"></i>@T("publicInterface.profile.Sidebar.myTours")</a></li>
+                <li class="@(Model.ViewName == "favorite" ? "active" : "")"><a asp-controller="Customers" asp-action="Favorite"><i class="fa fa-heart icon"></i>@T("publicInterface.profile.Sidebar.favoritedProperties")</a></li>
+                <li class="@(Model.ViewName == "new tour" ? "active" : "")"><a asp-controller="Tour" asp-action="Index"><i class="fa fa-plus icon"></i>@T("publicInterface.profile.Sidebar.newTour")</a></li>
+                <li><a asp-controller="Chat" asp-action="Index"><i class="fas fa-comment icon"></i>@T("publicInterface.profile.Sidebar.myChats")</a></li>
+              @*  <li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-lock icon"></i>@T("publicInterface.profile.Sidebar.changePassword")</a></li>
+                <li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-mobile-phone icon"></i>@T("publicInterface.profile.Sidebar.changePhoneNumber")</a></li>*@
+                <li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-reply icon"></i>@T("publicInterface.profile.Sidebar.logout")</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

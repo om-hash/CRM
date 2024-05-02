@@ -1,0 +1,95 @@
+﻿@using Syncfusion.EJ2.Navigations;
+@model Pal.Data.DTOs.Languages.LanguageCreateDTO;
+<link href="~/js/suncfusion/tab/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+<br />
+@{
+
+    await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+    {
+        OnSave = "onSave(false)",
+        BackToListhref = "/Admin/Languages/LanguageList",
+    });
+}
+<hr />
+@{
+    var languages = LanguageService.GetAllLanguages();
+}
+<div>
+    <form id="LanguageForm" asp-action="LanguageAdd">
+        <h3>@T("cp.views.languages.add.title")</h3>
+        <div class="form-row">
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <label asp-for="Name">@T("model.Language.Name")</label>
+                <input asp-for="Name" type="text" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <label asp-for="Culture">@T("model.Language.Culture")</label>
+                <input asp-for="Culture" type="text" class="form-control" />
+                <span asp-validation-for="Culture" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-12 col-md-6 col-sm-12">
+                <label asp-for="Shortcut">@T("model.Language.Shortcut")</label>
+                <input asp-for="Shortcut" class="form-control" />
+                <span asp-validation-for="Shortcut" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                <input asp-for="IsRtl" type="checkbox" class="form-group">
+                <label asp-for="IsRtl">@T("model.Language.IsRtl")</label>
+                <span asp-validation-for="IsRtl" class="text-danger"></span>
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                <input asp-for="IsActive" type="checkbox" class="form-group">
+                <label asp-for="IsActive">@T("model.Language.IsActive")</label>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+
+    <script>
+        function onSave(saveAndNew) {
+            $("#LanguageForm").valid();
+
+            // readyupdata
+            var data = new FormData();
+            data.append('Name', document.querySelector('#Name').value);
+            data.append('Shortcut', document.querySelector('#Shortcut').value);
+            data.append('Culture', document.querySelector('#Culture').value);
+            data.append('IsRtl', $('#IsRtl').prop('checked'));
+            data.append('IsActive', $('#IsActive').prop('checked'));
+
+            // ajax
+            var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+            $.ajax({
+                headers: header,
+                type: "post",
+                url: "/admin/Languages/LanguageAdd",
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (message) {
+                    if (message.responseType === 3) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                    else if (message.responseType === 1) {
+                        SuccessToast('@T("cp.alert.onSaveSuccess")');
+                    }
+                    else {
+                        ErrorDialog('@T("cp.alert.error")',' @T("cp.alert.onSaveFailde")');
+                    }
+                },
+                error: function () {
+                    alert('@T("cp.alert.error")');
+                }
+            });
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

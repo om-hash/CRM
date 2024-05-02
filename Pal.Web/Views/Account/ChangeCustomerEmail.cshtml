@@ -1,0 +1,108 @@
+﻿@model string;
+@{
+    ViewData["Title"] = T("publicInterface.resetEmail.title");
+    var userId = ViewBag.UserId;
+}
+<section class="module login">
+    <form id="myForm" onsubmit="StopSubment(event)">
+        <div class="container">
+            <div class="row">
+
+                <input id="userId" type="hidden" value="@userId" />
+                <div class="col-lg-4 col-lg-offset-4">
+                    <h4>@T("publicInterface.resetEmail.title")</h4>
+                    <h5>@T("publicInterface.resetEmail.subTitle")</h5>
+
+                    <div class="divider"></div>
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-block">
+                    <label>@T("publicInterface.resetEmail.newEmail")</label>
+                    <label id="newEmail-error" class="text-danger error" for="newEmail"></label>
+                    <small class="text-danger field-validation-valid" id="EmailValidation"></small>
+                    <input class="form-control" id="newEmail" onchange="CheckEmail(this.value)" required type="email" />
+                </div>
+                    <div class="form-block">
+                        <button class="button button-icon" onclick="changeEmail()"><i class="fa fa-angle-right"></i>@T("btn.save")</button>
+                    </div>
+                    <div class="divider " style=" margin-bottom: 103px;"></div>
+                </div>
+            </div><!-- end row -->
+        </div>
+    </form>
+</section>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let EmailCheckValue;
+
+        function StopSubment(e) {
+            e.preventDefault();
+
+        }
+
+        function CheckEmail(e) {
+        
+
+            $.ajax({
+                type: "post",
+                url: `/Account/IsEmailExist?email=${e}`,
+                contentType: false,
+                processData: false,
+
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("EmailValidation");
+                    if (res.responseType === 0) {
+                        UserNameErrorSpan.textContent = '';
+                        EmailCheckValue = 0;
+
+                    } else {
+                        UserNameErrorSpan.textContent = '';
+                        UserNameErrorSpan.textContent = 'Email Existing!';
+                        EmailCheckValue = 1;
+
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+        function changeEmail() {
+            if (!$("#myForm").valid()) {
+                return;
+            }
+
+            //if (!$("#myForm").valid()) {
+            //    return;
+            //}
+            if (EmailCheckValue !== 0) return;
+
+            var id = $("#userId").val();
+            var newEmail = $("#newEmail").val();
+            pleaseWaitDialog.show();
+            $.ajax({
+                type: "post",
+                url: `/Account/ChangeCustomerEmail?Id=${id}&Email=${newEmail}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    var UserNameErrorSpan = document.getElementById("EmailValidation");
+                    if (res.responseType === 1) {
+                        SuccessDialog('@T("publicInterface.view.changeCustomerEmail.SuccessDialog")');
+                        setTimeout(() => { window.location.assign("/Customers/Profile") }, 3000)
+
+                    } else {
+                        alert("something went wrong!!")
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+
+        }
+    </script>
+
+}

@@ -1,0 +1,220 @@
+﻿@using Newtonsoft.Json;
+@using Pal.Web.Models;
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/lib/intl-tel-input/css/intlTelInput.min.css" rel="stylesheet" />
+@{
+    ViewData["Title"] = T("admin.SalesList.View.Title");
+    var languages = LanguageService.GetAllLanguages();
+    var workingLanguage = LanguageService.GetLanguageIdFromRequestAsync();
+    var comapmyCategory = ViewBag.SalesCateogries;
+    var City = ViewBag.City;
+    var Countries = ViewBag.Countries;
+
+
+    var gridModel = new Pal.Web.Models.GridViewModel
+    {
+        GridId = "SalesGrid",
+        AllowResize = true,
+        Url = "/Admin/Sales/SalesPaginatedList",
+        Columns = new()
+        {
+            new() { Field = "id", HeaderText = "#", Width = "100", IsAllowEditing = false },
+            new() { Field = "SalesName", HeaderText = T("model.Sales.Name").ToString(), Width = "200", Id = "SalesName" },
+            new() { Field = "categoryName", HeaderText = T("model.Sales.SalesCategoryId").ToString(), Width = "200" },
+            new() { Field = "phone", HeaderText = T("model.Sales.Phone").ToString(), Width = "200" },
+            new() { Field = "whatsApp", HeaderText = T("model.Sales.WhatsApp").ToString(), Width = "200" },
+            new() { Field = "email", HeaderText = T("model.Sales.Email").ToString(), Id = "ee", Width = "200" },
+            new() { Field = "website", HeaderText = T("model.Sales.Website").ToString(), Visiable = false, Width = "200" },
+            new() { Field = "managerName", HeaderText = T("model.Sales.managerName").ToString(), Visiable = false, Width = "200" },
+            new() { Field = "managerEmail", HeaderText = T("model.Sales.managerEmail").ToString(), Visiable = false, Width = "200" },
+            new() { Field = "fullAddress", HeaderText = T("FullAddress").ToString(), Visiable = false, Width = "200" },
+            new() { Field = "countryName", HeaderText = T("country").ToString(), Width = "200" },
+            new() { Field = "cityName", HeaderText = T("cityName").ToString(), Width = "200", Id = "city" },
+        }
+    };
+}
+
+<form asp-action="SalesDelete"></form>
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <div class="form-row">
+            <div class="mr-auto">
+                <a class="btn btn-sm btn-primary" asp-action="SalesListAdd">@T("btn.add")</a>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-sm bg-gradient-primary active" onclick="showDeletedChanged('@gridModel.GridId',false)">
+                        <input type="radio" name="options" id="option_b1" autocomplete="off" checked=""> Active
+                    </label>
+                    <label class="btn btn-sm bg-gradient-primary " onclick="showDeletedChanged('@gridModel.GridId',true)">
+                        <input type="radio" name="options" id="option_b2" autocomplete="off"> Deleted
+                    </label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-sm btn-primary" onclick="document.querySelector('#UploadList').click()">@T("btn.addList")</a>
+                <input id="UploadList" onchange="UploadList(this)" type="file" hidden />
+                <a class="btn btn-sm btn-success" asp-action="SalesEditableList">@T("btn.editableDataGridView")</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div>
+            @{
+                await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+            }
+        </div>
+    </div>
+
+    @*<div class="card-footer">
+        <a class="btn btn-sm btn-primary" asp-action="SalesAdd">@T("btn.add")</a>
+    </div>*@
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/intl-tel-input/js/intlTelInput.min.js"></script>
+    <script>
+        //----------------------------
+
+        function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Sales/SalesUpdate/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                        title: '@T("cp.alert.onDeleteMessage.subtitle")',
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+
+                case "DeletePermanentBtn":
+                    ConfirmAlert("@T("cp.alert.onDeleteMessage.subtitle")", () => onDelete(args.rowData.id, true) );
+                    break;
+
+                case "RestoreBtn":
+                    ConfirmAlert("@T("Are You Sure?")", () => onRestore(args.rowData.id) );
+                    break;
+            }
+        }
+
+        function onDelete(id, isPermenantly ) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            var url = '/Admin/Sales/SalesDelete/' + id;
+            if (isPermenantly)
+                url = '/Admin/Sales/DeletePermenantly/' + id;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.isSuccess) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                         '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+          //==================================
+        function onRestore(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            var url = '/Admin/Sales/Restore/' + id;
+
+            $.ajax({
+                url:  url,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.isSuccess) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        console.log(grid.getSelectedRecords());
+                        grid.deleteRecord("id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                           '@T("cp.alert.onRestoreSuccess.title")',
+                            '@T("cp.alert.onRestoreSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                            '@T("cp.alert.onRestoreError.title")',
+                            '@T("cp.alert.onRestoreError")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                       '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+
+
+
+
+        function UploadList(input) {
+            var files = input.files;
+            var formData = new FormData();
+            formData.append("ExcelFile", files[0]);
+   
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "UploadList",
+                    data: formData,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        alert("Files Uploaded!");
+                    }
+                }
+            );
+
+        }
+
+
+    </script>
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

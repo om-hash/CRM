@@ -1,0 +1,262 @@
+﻿@model Pal.Data.DTOs.CRM.Deals.DealDetialsDTO
+@{
+    ViewData["Title"] = T("cp.views.deals.dealDetails").ToString();
+
+    var languages = LanguageService.GetAllLanguages();
+
+    var myID =
+
+}
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+@*<link href="~/css/style.css" rel="stylesheet" />*@
+<br />
+
+<style>
+ 
+</style>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+
+                BackToListhref = "/Admin/Deals/DealsList",
+            });
+        }
+    </div>
+
+    <div class="card-body">
+        <div  id="stagediv" style="margin-bottom:10px; display:flex; justify-content:center; align-items:center" dir="ltr">
+
+            @foreach (var item in ViewBag.DealStage.Items)
+            {
+                if (item.Id == Model.StageId)
+                {
+                    <button type="button" id="stage-@item.Id" onclick="changStage(@item.Id)" style="background: #dc3545" class="btn  btn-arrow-right stagesBTN">@item.Name</button>
+                }
+                else
+                {
+
+                    <button type="button" id="stage-@item.Id" onclick="changStage(@item.Id)" class="btn btn-arrow-right stagesBTN">@item.Name</button>
+                }
+
+
+            }
+
+
+        </div>
+
+
+        @*<li class="breadcrumb-item pl-0"><a href="#" class="text-uppercase">Library</a></li>
+            <li class="breadcrumb-item pl-0"><a href="#" class="text-uppercase">Library</a></li>
+            <li class="breadcrumb-item pl-0"><a href="#" class="text-uppercase">Library</a></li>
+            <li class="breadcrumb-item pl-0"><a href="#" class="text-uppercase">Library</a></li>
+
+            </ol>*@
+        <div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="background-color: #6c757d61 ">
+                        <h3 class="card-title">
+                            <i class="fas fa-text-width"></i>
+                            @T("cp.views.deals.dealDetails.title.dealInformation")
+                        </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <dl>
+                            <dt>@T("model.Deal.EmployeeId")</dt>
+                            <dd>@Model.Employee</dd>
+                            <dt>@T("model.Deal.StageId")</dt>
+                            <dd>@Model.StageName</dd>
+                            <dt>@T("model.Deal.SuccessProbability") (%)</dt>
+                            <dt>
+                                <div class="progress" style="width: 20%;">
+                                    <div class="progress-bar bg-primary progress-bar-striped" role="progressbar"
+                                         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @Model.SuccessProbability%">
+                                        <span class="sr-only">40% Complete (success)</span>
+                                    </div>
+                                </div>
+                            </dt>
+                            <dd>@Model.SuccessProbability%</dd>
+                            <dt>@T("model.Deal.Amount")</dt>
+                            <dd>@Model.Amount$</dd>
+                        </dl>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+
+        </div>
+
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #6c757d61 ">
+                    <h3 class="card-title">
+                        <i class="fas fa-user"></i>
+                        @T("cp.views.deals.dealDetails.title.customerInformation")
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="col-12 col-sm-12 col-md-6 d-flex align-items-stretch flex-column">
+                        <div class="card bg-light d-flex flex-fill ">
+                            <div class="card-header text-muted border-bottom-0">
+                                @*@Model.*@
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row">
+                                    <div class="col-12 ">
+                                        <h2 class="lead"><b>@Model.CustomerName</h2>
+                                        <p class="text-muted text-sm"><strong>  @T("cp.views.deals.dealDetails.title.address"): </strong>@Model.CustomerAddress</p>
+                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                            <li class="small"><span class="fa-li"><i class="fas fa-envelope"></i></span>@Model.CustomerEmail</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>@Model.PhoneNumber</li>
+                                        </ul>
+                                    </div>
+                                    <!--<div class="col-5 text-center">-->
+                                    @*<img src="../../dist/img/user1-128x128.jpg" alt="user-avatar" class="img-circle img-fluid">*@
+                                    <!--</div>-->
+                                </div>
+                            </div>
+                            @*
+                            <div class="card-footer">
+                                <div class="text-right">
+                                    @{ var link = "/Admin/Chat/Index?chatType=1&senderType=0&senderId=Admin&receiverType=Customers&receiverId={Model.CustomerId}&ref1=Admin&ref2={Model.CustomerId}"; }
+                                    <a href="@link" class="btn btn-sm bg-teal">
+                                        <i class="fas fa-comments"></i>
+                                    </a>
+                                    <a href="/admin/Leads/LeadUpdate/@Model.CustomerId" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-user"></i> @T("cp.views.deals.dealDetails.title.viewProfile")
+                                    </a>
+                                </div>
+                            </div>
+                        *@
+                            
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="background-color: #6c757d61 ">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-week"></i>
+                            @T("cp.views.deals.dealDetails.title.dealDetails")
+                        </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div style="display:flex; ">
+                            <div class="col-6">
+                                <dl>
+                                    <dt>@T("model.Deal.EmployeeId")</dt>
+                                    <dd>@Model.Employee</dd>
+                                    <dt>@T("model.Deal.DealName")</dt>
+                                    <dd>@Model.DealName</dd>
+                                    <dt>@T("model.Deal.SuccessProbability") (%)</dt>
+                                    <dd>@Model.SuccessProbability</dd>
+                                    <dt>@T("model.Deal.Amount")</dt>
+                                    <dd>@Model.Amount$</dd>
+                                </dl>
+                            </div>
+                            <div class="col-6">
+                                <dl>
+                                    <dt>@T("model.Deal.ClosingDate")</dt>
+                                    <dd>@Model.ClosingDate</dd>
+                                    <dt>@T("model.Deal.NextStep")</dt>
+                                    <dd>@Model.NextStep</dd>
+                                    <dt>@T("model.Deal.StageId")</dt>
+                                    <dd>@Model.StageName</dd>
+                                    <dt>@T("model.Deal.TypeId")</dt>
+                                    <dd>@Model.TypeString</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <dl>
+                                <dt>@T("model.Deal.Description")</dt>
+                                <dd>@Model.Description</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+
+        </div>
+    </div>
+    @*<div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+
+                BackToListhref = "/Admin/Deals/DealsList",
+            });
+        }
+    </div>*@
+</div>
+<!-- /.card -->
+
+
+
+
+<hr />
+
+@section Scripts{
+    <script>
+
+        function changStage(e) {
+         var id=   $("#Id").val();
+         $.ajax({
+                type: "post",
+             url: `/admin/Deals/ChangeDealStage?id=${id}&stageId=${e}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var btns = document.querySelectorAll(".stagesBTN");
+                        btns.forEach((val, i) => {
+                            val.style.background = "#6c757d";
+                        });
+                        $(`#stage-${e}`).css("background", "#dc3545")
+                    } else {
+                        alert("hello")
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                }
+
+            });
+
+
+        }
+
+
+
+    </script>
+
+
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

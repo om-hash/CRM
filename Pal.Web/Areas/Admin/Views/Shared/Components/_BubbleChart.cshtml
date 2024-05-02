@@ -1,0 +1,30 @@
+﻿@using Pal.Data.DTOs.Statistics;
+@model BubbleChartDTO;
+@{ var isRtl = LanguageService.IsLayoutRtl();}
+
+@if (Model != null)
+{
+    <div class="control-section" style="margin-top:10px">
+        <div id="container" align="center">
+            <ejs-chart id="BubbleContainer" title="Deals">
+                <e-chart-tooltipsettings enable="true" format="${point.text}<br/>@T("model.Deal.SuccessProbability") : <b>${point.x}%</b> <br/>@T("model.Deal.Amount") : <b>${point.y}$</b><br/>">
+                </e-chart-tooltipsettings>
+                <e-chart-legendsettings visible="false">
+                </e-chart-legendsettings>
+                <e-chart-primaryxaxis title="@T("model.Deal.SuccessProbability")" minimum=0
+                                  maximum=100 interval=10 labelFormat=""></e-chart-primaryxaxis>
+                <e-chart-primaryyaxis title="@T("model.Deal.Amount")" minimum=0
+                                  maximum=@Model.MaxValue interval=@Model.Step></e-chart-primaryyaxis>
+                <e-series-collection>
+                    <e-series dataSource="@Model.Data" minRadius=3 maxRadius=8 xName="x" yName="y"
+                          size="size" name="deal" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Bubble">
+                        <e-series-marker>
+                            <e-series-datalabel name="text"></e-series-datalabel>
+                        </e-series-marker>
+                    </e-series>
+                </e-series-collection>
+            </ejs-chart>
+        </div>
+    </div>
+}
+<ejs-scripts></ejs-scripts>

@@ -1,0 +1,36 @@
+﻿@model Pal.Web.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="module login">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-lg-offset-4">
+                <form asp-action="Login" method="post">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    <div class="form-block">
+                        <label>@T("publicUI.account.logIn.emailOrUserName")</label>
+                        <input class="border" type="text" asp-for="UserNameOrEmail" />
+                    </div>
+                    <div class="form-block">
+                        <label>@T("publicUI.account.logIn.password")</label>
+                        <input class="border" type="password" asp-for="Password"/>
+                    </div>
+                    <div class="form-block">
+                        <button class="button button-icon" type="submit"><i class="fa fa-angle-right"></i>@T("global.login")</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; 
+                    margin-top: 40px; padding-top:20px; border-top: 1px solid #D3d8dc;">
+                        <label><input type="checkbox" asp-for="RememberMe" />@T("publicUI.account.logIn.rememberMe")</label>
+@*                        <a asp-action="ForgetPasswordByEmail" asp-controller="Account">@T("publicUI.account.logIn.ForgotMyPassword")</a>*@
+                    </div>
+                    <div class="divider"></div>
+                </form>
+       
+            </div>
+        </div><!-- end row -->
+
+    </div>
+</section>
+

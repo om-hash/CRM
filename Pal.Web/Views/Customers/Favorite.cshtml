@@ -1,0 +1,166 @@
+﻿@using Pal.Data.DTOs.Customer;
+@model List<CustomerFavoriteViewModel>
+
+
+<style>
+    .favorite-properties-list .property-actions {
+        width: 50%;
+    }
+</style>
+
+<section class="subheader" style="background-image: url('/images/Members------main-photo-B.jpg') ">
+    <div class="container">
+        <h1>@T("publicInterface.customers.favorite.title")</h1>
+        <div class="breadcrumb right">@T("global.home") <i class="fa fa-angle-right"></i> <a href="#" class="current">@T("publicInterface.customers.favorite.title")</a></div>
+        <div class="clear"></div>
+    </div>
+</section>
+
+<section class="module favorited-properties">
+    <div class="container">
+
+        <div class="row">
+            <partial name="Partials/_ProfileSidebar" model="new  Pal.Data.VMs.Customer.ProfileSidebarViewModel(Model[0]?.ProfileSidebarViewModel?.CustomerImage)" />
+
+            <div class="col-lg-9 col-md-9">
+                <table class="my-properties-list favorite-properties-list">
+                    <tr>
+                        <th>@T("model.MainImage")</th>
+                        <th>@T("btn.details")</th>
+                        <th>@T("global.manage")</th>
+                    </tr>
+                    @foreach (var item in Model)
+                    {
+
+
+                        <tr id="row-@item.Id-@item.ItemType">
+                            <td class="property-title" style=" width: 50%;">
+                                <a href="#" class="property-img" target="_blank">
+                                    <img style=" object-fit: contain; width:100%" src="@item.Image" alt="" />
+                                </a>
+
+                            </td>
+                            <td class="property-title" style="width: 50%; padding-left: 52px;">
+
+                                <a href="property-single.html">@item.Name</a><br />
+                                <p class="property-address"><i class="fa fa-map-marker icon"></i>@item.Address</p>
+                                <p><strong>$@item.Price</strong></p>
+                            </td>
+                            <td class="property-actions" style="display: flex; justify-content: center; padding-top: 50%; align-items: center; width: 125%; ">
+                                <a href="@item.Link" style=" display: flex; "><i class="fa fa-eye icon"></i>@T("btn.details")</a>
+                                @if (item.IsAddedToTour)
+                                {
+
+                                    <a style=" display: flex; "><i class="fas fa-plus-circle disabled"></i>Added</a>
+                                }
+                                else
+                                {
+                                    <a id="btnAddToTour-@item.Id" onclick="CheckIfPropertyExist(@item.Id, '@item.ItemType.ToString()', @item.CityId)" style=" display: flex; "><i class="fas fa-plus-circle"></i>Add to tour</a>
+                                }
+                                <a onclick="onDeleteFavoriteItem('@item.Id', '@item.ItemType.ToString()')" style=" display: flex; "><i class="fa fa-close icon"></i>@T("btn.delete")</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div><!-- end col -->
+        </div><!-- end row -->
+
+    </div><!-- end container -->
+</section>
+<!-- Warning model for tour adding -->
+<div class="modal" id="myModel" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #e8792f; ">
+                <h5 style="color:white" class="modal-title">@T("global.warning")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>@T("warning.propertyAddedBefor")</h5>
+                <h6>@T("warning.propertyAddedBeforWouldYouLikeToAdd")</h6>
+            </div>
+            <div class="modal-footer">
+                <button type="button" style="background-color: #e8792f; color:white" onclick="onAddToTour()" class="btn">@T("btn.yes")</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@T("btn.no")</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end Warning model for tour adding  -->
+
+@section Scripts{
+
+    <script>
+        let RefrencId = 0;
+        let CityId = 0;
+        let RefrencType = 0;
+        //---------------------------------------------------------------------------
+        function onDeleteFavoriteItem(Id, referenceType) {
+            pleaseWaitDialog.show();
+            $.ajax({
+                url: `/Customers/RemoveItemFromFavorite?id=${Id}&type=${referenceType}`,
+                type: 'POST',
+                success: function (res) {
+                    $(`#row-${Id}-${referenceType}`).remove();
+                },
+                error: function (e) {
+                    console.error(e);
+                },
+                complete: function () {
+                    pleaseWaitDialog.hide();
+                }
+            });
+        }
+        //--------------------------------------------------------------------
+        function CheckIfPropertyExist(refrencId, refrencType, cityId) {
+            $.ajax({
+                type: "POST",
+                url: `/Tour/CheckPropertyExistInOldTours?id=${refrencId}&type=${refrencType}`,
+                success: function (data) {
+                    console.log(data.responseType)
+                    if (data.responseType == 0) {
+                        $("#myModel").modal("show");
+                        RefrencId = refrencId;
+                        CityId = cityId;
+                        RefrencType = refrencType
+                    }
+                    else {
+                        RefrencId = refrencId;
+                        CityId = cityId;
+                        RefrencType = refrencType
+                        onAddToTour();
+                    }
+                },
+                error: function (e) {
+                }
+            });
+        }
+        //--------------------------------------------------------------------
+        function onAddToTour() {
+            $("#myModel").modal("hide");
+            $(`#btnAddToTour-${RefrencId}`).attr('disabled', true).html('Please Wait...');
+            $.ajax({
+                type: "get",
+                url: `/Tour/TourItemAdd?referenceType=${RefrencType}&referenceId=${RefrencId}&cityId=${CityId}`,
+                success: function (res) {
+                    if (res.responseType === 3) {
+                        $(`#btnAddToTour-${RefrencId}`).attr('disabled', false).html('Add To Tour');
+                    }
+                    else if (res.responseType === 1) {
+                        $(`#btnAddToTour-${RefrencId}`).attr('disabled', true).html('Added');
+                    }
+                    else {
+                        alert("something happend while saveing the info!!");
+                    }
+                },
+                error: function (e) {
+                    location.assign('/Account/Login');
+                    console.error(e);
+                }
+            });
+
+        }
+    </script>
+}

@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = T("cp.views.blogs.title");
+}
+
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/datagrid/customGridStyle.css" rel="stylesheet" />
+
+<br>
+<p>
+    <a class="btn btn-primary" asp-action="AddBlog">@T("btn.add")</a>
+</p>
+
+
+<form asp-action="BlogDelete" method="post">
+</form>
+
+
+@{
+
+
+    var gridModel = new Pal.Web.Models.GridViewModel
+    {
+        GridId = "BlogsGrid",
+        Url = "/Admin/Blogs/BlogsPaginatedList",
+         
+        Columns = new()
+        {
+                    new() { Field = "id", HeaderText = "#", Width = "100" },
+                    new() { Field = "title", HeaderText = T("model.BlogPost.Title").ToString(), Width = "100" },
+                    new() { Field = "subTitle", HeaderText = T("model.BlogPost.SubTitle").ToString(), Width = "100" },
+                    new() { Field = "tags", HeaderText = T("model.BlogPost.Tags").ToString(), Width = "100" },
+        }
+    };
+
+    await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+}
+
+
+
+@section Scripts{
+    <script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+         function commandClick(args) {
+            switch (args.commandColumn.type) {
+                case "EditBtn":
+                    window.location.assign('/Admin/Blogs/UpdateBlog/' + args.rowData.id);
+                    break;
+                case "DeleteBtn":
+                    Swal.fire({
+                        title: "@T("cp.alert.onDeleteMessage.subtitle")",
+                        text: "@T("cp.alert.onDeleteMessage.title")",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText:  '@T("cp.alert.onDelete.btnDelete")',
+                        cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            onDelete(args.rowData.id);
+                        }
+                    });
+                    break;
+            }
+        }
+    </script>
+    <script>
+       
+
+        function onDelete(id) {
+            var token = $("input[name='__RequestVerificationToken']").val();
+            $.ajax({
+                url: '/admin/Blogs/BlogDelete/' + id,
+                type: 'POST',
+                headers: { RequestVerificationToken: token },
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var grid = document.getElementById('@gridModel.GridId').ej2_instances[0];
+                        grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+                        Swal.fire(
+                              '@T("cp.alert.onDeleteSuccess.title")',
+                            '@T("cp.alert.onDeleteSuccess.subtitle")',
+                            'success',
+                        );
+
+                    } else {
+                        Swal.fire(
+                            '@T("cp.alert.onDeleteFailde.title")',
+                            '@T("cp.alert.onDeleteFailde")',
+                            'error',
+                        );
+                    }
+
+                },
+                error: function (e) {
+                    Swal.fire(
+                        '@T("cp.alert.onDeleteFailde.title")',
+                        '@T("cp.alert.onDeleteFailde.subtitle")',
+                        'error',
+                    );
+                    console.error(e);
+                }
+            });
+        }
+    </script>
+}

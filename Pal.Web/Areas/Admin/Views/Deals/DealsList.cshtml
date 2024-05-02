@@ -1,0 +1,135 @@
+@{
+	ViewData["Title"] = T("Deals List");
+}
+
+<link href="~/js/suncfusion/datagrid/bootstrap4.min.css" rel="stylesheet" />
+
+<div class="card card-outline card-primary">
+	<div class="card-header">
+		<a asp-action="DealAdd" class="btn btn-sm btn-primary">@T("btn.add")</a>
+	</div>
+
+	<div class="card-body">
+
+		@{
+			var gridModel = new Pal.Web.Models.GridViewModel
+			{
+				GridId = "DealsGrid",
+				AllowToShowDetails = true,
+				//Model = Model,
+				Url = "/Admin/Deals/DealsPaginatedList",
+				Columns = new()
+				{
+					new() { Field = "id", HeaderText = "#", Width = "50" },
+					new() { Field = "dealName", HeaderText = T("model.Deal.DealName").ToString(), Width = "100" },
+					new() { Field = "typeString", HeaderText = T("model.Deal.TypeId").ToString(), Width = "100" },
+					new() { Field = "leadSourceString", HeaderText = T("model.Deal.LeadSourceId").ToString(), Width = "100" },
+					new() { Field = "customer", HeaderText = T("model.Deal.CustomerId").ToString(), Width = "100" },
+					new() { Field = "stageName", HeaderText = T("model.Deal.StageId").ToString(), Visiable = false, Width = "100" },
+					new() { Field = "employee", HeaderText = T("model.Deal.EmployeeId").ToString(), Width = "100" },
+					new()
+					{
+						Field = "amount",
+						HeaderText = T("model.Deal.Amount").ToString(),
+						ColumnType = GridViewModel.GridColumnType.Number,
+						Width = "100"
+					},
+					new()
+					{
+						Field = "closingDate",
+						HeaderText = T("model.Deal.ClosingDate").ToString(),
+						ColumnType = GridViewModel.GridColumnType.Date,
+						Width = "100",
+						Visiable = false
+					},
+					new()
+					{
+						Field = "successProbability",
+						HeaderText = T("model.Deal.SuccessProbability").ToString(),
+						ColumnType = GridViewModel.GridColumnType.Number,
+						Width = "100",
+						Visiable = false
+					},
+				}
+			};
+
+			await Html.RenderPartialAsync("_PaginatedGridView", gridModel);
+		}
+
+	</div>
+	@*<div class="card-footer">
+		<a asp-action="DealAdd" class="btn btn-sm btn-primary">@T("btn.add")</a>
+	</div>*@
+</div>
+
+
+<form asp-action="DealDelete"></form>
+
+
+@section Scripts{
+<script>
+	function commandClick(args) {
+		switch (args.commandColumn.type) {
+			case "EditBtn":
+				window.location.assign('/Admin/Deals/DealUpdate/' + args.rowData.id);
+				break;
+			case "DeleteBtn":
+				Swal.fire({
+					title: '@T("cp.alert.onDelete.btnDelete")',
+					text: "@T("cp.alert.onDeleteMessage.title")",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#d33',
+					cancelButtonColor: '#3085d6',
+					confirmButtonText: '@T("cp.alert.onDelete.btnDelete")',
+					cancelButtonText: '@T("cp.alert.onDelete.btnCancel")',
+				}).then((result) => {
+					if (result.isConfirmed) {
+						onDelete(args.rowData.id);
+					}
+				});
+				break;
+			case "DetalisBtn":
+                window.location.assign("/Admin/deals/dealdetails/" + args.rowData.id);
+                break;
+		}
+	}
+	function onDelete(id) {
+		var token = $("input[name='__RequestVerificationToken']").val();
+		$.ajax({
+			url: '/admin/Deals/DealDelete/' + id,
+			type: 'POST',
+			headers: { RequestVerificationToken: token },
+			success: function (res) {
+				if (res.responseType === 1) {
+					var grid = document.getElementById("@gridModel.GridId").ej2_instances[0];
+					grid.deleteRecord("Id", grid.getSelectedRecords()[0]);
+					Swal.fire(
+						'@T("cp.alert.onDeleteSuccess.title")',
+						'@T("cp.alert.onDeleteSuccess.subtitle")',
+						'success',
+					);
+
+				} else {
+					Swal.fire(
+						'@T("cp.alert.onDeleteFailde.title")',
+						'@T("cp.alert.onDeleteFailde")',
+						'error',
+					);
+				}
+
+			},
+			error: function (e) {
+				Swal.fire(
+					'@T("cp.alert.onDeleteFailde.title")',
+					'@T("cp.alert.onDeleteFailde.subtitle")',
+					'error',
+				);
+				console.error(e);
+			}
+		});
+	}
+</script>
+<script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+<ejs-scripts></ejs-scripts>
+}

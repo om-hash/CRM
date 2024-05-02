@@ -1,0 +1,45 @@
+﻿@using Pal.Data.DTOs.Statistics.Charts;
+@model LineChart;
+@{ var isRtl = LanguageService.IsLayoutRtl();}
+@using Syncfusion.EJ2
+
+@if (Model != null)
+{
+<div class="control-section" align="center" style="margin-top:10px">
+    <ejs-chart id="@Model.ChartId" load="window.onChartLoad" title="@T(Model.ChartTitle)" height='280' enableRtl="isRtl">
+        <e-chart-tooltipsettings enable="true">
+        </e-chart-tooltipsettings>
+        <e-chart-primaryxaxis valueType="Category"
+                              edgeLabelPlacement="Shift">
+            <e-majorgridlines width="0"></e-majorgridlines>
+        </e-chart-primaryxaxis>
+        <e-chart-primaryyaxis rangePadding="None"
+                              minimum=0
+                              maximum=@int.Parse(Model.MaxValue)
+                              interval=@int.Parse(Model.Intervalvalue)>
+            <e-linestyle width="0"></e-linestyle>
+            <e-majorticklines width="0"></e-majorticklines>
+        </e-chart-primaryyaxis>
+        <e-chart-chartarea>
+            <e-chartarea-border width="0"></e-chartarea-border>
+        </e-chart-chartarea>
+        <e-series-collection>
+            <e-series dataSource="@Model.ChartData" name="Current" xName="xValue"  width="2" opacity="1" yName="yValue" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
+                <e-series-marker visible="true" height="10" width="10"></e-series-marker>
+            </e-series>
+
+            <e-series dataSource="@Model.ChartData" name="Last" xName="xValue" width="2" opacity="1" yName="yValue1" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
+                <e-series-marker visible="true" height="10" width="10"></e-series-marker>
+            </e-series>
+
+
+
+        </e-series-collection>
+    </ejs-chart>
+    </div>
+}
+
+<ejs-scripts></ejs-scripts>
+
+
+

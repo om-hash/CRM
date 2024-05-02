@@ -1,0 +1,52 @@
+﻿@using Pal.Data.VMs.Company
+@using Pal.Core.Enums.Account
+
+@model CompanyViewModel
+@{
+    var compId = Model.Id;
+    var userTypeString = User.FindFirst(Pal.Core.Enums.Account.PalClaimType.UserType.ToString())?.Value;
+}
+<style>
+    .contact-info {
+        font-size: 14px !important;
+    }
+
+    .company-img{
+        width: 100%;
+        height: 100px;
+    }
+</style>
+
+<div class="agent">
+    <a class="agent-img">
+        <div class="img-fade"></div>
+        <img src="@Model.Logo" alt="" class="company-img"/>
+    </a>
+    <div class="agent-content">
+        @if (User.Identity.IsAuthenticated && userTypeString == UserType.Customers.ToString())
+        {
+            var customerId = User.FindFirst(Pal.Core.Enums.Account.PalClaimType.CustomerId.ToString()).Value;
+            <a href="https://wa.me/@Model.WhatsApp.Replace(" " , "")" class="button button-icon small right"><i class="fa fa-angle-right"></i>@T("global.whatsapp")</a>
+            <a onclick="chat(2, 3,@customerId, 1,@Model.Id,@Model.Id, @customerId, '@Model.CompanyName')" class="button button-icon small grey right"><i class="fa fa-angle-right"></i>@T("global.chat")</a>
+        }
+        else if (User.Identity.IsAuthenticated)
+        {
+            <a href="https://wa.me/@Model.WhatsApp.Replace(" " , "")" class="button button-icon small right"><i class="fa fa-angle-right"></i>@T("global.whatsapp")</a>
+        }
+        else
+        {
+            <a href="/account/login" class="button button-icon small grey right"><i class="fa fa-angle-right"></i>@T("global.chat")</a>
+        }
+        <div class="agent-details">
+            <h4><a asp-controller="Companies" asp-action="Company" asp-route-id="@Model.Id">@Model.CompanyName</a></h4>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <p><a href="mailto:@Model.Email" class="contact-info"><i class="fa fa-envelope icon"></i>@Model.Email</a></p>
+                <p><a href="tel:@Model.PhoneNumber" class="contact-info"><i class="fa fa-phone icon"></i>@Model.PhoneNumber</a></p>
+
+            }
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+

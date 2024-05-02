@@ -1,0 +1,17 @@
+﻿@using Pal.Data.DTOs.Statistics;
+@model LatestPropertiesDTO; 
+
+<div class="control-section12342" style="margin-top:10px">
+
+    <ejs-grid id="@Model.GridId"  dataSource="Model.dataSource"  gridLines="Horizontal"  height="auto" width="auto">
+        <e-grid-pagesettings  pageSizes="new []{ 5,10,20,50,100}" pageSize="5" ></e-grid-pagesettings>
+        <e-grid-columns>
+            <e-grid-column field="Id" headerText="#" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="Name" headerText="@T("cp.views.Dashboard.list.name")" textAlign="Center" width="130"></e-grid-column>
+            <e-grid-column field="Date" headerText="@T("cp.views.Dashboard.list.date")"  format="yMd"  textAlign="Center" width="130"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+
+</div>   
+
+<ejs-scripts></ejs-scripts>

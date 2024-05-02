@@ -1,0 +1,385 @@
+﻿@{
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value;
+    var userType = User.FindFirst(PalClaimType.UserType.ToString()).Value;
+}
+
+<style>
+    .logo {
+        width: 100%;
+        border-bottom: 1px solid #4f5962;
+        text-align: center;
+        padding: 10px 20px;
+    }
+    .logo>img {
+        width: 50%;
+    }
+</style>
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <div class="logo">
+        <input id="imgUploader" type="file" hidden />
+        <img id="logoPreview" src="/logo/myLogo.png" alt="AdminLTE Logo" asp-append-version="true">
+    </div>
+  @*  <a href="/" class="brand-link">
+        <span class="brand-text font-weight-light">@T("cp.views.sideBar.title")</span>
+    </a>*@
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="~/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">@userName</a>
+            </div>
+        </div>
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="@T("global.search")" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+@*
+                <li class="nav-item">
+                    <a asp-action="Index" asp-controller="Dashboard" class="nav-link " style="background-color: #007bff">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <p>@T("cp.views.sideBar.Dashboard.title")</p>
+                    </a>
+                </li>*@
+
+         @*       <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link  " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fas fas fa-home"></i>
+                        <p>@T("cp.views.sideBar.realestates.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview ">
+
+                        <li class="nav-item">
+                            <a href="/Admin/Projects/ProjectsList" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.projects.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="RegionList" asp-controller="Region" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.regions.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="RealEstatesList" asp-controller="RealEstates" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.realestates.title")</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-action="CommentsList" asp-controller="RatingAndComments" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.reviews.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Tours" asp-controller="Tours" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.tours.title")</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+*@
+                <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>@T("cp.views.sideBar.crm.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @*<li class="nav-item">
+                            <a asp-action="EmployeesList" asp-controller="Employees" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.employees.title")</p>
+                            </a>
+                        </li>*@
+                        <li class="nav-item">
+                            <a asp-action="LeadsList" asp-controller="Leads" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.Leads.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="CustomersList" asp-controller="Customers" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.cutomers.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="DealsList" asp-controller="Deals" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.Deals.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="TasksList" asp-controller="Tasks" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.Tasks.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="MyTasks" asp-controller="Tasks" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("model.myTasks")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="CallsList" asp-controller="Calls" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.Calls.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="MeetingsList" asp-controller="Meetings" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.Meetings.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="CompaniesList" asp-controller="Companies" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.companies.title")</p>
+                            </a>
+                        </li> 
+                        <li class="nav-item">
+                            <a asp-action="SalesList" asp-controller="Sales" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.sels.title")</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+@*
+                <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fab fa-rocketchat"></i>
+                        <p>@T("cp.views.sideBar.chat.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                        <li class="nav-item">
+                            <a href="/Admin/Chat/AllInboxes" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.chat.all")</p>
+                            </a>
+                        </li>
+                        }
+                        <li class="nav-item">
+                            <a href="/Admin/Chat/Inbox?chatType=0" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.chat.companies")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Admin/Chat/Inbox?chatType=1" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.chat.customers")</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+*@
+@*
+                <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fas fa-info-circle"></i>
+                        <p>@T("cp.views.sideBar.webSiteInfo.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="AboutUs" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.aboutUs.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="ContactUs" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.ContactUs.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="GeneralInfo" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.generalInfo.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="GetAllServices" asp-controller="OurServices" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.ourServices.title")</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                *@
+@*
+                <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fas fa-rss"></i>
+                        <p>@T("cp.views.sideBar.post.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a asp-action="BlogsList" asp-controller="Blogs" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.blogs.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="AdvertisementsList" asp-controller="Advertisements" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.advertisements.title")</p>
+                            </a>
+                        </li> 
+                        <li class="nav-item">
+                            <a asp-action="SendEmail" asp-controller="Newspaper" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.newsPaper.title")</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+*@
+
+                <li class="nav-item nav-list" isOpen="0">
+                    <a href="#" class="nav-link " style="background-color: #17a2b8" onclick="updateNavbar(this)">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>@T("cp.views.sideBar.settings.title")<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a asp-action="LanguageList" asp-controller="Languages" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.languages.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="UsersList" asp-controller="Account" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.users.title")</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="Lookups" class="nav-link ">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@T("cp.views.sideBar.lookups.title")</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
+                @*<li class="nav-item menu-open">
+                        <a href="#" class="nav-link " style="background-color: #17a2b8">
+                            <i class="fas fa-user-cog"></i>
+                            <p>@T("cp.views.sideBar.CRM.title")<i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                        </ul>
+                    </li>*@
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
+
+
+<script>
+
+    let imgUploader = document.getElementById('imgUploader');
+    let logoPreview = document.getElementById('logoPreview');
+    imgUploader.addEventListener('change', (e) => {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = function () {
+            logoPreview.src = reader.result;
+
+            var img = new FormData();
+            img.append('imgFile', e.target.files[0]);
+            fetch("Dashboard/ChangeLogo", {
+                method: "POST",
+                body: img,
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    console.log("Success:", result);
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+
+        }
+    });
+    logoPreview.addEventListener('click', () => {
+        imgUploader.click();
+    });
+
+
+    function updateNavbar(a) {
+        e = $(a).parent()
+        try {
+            if ($(e).attr('isOpen') == 0)
+                $(e).attr('isOpen', 1)
+            else
+                $(e).attr('isOpen', 0)
+
+
+            var navItems = $('.nav-list');
+
+            var navStatus = [];
+            Array.from(navItems).forEach((e) => {
+
+                navStatus.push($(e).attr('isOpen'));
+            });
+
+            localStorage.setItem('navStatus', JSON.stringify(navStatus));
+        } catch (e) {
+        }
+
+    }
+
+    $(function () {
+        try {
+            var navStatus = JSON.parse(localStorage.getItem('navStatus'));
+            var navItems = Array.from($('.nav-list'));
+
+            for (var i = 0; i < navItems.length; i++) {
+                if (navStatus[i] == 1) $(navItems[i]).addClass('menu-open')
+                $(navItems[i]).attr('isOpen', navStatus[i]);
+            }
+
+        } catch (e) {
+
+        }
+    });
+
+</script>

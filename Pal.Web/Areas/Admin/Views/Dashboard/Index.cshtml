@@ -1,0 +1,551 @@
+﻿@using Pal.Data.DTOs.Statistics.Charts;
+@model LineChart;
+
+@{
+    var userType = webWorkContext.GetUserType();
+
+}
+
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/fluent.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/fluent.css" />
+
+
+
+@*<button  class="btn btn-danger" onclick="SendPhoneNumber()">send number</button>
+
+    <input type="text" name="name" id="code" value="" />
+    <button  class="btn btn-danger" onclick="onCheck()">check</button>*@
+
+@*
+<div class="row">
+
+    <div class="col-lg-3 col-md-3 col-sm-12 right" style="margin-top:10px">
+        <select class="form-control" id="prtiodSelectList" onchange="Changperiod()">
+            <option value="0">@T("cp.views.Dashboard.dateList.all")</option>
+            <option value="1">@T("cp.views.Dashboard.dateList.today")</option>
+            <option value="2">@T("cp.views.Dashboard.dateList.yesterday")</option>
+            <option value="3">@T("cp.views.Dashboard.dateList.lastWeek")</option>
+            <option value="4">@T("cp.views.Dashboard.dateList.lastMonth")</option>
+            <option value="5">@T("cp.views.Dashboard.dateList.lastThreeMonths")</option>
+            <option value="6">@T("cp.views.Dashboard.dateList.custom")</option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 right" style="margin-top:10px">
+        <input class="form-control" type="date" id="DateFrom" style="display:none" />
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 right" style="margin-top:10px">
+        <input class="form-control" type="date" id="DateTo" style="display:none" />
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 right" style="margin-top:10px">
+        <button class="btn btn-success" id="DateSubmit" style="display:none" onclick="submitDate()">@T("global.submit")</button>
+    </div>
+</div>
+<div id="cardsAndCharts">
+
+</div>
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-12" id="agents">
+
+    </div>
+    <div class="col-lg-8 col-md-6 col-sm-12" id="deals">
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-12">
+        <h6 style=" padding: 10px; padding-bottom: 2px;">@T("global.projects")</h6>
+        <div class="col-12" id="LatestAddedProjects">
+        </div>
+        <h6 style=" padding: 10px; padding-bottom: 2px;">@T("global.realEstate")</h6>
+        <div class="col-12" id="LatestAddedProperties">
+        </div>
+        <h6 style=" padding: 10px; padding-bottom: 2px;">@T("cp.views.Dashboard.list.title")</h6>
+        <div class="col-12" id="MostCustomerActiveList">
+        </div>
+    </div>
+
+    <div class="col-lg-8 col-md-4 col-sm-12">
+        <div class="col-12" id="propertiesVisitCount">
+        </div>
+        <div class="col-12" id="projectsVisitCount">
+        </div>
+        <h6 style=" padding: 10px; padding-bottom: 2px;">@T("global.realEstate")</h6>
+        <div class="col-12" id="realEstateList">
+        </div>
+    </div>
+</div>
+
+
+<a data-backdrop="static" data-keyboard="false" href="#" class="modal" tabindex="-1"  role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@T("publicInterface.policy.title")</h5>
+               
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input class="custom-control-input custom-control-input-danger" type="checkbox" id="customCheckbox1" checked>
+                        <label for="customCheckbox1" class="custom-control-label"></label>
+                        <label onclick="window.open('/Home/PrivacyPolicy', '_blank')">@T("publicInterface.policy.title")</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input class="custom-control-input custom-control-input-danger" type="checkbox" id="customCheckbox2" checked>
+                        <label for="customCheckbox2" class="custom-control-label"></label>
+                        <label onclick="window.open('/Home/TermsAndConditions', '_blank')">@T("publicInterface.TermsAndConditions.title")</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input  class="custom-control-input custom-control-input-danger" type="checkbox" id="customCheckbox3" checked>
+                       <label class="custom-control-label" for="customCheckbox3"></label>
+                       <label  onclick="window.open('/Home/TermsOfUse', '_blank')">@T("publicInterface.TermsOfUse.title")</label>
+                        
+                    </div>
+                </div>
+                <div>
+                    <small id="errorSpan" style="display:none" class="text-danger">@T("publicUI.account.register.errorPrivacy")</small>
+                </div>
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="AcceptTerms()">@T("btn.accept")</button>
+
+                </div>
+            </div>
+    </div>
+</a>
+*@
+
+
+@section Scripts{
+
+
+@*
+    <script>
+
+
+        let company = false;
+
+        function AcceptTerms() {
+            if ($("#customCheckbox1").prop('checked') === false) {
+                $("#errorSpan").css("display", "inline-block")
+                return;
+            }
+            if ($("#customCheckbox2").prop('checked') === false) {
+                $("#errorSpan").css("display", "inline-block")
+                return;
+            }
+            if ($("#customCheckbox3").prop('checked') === false) {
+                $("#errorSpan").css("display", "inline-block")
+                return;
+            }
+            $("#errorSpan").css("display", "none")
+
+
+            $.ajax({
+                type: "post",
+                url: "/admin/Companies/AcceptTearmAndConditions",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        $(".modal").modal("hide");
+                    } else {
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+
+            });
+        }
+
+        $('document').ready(function () {
+          
+            if ('@userType' ==='Companies') {
+                $.ajax({
+                    type: "post",
+                    url: "/admin/Companies/CheckIsFirstTimeLogIn",
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.responseType === 0) {
+                            $(".modal").modal("show");
+                        } else {
+                            $(".modal").modal("hide");
+                        }
+                    },
+                    error: function (e) {
+                        console.error(e);
+                    }
+
+                });
+            }
+           
+
+            //------------------------------------------
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/GetStatistics?Date=0",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    $("#cardsAndCharts").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/MostActiveAdvisors",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res)
+                    $("#agents").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/GetMostPropertiesStatistics?Date=0&ActionName=GetProjectByIdForView",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+
+                    $("#projectsVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/GetMostPropertiesStatistics?Date=0&ActionName=GetRealEstateByIdForView",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+
+                    $("#propertiesVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/LatestPropertiesAdded?actionType=7",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    $("#LatestAddedProjects").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/LatestPropertiesAdded?actionType=8",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    $("#LatestAddedProperties").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/MostActiveCutomers",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    $("#MostCustomerActiveList").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/RealEstatesListForCompany",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    $("#realEstateList").html(res);
+
+                    //                    var reviewsGrid = document.getElementById("realEstatesGrid").ej2_instances[0];
+                    //                    setTimeout(() => {
+                    //                        var contentOfGrid = reviewsGrid.contentModule.initialPageRecords;
+                    //                        contentOfGrid.forEach((x) => {
+                    //                            x.SoldQuantity = `
+                    //<div style="display:flex">
+                    //                                <div>
+                    //                                    <button onclick="decreaseSoldQuntity(${x.Id})" class="btn btn-danger">-</button>
+                    //                                </div>
+                    //                                <div style="padding:20px; padding-top:5px">
+                    //                                    <span>${x.SoldQuantity}</span>
+                    //                                </div>
+                    //                                <div>
+                    //                                    <button onclick="increaseSoldQuntity(${x.Id})"  class="btn btn-success">+</button>
+                    //                                </div>
+                    //</div>`;
+                    //                        });
+                    //                        reviewsGrid.refresh();;
+                    //                    }, "1000")
+                    //var contentOfGrid = reviewsGrid.contentModule.initialPageRecords;
+                    //contentOfGrid.forEach((x) => {
+                    //    x.Rate = ` ${x.Rate} <i class="fas fa-star"></i>`;
+                    //});
+                    //reviewsGrid.refresh();
+
+                    //console.log(reviewsGrid)
+                    //reviewsGrid.refresh();
+
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: "/admin/Dashboard/DealsStatistics",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res)
+                    $("#deals").html(res);
+                    console.log(res)
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+
+
+        });
+
+        //----------------------------------------------------------------------------------
+        function Changperiod() {
+            var period = $('#prtiodSelectList').val();
+            if (period == 6) {
+                $('#DateFrom').css("display", "")
+                $('#DateTo').css("display", "")
+                $('#DateSubmit').css("display", "")
+                return;
+            }
+            $('#DateFrom').css("display", "none")
+            $('#DateTo').css("display", "none")
+            $('#DateSubmit').css("display", "none")
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetStatistics?Date=${period}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#cardsAndCharts").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetMostPropertiesStatistics?Date=${period}&ActionName=GetProjectByIdForView`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#projectsVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetMostPropertiesStatistics?Date=${period}&ActionName=GetRealEstateByIdForView`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#propertiesVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //----------------------------------------------------------------------------------
+        function submitDate() {
+            var period = $('#prtiodSelectList').val();
+            var dateFrom = $('#DateFrom').val();
+            var dateTo = $('#DateTo').val();
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetStatistics?Date=${period}&dateF=${dateFrom}&dateT=${dateTo}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#cardsAndCharts").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetMostPropertiesStatistics?Date=${period}&dateF=${dateFrom}&dateT=${dateTo}&ActionName=GetProjectByIdForView`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#projectsVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: `/admin/Dashboard/GetMostPropertiesStatistics?Date=${period}&dateF=${dateFrom}&dateT=${dateTo}&ActionName=GetRealEstateByIdForView`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#propertiesVisitCount").html(res);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+
+        }
+        //----------------------------------------------------------------------------------
+
+
+
+        function SendPhoneNumber() {
+            $.ajax({
+                type: "post",
+                url: "/Account/SendSmsVerification?phoneNumber=%2B905344602870",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res.responseText);
+                    if (res.responseType === 1) {
+                        alert("done")
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+
+        function onCheck() {
+            $.ajax({
+                type: "post",
+                url: "/Account/CheckSmsVerification?phoneNumber=%2B905344602870&code=" + $('#code').val(),
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log(res.responseText);
+                    if (res.responseType === 1) {
+                        alert("done")
+                    }
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //----------------------------------------------------------------------------------
+        function regionChartClick(args) {
+            var RegionName = args.point.argsData.text;
+            var dataSour = args.series.properties.dataSource;
+            for (var i = 0; i < dataSour.length; i++) {
+                if (dataSour[i].Name === RegionName) {
+                    window.location.assign(dataSour[i].Link)
+                }
+            }
+        }
+        //----------------------------------------------------------------------------------
+        function chartCustomPointClick(args) {
+            var ObjectName = args.point.x;
+            var dataSource = args.series.properties.dataSource;
+            for (var i = 0; i < dataSource.length; i++) {
+                if (dataSource[i].Name === ObjectName) {
+                    window.location.assign(dataSource[i].Link);
+                }
+            }
+        }
+
+        setTimeout(a => { $('#js-licensing').css('display', 'none'); }, 1000)
+        //----------------------------------------------------------------------------------
+        ///**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/
+        //var reviewsGrid = document.getElementById("RealEstates").ej2_instances[0];
+        //console.log(reviewsGrid)
+        //reviewsGrid.recordClick = (e) => {
+        //    console.log("sdasdasdadsa")
+        //    console.log(e);
+        //    var link = e.rowData.Link;
+        //    window.location.assign(link)
+        //};
+        ///**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/  /**/
+
+        //----------------------------------------------------------------------------------
+
+        function decreaseSoldQuntity(id) {
+            console.log(id)
+            $.ajax({
+                type: "post",
+                url: `/admin/RealEstates/DecreaseSoldQuntity/${id}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    document.getElementById(`quan-${id}`).innerHTML = res.responseText;
+                    console.log(document.getElementById(`quan-${id}`).innerHTML);
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+        //----------------------------------------------------------------------------------
+
+        function increaseSoldQuntity(id) {
+            $.ajax({
+                type: "post",
+                url: `/admin/RealEstates/IncreaseSoldQuntity/${id}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    document.getElementById(`quan-${id}`).innerHTML = res.responseText;
+                    console.log(document.getElementById(`quan-${id}`).innerHTML);
+                    //
+                },
+                error: function (e) {
+                    console.error(e);
+                }
+            });
+        }
+    </script>*@
+    <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

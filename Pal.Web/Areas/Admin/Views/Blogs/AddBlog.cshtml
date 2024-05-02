@@ -1,0 +1,240 @@
+﻿@model Pal.Data.DTOs.Blogs.BlogsCreateDTO
+@using Syncfusion.EJ2.Navigations;
+
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+
+<br />
+
+@{
+    ViewData["Title"] = T("cp.views.blogs.add.title");
+    await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                OnSave = "onSave(false)",
+                BackToListhref = "/Admin/Blogs/BlogsList",
+            });
+}
+
+@{
+
+    var HtmlEditorItems = new[] {"Bold", "Italic", "Underline", "StrikeThrough",
+                "FontName", "FontSize", "FontColor", "BackgroundColor",
+                "LowerCase", "UpperCase", "|",
+                "Formats", "Alignments", "OrderedList", "UnorderedList",
+                "Outdent", "Indent", "|",
+                "CreateLink", "Image", "|", "ClearFormat", "Print",
+                "SourceCode", "FullScreen", "|", "Undo", "Redo" };
+
+
+
+    var languages = LanguageService.GetAllLanguages();
+
+}
+
+
+<hr />
+<div class="row">
+    <div style="width: 100%">
+        <form id="BlogForm" asp-action="AddBlog">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+            <div class="form-group">
+                <label asp-for="PostDate" class="control-label">@T("model.BlogPost.PostDate")</label>
+                <input asp-for="PostDate" type="date" class="form-control"/>
+                <span asp-validation-for="PostDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="Tags">@T("model.BlogPost.Tags")</label>
+                    <ejs-multiselect id="Tags" ejs-for="Tags" dataSource="ViewBag.BlogTags" placeholder="Blog Tags..." allowCustomValue="true" mode="Box">
+                        <e-multiselect-fields text="TagName" value="TagName"></e-multiselect-fields>
+                    </ejs-multiselect>
+                </div>
+            </div>
+
+
+
+            <div class="form-row">
+                <div class="form-group col-lg-6 col-md-12">
+                    <label>@T("model.BlogPost.MainImg")</label>
+                    <input type="file" asp-for="MainImgFile" accept="image/*" onchange="showImgPreview(this, 'mainImgPreview');" />
+                </div>
+
+                @*<div class="form-group col-lg-6 col-md-12">
+            <label>@T("model.BlogPost.Images")</label>
+            <input id="blogImages" type="file" accept="image/*" multiple />
+        </div>*@
+                <div class="form-group col-lg-6 col-md-12">
+                    <label>@T("model.BlogPost.Images")</label>
+                    <button onclick="OnClickImagesBtn()" type="button" class="btn btn-sm btn-primary" data-toggle="modal"
+                            data-target="#uploadModal">
+                        Upload
+                    </button>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div><img src="" id="mainImgPreview" alt="Image Preview" style="max-width:160px;display:none;" /></div>
+            </div>
+            <br />
+            <section id="tabs">
+                <h3 class="section-title ">@T("cp.views.blogs.add.blogDetails")</h3>
+                <div class="row">
+                    <div class="col-12 ">
+                        <nav>
+                            <div class="nav  nav-tabs nav-fill" id="nav-tab" role="tablist">
+                                @{
+                                    for (int i = 0; i < languages.Count; i++)
+                                    {
+                                        var tabName = languages[i].Id;
+                                        if (i == 0)
+                                        {
+                                            <a class="nav-item nav-link active" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                        }
+                                        else
+                                        {
+                                            <a class="nav-item nav-link" id="nav-@tabName" data-toggle="tab" href="#contentDiv-@i" role="tab" aria-controls="#contentDiv-@i">@languages[i].Name</a>
+                                        }
+                                    }
+                                }
+
+                            </div>
+                        </nav>
+                        <div class="tab-content " id="nav-tabContent">
+                            @{
+                                for (int i = 0; i < languages.Count; i++)
+                                {
+                                    var langId = languages[i].Id;
+
+                                    <input type="hidden" class="local-tap" id="langId-@i" value="@langId" />
+                                    <div class='tab-pane fade @(i == 0 ? "show active":"") ' id="contentDiv-@i" role="tabpanel">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>@T("model.BlogPost.Title") (@languages[i].Name)</label>
+                                                <input id="blogTitle-@i" asp-for="Translates[i].Title" type="text" class="form-control BlogNameInput BlogTranslateInput">
+                                                <span asp-validation-for="Translates[i].Title" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@T("model.BlogPost.SubTitle") (@languages[i].Name)</label>
+                                                <input id="blogSubTitle-@i" asp-for="Translates[i].SubTitle" type="text" class="form-control BlogTranslateInput">
+                                                <span asp-validation-for="Translates[i].SubTitle" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>@T("model.BlogPost.Content") (@languages[i].Name)</label>
+                                                @{
+                                                    var contentEditor = new Pal.Web.Models.HtmlEditorModel
+                                                    {
+                                                        Value = "",
+                                                        Id = "blogDescription-" + i,
+                                                        ImgPath = "",
+                                                        ImgSaveUrl = "",
+                                                    };
+                                                    await Html.RenderPartialAsync("_HtmlEditor", contentEditor);
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+        <form asp-action="UploadFiles" asp-controller="Attachments" id="form-Attachments"></form>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        var languagesCount = @languages.Count;
+
+        function onSave(saveAndNew) {
+
+                var allGood = true;
+                if (!$("#BlogForm").valid()) {
+                    ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    allGood = false;
+                    return;
+                }
+            var inpo = document.querySelectorAll('.BlogNameInput');
+                inpo.forEach((ele) => {
+                    if (!ele.value) {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                        allGood = false;
+                        return;
+                    }
+
+                });
+
+            if (!allGood) {
+                ErrorToast('Please check all of the required information');
+                return;
+            }
+
+                var BlogTranslateInfo = [];
+                for (var i = 0; i < languagesCount; i++) {
+                    var langid = $('#langId-' + i).val();
+                    var blogTitle = $('#blogTitle-' + i).val();
+                    var blogSubTitle = $('#blogSubTitle-' + i).val();
+                    var blogDescription = document.getElementById('blogDescription-' + i).ej2_instances[0].value;
+                    BlogTranslateInfo.push({ langid, blogTitle, blogSubTitle, blogDescription});
+                }
+
+                // readyupdata
+                var data = new FormData();
+                data.append('PostDate', $('#PostDate').val());
+
+                var tags = document.getElementById('Tags').ej2_instances[0].value;
+                data.append('Tags', tags ? tags.join() : '');
+                data.append("MainImgFile", document.querySelector('#MainImgFile').files[0]);
+
+
+                BlogTranslateInfo.forEach((val, i) => {
+                    data.append('Translates[' + i + '][LanguageId]', val.langid);
+                    data.append('Translates[' + i + '][Title]', val.blogTitle);
+                    data.append('Translates[' + i + '][SubTitle]', val.blogSubTitle);
+                    data.append('Translates[' + i + '][Content]', val.blogDescription);
+                });
+                console.log(data);
+                var header = { RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() }
+                $.ajax({
+                    type: "post",
+                    headers: header,
+                    url: "/admin/Blogs/AddBlog",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (res) {
+
+                        if (res.responseType === 1) {
+                            SuccessToast('@T("cp.alert.onSaveSuccess")');
+                            saveAttachments(res.responseText , 'blogImages' , 1, 10);
+                        }
+                    },
+                    error: function (e) {
+                        console.error(e);
+                    }
+                });
+        }
+
+        //----------------------------------------------------------------------
+    function OnClickImagesBtn() {
+        Swal.fire(
+            '@T("cp.alert.imageBtn.title")',
+            '@T("cp.alert.imageBtn.subtitle")',
+            'info',
+        );
+    }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+}

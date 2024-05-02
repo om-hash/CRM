@@ -1,0 +1,93 @@
+﻿
+<style>
+    .accDetailscard {
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        border-radius: 7px;
+    }
+
+        .accDetailscard:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+
+            .accDetailscard:hover .color-bar {
+                width: 100%;
+            }
+
+        .accDetailscard img {
+            width: 100%;
+            height: 32rem;
+            object-fit: cover;
+            border-radius: 7px 7px 0px 0;
+        }
+
+    .color-bar {
+        background: var(--primaryColor);
+        height: 3px;
+        width: 0;
+        z-index: 20;
+        transition: all 0.4s;
+    }
+   
+
+</style>
+
+@{
+    //var data = await _frontendInfoService.GetGeneralInfoDetails();
+}
+
+<div class="modal fade" id="registerDescriptionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style=" background: var(--secondaryColor); color: #fff !important;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" style="color:#fff" id="myModalLabel">@T("publicUI.account.register.choseAccount.title")</h4>
+            </div>
+            <div class="modal-body">
+                <h5>@T("publicUI.account.register.choseAccount.subtitle")</h5>
+                <div class="row" style=" ">
+                    <div class="col-lg-3 col-md-4 col-sm-12 " style="cursor:pointer">
+                        <div class="accDetailscard " onclick="location.assign('/Account/RegisterCompany')">
+                            <img src="~/img/companyRegister.webp" alt="Avatar">
+                            <div class="color-bar"></div>
+                            <div class="text-center" style="margin: 8px; padding: 13px 3px;">
+                                <h4><b>@T("publicUI.account.register.choseAccount.company")</b></h4>
+                                @*@Html.Raw(data?.CompanySignupContent)*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12  " style="cursor:pointer" onclick="location.assign('/Account/CustomerRegister')">
+                        <div class="accDetailscard">
+                            <img src="~/img/customerRegister.webp" alt="Avatar">
+                            <div class="color-bar"></div>
+                            <div class="text-center" style="margin: 8px; padding: 13px 3px;">
+                                <h4><b>@T("publicUI.account.register.choseAccount.customer")</b></h4>
+                                @*@Html.Raw(data?.CustomerSignupContent)*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12  " style="cursor:pointer" onclick="location.assign('/Account/RegisterAdvisor')">
+                        <div class="accDetailscard">
+                            <img src="~/img/advisorRegister.webp" alt="Avatar">
+                            <div class="color-bar"></div>
+                            <div class="text-center" style="margin: 8px; padding: 13px 3px;">
+                                <h4><b>@T("publicUI.account.register.choseAccount.advisor")</b></h4>
+                                @*@Html.Raw(data?.AdvisorSignupContent)*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12  " style="cursor:pointer" onclick="location.assign('/Account/RegisterLawyer')">
+                        <div class="accDetailscard">
+                            <img src="~/img/Lawyer.jpg" alt="Avatar" >
+                            <div class="color-bar"></div>
+                            <div class="text-center" style="margin: 8px; padding: 13px 3px;">
+                                <h4><b>@T("publicUI.account.register.choseAccount.lawyer")</b></h4>
+                                @*@Html.Raw(data?.AdvisorSignupContent)*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

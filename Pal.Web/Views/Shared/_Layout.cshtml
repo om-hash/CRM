@@ -1,0 +1,229 @@
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+
+@using Pal.Data.VMs.FooterAndHeader
+
+@inject IOptions<RequestLocalizationOptions> LocOptions;
+
+@{
+
+    string returnUrl = ViewContext.HttpContext.Request.Path;
+
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
+        .ToList();
+
+    //HeaderFooterInfoVm layOutInfo = await _frontendInfoService.GetHeaderAndFooterInfo();
+
+    var isRtl = LanguageService.IsLayoutRtl();
+    //var dir = isRtl ? "rtl" : "ltr";
+    //var dir =  "ltr";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="Homely - Responsive Real Estate Template">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/x-icon" href="~/favcon.ico">
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.css" />
+
+    <link href="~/lib/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" media="screen">
+    <link href="~/lib/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
+    <link href="~/lib/slick-1.6.0/slick.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    @if (isRtl)
+    {
+        <link rel="stylesheet"
+              href="https://cdn.rtlcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+              integrity="sha384-cSfiDrYfMj9eYCidq//oGXEkMc0vuTxHXizrMOFAaPsLt1zoCUVnSsURN+nef1lj"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="~/css/style.rtl.css" />
+    }
+    else
+    {
+        <link href="~/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link rel="stylesheet" href="~/css/style.css" />
+    }
+<link href="~/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/responsive.css" />
+    <link rel="stylesheet" href="~/css/nouislider.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i" rel="stylesheet">
+</head>
+<body >
+@*    @{ await Html.RenderPartialAsync("_Header", layOutInfo); }*@
+
+    @RenderBody()
+
+    <footer id="footer" style=" padding: 60px 0px 0;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-4 widget footer-widget">
+                    <a class="footer-logo" href="/"><img src="~/images/logo2.png" alt="Homely" /></a>
+                    <p>
+                        @*@layOutInfo.AboutUs*@
+                    </p>
+                    <div class="divider"></div>
+                    <ul class="social-icons circle">
+                        @*@foreach (var item in layOutInfo.SocialMediaLinks)
+                        {
+                            <li><a href="@item.URL"><i class="@item.Icon"></i></a></li>
+                        }*@
+                    </ul>
+                    <div style="margin-top:10px; display:block">
+                        <label style=" cursor: pointer " onclick="window.open('/Home/PrivacyPolicy', '_blank')">@T("publicInterface.policy.title")</label><br>
+                        <label style=" cursor: pointer" onclick="window.open('/Home/TermsAndConditions', '_blank')">@T("publicInterface.TermsAndConditions.title")</label><br>
+                        <label style=" cursor: pointer " onclick="window.open('/Home/TermsOfUse', '_blank')">@T("publicInterface.TermsOfUse.title")</label>
+                    </div>
+
+
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-4 widget footer-widget from-the-blog">
+                    <h4><span>@T("global.gromTheBlog")</span> <img src="~/images/divider-half.png" alt="" /></h4>
+                    <ul>
+                       @* @foreach (var article in layOutInfo.Blogs)
+                        {
+                            <li>
+                                <a asp-controller="Blogs" asp-action="Blog" asp-route-id="@article.BlogId"><h3>@article.Title</h3></a>
+                                <p>@(article.SubTitle?.Length > 35 ? article.SubTitle?.Substring(0, 35) : article.SubTitle) ...<br /> <a asp-controller="Blogs" asp-action="Blog" asp-route-id="@article.BlogId">@T("global.more")</a></p>
+                                <div class="clear"></div>
+                            </li>
+                        }*@
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-4 widget footer-widget">
+                    <h4><span>@T("global.getInTouch")</span> <img src="~/images/divider-half.png" alt="" /></h4>
+                    <p>
+                  @*      @layOutInfo.GetInTouch.Address*@
+                    </p>
+                    <p>
+                        <b class="open-hours">Open Hours</b><br />
+                       @* @Html.Raw(layOutInfo.GetInTouch.OpenHours)*@
+                    </p>
+
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12 widget footer-widget newsletter">
+                    <h4><span>@T("global.newsLetter")</span> <img src="~/images/divider-half.png" alt="" /></h4>
+                    <p>@T("global.subTitle.newsLetter")</p>
+                    <form class="subscribe-form" method="post" action="#">
+                        <input type="text" name="email" placeholder="@T("global.email")" />
+                        <input type="submit" name="submit" value="@T("global.send")" class="button small alt" />
+                    </form>
+                </div>
+
+            </div><!-- end row -->
+            <div style="display:flex;justify-content:center;align-items:center; padding:0; margin:0; padding-top:3rem">
+                <p>Powered by  <a href="https://pal4it.com/" style="color:#e8792f" target="_blank">Pal4it</a> </p>
+            </div>
+        </div><!-- end footer container -->
+    </footer>
+
+
+
+    <script src="~/lib/jquery/dist/jquery-3.1.1.min.js"></script>
+    <script src="~/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/js/chat.js"></script>
+
+    <script src="~/lib/bootstrap/bootstrap-3.3.7.min.js"></script>
+    <script src="~/lib/slick-1.6.0/slick.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/publicUI/isotope.min.js"></script>
+    <script src="~/js/publicUI/wNumb.js"></script>
+
+    <script src="~/js/publicUI/nouislider.min.js"></script>
+    <script src="~/js/publicUI/global.js"></script>
+    <script src="~/js/PleaseWait.js"></script>
+    <script src="~/js/select2.full.min.js"></script>
+    @{ await Html.RenderPartialAsync("_ChatBox"); }
+    @await RenderSectionAsync("Scripts", required: false)
+
+    @{
+        await Html.RenderPartialAsync("_RegisterAccountDescription");
+    }
+    <script>
+        $('document').ready(function () {
+            var key = localStorage.getItem('VisitKey');
+            if (key == null) {
+                var date = new Date();
+                localStorage.setItem('VisitKey', date);
+                $.ajax({
+                    type: "post",
+                    url: `/admin/Logger/LogInfo?actionName=Visit&actionType=7&transType=23&transReferenceId=0`,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                    },
+                    error: function (e) {
+                        console.error(e);
+                    }
+                });
+                console.log("new")
+            } else {
+                var VisitDate = new Date(key);
+                var dateNow = new Date()
+                var Today = dateNow.getDate();
+                if (VisitDate.getDate() < Today) {
+                    localStorage.removeItem('VisitKey');
+                    var newKey = localStorage.setItem('VisitKey', new Date());
+                    $.ajax({
+                        type: "post",
+                        url: `/admin/Logger/LogInfo?actionName=Visit&actionType=7&transType=23&transReferenceId=0`,
+                        contentType: false,
+                        processData: false,
+                        success: function (res) {
+                        },
+                        error: function (e) {
+                            console.error(e);
+                        }
+                    });
+
+                } else { }
+            }
+
+        });
+        function Projects() {
+            localStorage.removeItem('searchText')
+            localStorage.removeItem('forSale')
+            localStorage.removeItem('forRent')
+            localStorage.removeItem('projectFilter')
+            location.href = "/Projects"
+        }
+
+        function RealEstates() {
+            localStorage.removeItem('searchText')
+            localStorage.removeItem('forSale')
+            localStorage.removeItem('forRent')
+            localStorage.removeItem('realEstateFilter')
+            location.href = "/RealEstates"
+        }
+
+        function Regions() {
+            localStorage.removeItem('regionFilter')
+            location.href = "/Regions"
+        }
+
+        function getRegion(id) {
+            location.href = "/Regions/Region/" + id
+        }
+
+    </script>
+
+    @if (isRtl)
+    {
+        <script>
+            ej.base.enableRtl(true);
+        </script>
+    }
+
+
+</body>
+</html>

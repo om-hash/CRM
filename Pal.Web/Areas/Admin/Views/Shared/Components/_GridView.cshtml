@@ -1,0 +1,237 @@
+﻿@model Pal.Web.Models.GridViewModel
+@using System.Linq
+
+
+<style>
+    .e-btn {
+        font-size: 11px !important;
+    }
+</style>
+
+
+@{
+
+    List<object> commands = new List<object>();
+    var width = 0;
+    if (@Model.AllowToEdit)
+    {
+        width += 40;
+        commands.Add(new { type = Model.BlueButtonType, buttonOption = new { content = T(Model.BlueButtonName).ToString(), cssClass = "e-flat e-info EditBtn" } }); // custom
+    }
+    if (Model.IsAllowToDelete)
+    {
+        width += 50;
+        commands.Add(new { type = Model.RedButtonType, buttonOption = new { content = T(Model.RedButtonName).ToString(), cssClass = "e-flat e-danger DeleteBtn" } }); // custom
+    }
+    if (Model.AllowToShowDetails)
+    {
+        width += 40;
+        commands.Add(new { type = "DetalisBtn", buttonOption = new { content = T("btn.details").ToString(), cssClass = "btn btn-sm btn-primary DeltailsBtn" } }); // custom
+    }
+    if (Model.AllowToChat)
+    {
+        width += 40;
+        commands.Add(new { type = "ChatBtn", buttonOption = new { content = T("btn.chat").ToString(), cssClass = "btn btn-sm e-success ChatBtn" }, }); // custom
+    }
+
+}
+<ejs-grid id="@Model.GridId"
+          enableRtl="LanguageService.IsLayoutRtl()"
+          allowPaging="true" 
+          gridLines="Both"
+          dataSource="@Model.Model"
+          enablePersistence="false"
+          allowFiltering="@Model.AllowFiltering"
+          allowMultiSorting="@Model.AllowMultiSorting"
+          allowReordering="@Model.AllowReordering"
+          allowResizing="@Model.AllowResize"
+          allowSelection="@Model.AllowSelection"
+          allowSorting="@Model.AllowSorting"
+          allowGrouping="@Model.AllowGrouping"
+          commandClick="@Model.OnCommandClick"
+          showColumnChooser="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          toolbarClick="toolbarClick"
+          
+          toolbar="@(new List<string>() {"Search","ColumnChooser","ExcelExport"})">
+    <e-grid-editSettings allowDeleting="true"></e-grid-editSettings>
+    <e-grid-pagesettings pageSizes="@(new string[]{ "5","10","20","50","100","All"})" pageSize="10"></e-grid-pagesettings>
+    <e-grid-filtersettings showFilterBarStatus="true" showFilterBarOperator="@Model.IsShowFilterBarOperator" type="Excel"></e-grid-filtersettings>
+    @*<e-data-manager adaptor="UrlAdaptor" Url="@Model.Url"></e-data-manager>*@
+    @*width="@width.ToString()"*@
+    <e-grid-columns>
+        <e-grid-column headerText="@T("global.manage")" visible="@Model.IsInformationManaged" width="200" commands="commands" textAlign="Center"></e-grid-column>
+        @foreach (var col in Model.Columns)
+        {
+
+            switch (col.ColumnType)
+            {
+
+                case GridViewModel.GridColumnType.Boolean:
+                    <e-grid-column visible="col.Visiable" displayAsCheckBox="true" type="boolean" field="@col.Field" headerText="@col.HeaderText" width="@col.Width"></e-grid-column>
+                    break;
+
+                case GridViewModel.GridColumnType.RateEditor:
+                    <e-grid-column Template="#rateTemplate" visible="col.Visiable" field="@col.Field" headerText="@col.HeaderText" width="@col.Width"></e-grid-column>
+                    break;
+
+                case GridViewModel.GridColumnType.Date:
+                    <e-grid-column field="@col.Field" visible="col.Visiable" format="@(col.Format ?? "dd/MM/yyyy")" headerText="@col.HeaderText" width="@col.Width"></e-grid-column>
+                    break;
+
+                case GridViewModel.GridColumnType.Number:
+                    <e-grid-column field="@col.Field" visible="col.Visiable" format="n2" headerText="@col.HeaderText" width="@col.Width"></e-grid-column>
+                    break;
+
+                default:
+                    <e-grid-column disableHtmlEncode="false" visible="col.Visiable" field="@col.Field" headerText="@col.HeaderText" width="@col.Width"></e-grid-column>
+                    break;
+
+            }
+
+        }
+
+
+
+
+    </e-grid-columns>
+</ejs-grid>
+
+
+
+<script type="text/x-jsrender" id="rateTemplate">
+    ${Rate}
+    @*${for Rate}
+            <i class="fa-solid fa-star" style="color: yellow"></i>
+        ${/for}
+
+        ${for 5-Rate}
+            <i class="fa-regular fa-star" style="color: yellow"></i>
+        ${/for}*@
+        @*console.log(@width.ToString())*@
+</script>
+<script>
+
+ function toolbarClick(args) {
+      var gridObj = document.getElementById(`@Model.GridId`).ej2_instances[0];
+
+     @*if (args.item.id === '@Model.GridId'+'_pdfexport') {
+         gridObj.pdfExport(getPdfExportProperties());
+     }*@
+     if (args.item.id === '@Model.GridId'+'_excelexport') {
+         gridObj.excelExport();
+     }
+     }
+
+
+    function getPdfExportProperties() {
+        return {
+            header: {
+                fromTop: 0,
+                height: 120,
+                contents: [
+                    {
+                        type: 'Text',
+                        value: 'INVOICE',
+                        position: { x: 280, y: 0 },
+                        style: { textBrushColor: '#C25050', fontSize: 25 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'INVOICE NUMBER',
+                        position: { x: 500, y: 30 },
+                        style: { textBrushColor: '#C67878', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Date',
+                        position: { x: 600, y: 30 },
+                        style: { textBrushColor: '#C67878', fontSize: 10 },
+                    }, {
+                        type: 'Text',
+                        value: '223344',
+                        position: { x: 500, y: 50 },
+                        style: { textBrushColor: '#000000', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'date',
+                        position: { x: 600, y: 50 },
+                        style: { textBrushColor: '#000000', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'CUSTOMER ID',
+                        position: { x: 500, y: 70 },
+                        style: { textBrushColor: '#C67878', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'TERMS',
+                        position: { x: 600, y: 70 },
+                        style: { textBrushColor: '#C67878', fontSize: 10 },
+                    }, {
+                        type: 'Text',
+                        value: '223',
+                        position: { x: 500, y: 90 },
+                        style: { textBrushColor: '#000000', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Net 30 days',
+                        position: { x: 600, y: 90 },
+                        style: { textBrushColor: '#000000', fontSize: 10 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Adventure Traders',
+                        position: { x: 20, y: 30 },
+                        style: { textBrushColor: '#C67878', fontSize: 20 }
+                    },
+                    {
+                        type: 'Text',
+                        value: '2501 Aerial Center Parkway',
+                        position: { x: 20, y: 65 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Tel +1 888.936.8638 Fax +1 919.573.0306',
+                        position: { x: 20, y: 80 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
+                ]
+            },
+            footer: {
+                fromBottom: 160,
+                height: 100,
+                contents: [
+                    {
+                        type: 'Text',
+                        value: 'Thank you for your business !',
+                        position: { x: 250, y: 20 },
+                        style: { textBrushColor: '#C67878', fontSize: 14 }
+                    },
+                    {
+                        type: 'Text',
+                        value: '! Visit Again !',
+                        position: { x: 300, y: 45 },
+                        style: { textBrushColor: '#C67878', fontSize: 14 }
+                    }
+                ]
+            },
+
+            fileName: "pdfdocument.pdf"
+        };
+    }
+
+    function OnDataBound(args) {
+        // Perform some operations here
+    }
+</script>
+<script src="~/js/suncfusion/datagrid/datagrid.min.js"></script>
+@*<ejs-scripts></ejs-scripts>*@
+
+
+

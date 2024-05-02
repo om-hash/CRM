@@ -1,0 +1,26 @@
+﻿@using Pal.Data.VMs.Region
+@model List<RegionSiteVM>
+
+@foreach (var site in Model)
+{
+<div class="property shadow-hover">
+    <a class="property-img">
+        <div class="img-fade"></div>
+        <div class="property-tag button status">@site.PlaceTypeName</div>
+        <div class="property-color-bar"></div>
+        @if (site.SiteImage == null)
+        {
+            <img src="~/img/project-default.webp" alt="" />
+        }
+        else
+        {
+            <img src="@site.SiteImage" alt="" />
+        }
+    </a>
+    <div class="property-content">
+        <div class="property-title">
+            <h4 style="padding-top:20px">@site.SiteName</h4>
+        </div>
+    </div>
+</div>
+}

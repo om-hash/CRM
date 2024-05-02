@@ -1,0 +1,204 @@
+﻿@model Pal.Data.DTOs.CRM.Task.TaskDetailsDTO
+@{
+    ViewData["Title"] = T("cp.views.task.details").ToString();
+
+    var languages = LanguageService.GetAllLanguages();
+
+}
+<link href="~/js/suncfusion/multiselectbox/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/richtexteditor/bootstrap4.min.css" rel="stylesheet" />
+<link href="~/js/suncfusion/listbox/bootstrap4.min.css" rel="stylesheet" />
+@*<link href="~/css/style.css" rel="stylesheet" />*@
+<br />
+
+<style>
+    .work-flow {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .table td, .table th {
+        border-top: none;
+    }
+
+    .status:hover {
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+                BackToListhref = "/Admin/Tasks/TasksList",
+            });
+        }
+    </div>
+
+    <div class="card-body">
+        <div id="statusDiv" style="margin-bottom:10px; display:flex; justify-content:center; align-items:center" dir="ltr">
+
+            @foreach (var item in ViewBag.TaskStatuses.Items)
+            {
+                if (item.Id == Model.StatusId)
+                {
+                    <button type="button" id="stage-@item.Id" onclick="changStatus(@item.Id)" style="background: #dc3545" class="btn  btn-arrow-right stagesBTN status">@item.Name</button>
+                }
+                else
+                {
+
+                    <button type="button" id="stage-@item.Id" onclick="changStatus(@item.Id)" class="btn btn-arrow-right stagesBTN status">@item.Name</button>
+                }
+
+
+            }
+
+
+        </div>
+        <div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="background-color: #6c757d61 ">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-week"></i>
+                            @T("cp.views.task.details")
+                        </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div style="display:flex; ">
+                            <div class="col-6">
+                                <dl>
+                                    <dt>@T("model.Task.EmployeeId")</dt>
+                                    <dd>@Model.EmployeeName</dd>
+                                    <dt>@T("model.Task.Subject")</dt>
+                                    <dd>@Model.Subject</dd>
+                                    <dt>@T("model.Task.CreatedBy")</dt>
+                                    <dd>@Model.CreatedByName</dd>
+                                    <dt>@T("model.Task.CustomerId")</dt>
+                                    <dd>@Model.CustomerName</dd>
+                                </dl>
+                            </div>
+                            <div class="col-6">
+                                <dl>
+                                    <dt>@T("model.Task.StartDate")</dt>
+                                    <dd>@Model.StartDate</dd>
+                                    <dt>@T("model.Task.EndDate")</dt>
+                                    <dd>@Model.EndDate</dd>
+                                    <dt>@T("model.Task.TaskPriority")</dt>
+                                    <dd>@T("enum.taskPriority." + Model.TaskPriority)</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <dl>
+                                <dt>@T("model.Task.Description")</dt>
+                                <dd>@Html.Raw(Model.Description)</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <hr />
+                    <table class="table  table-responsive ">
+                        <thead>
+                            <tr>
+                                @{
+                                    foreach (var screen in Model.Attachments)
+                                    {
+                                        if (screen.MediaType == Pal.Core.Enums.Attachment.MediaType.Photos)
+                                        {
+                                            <td class="td-@screen.Id">
+                                                <img src="@screen.FileName" class="img-fluid img-thumbnail" style="max-height:200px">
+                                            </td>
+                                        }
+
+                                        if (screen.MediaType == Pal.Core.Enums.Attachment.MediaType.Videos)
+                                        {
+                                            <td class="td-@screen.Id">
+                                                <video controls="controls" style="max-width: 275px;">
+                                                    <source src="@screen.FileName" type="video/mp4" />
+                                                </video>
+                                            </td>
+                                        }
+
+                                    }
+                                }
+                            </tr>
+
+                        </thead>
+
+                    </table>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+
+        </div>
+    </div>
+    @*<div class="card-footer">
+        @{
+            await Html.RenderPartialAsync("_SaveButtons", new Pal.Web.Models.SaveButtonViewModel
+            {
+
+                BackToListhref = "/Admin/Tasks/TasksList",
+            });
+        }
+    </div>*@
+</div>
+<!-- /.card -->
+
+
+
+
+<hr />
+
+@section Scripts{
+    <script>
+
+        function changStatus(e) {
+         var id=   $("#Id").val();
+         $.ajax({
+                type: "post",
+             url: `/admin/Tasks/ChangeTaskStatus?id=${id}&statusId=${e}`,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.responseType === 1) {
+                        var btns = document.querySelectorAll(".stagesBTN");
+                        btns.forEach((val, i) => {
+                            val.style.background = "#6c757d";
+                        });
+                        $(`#stage-${e}`).css("background", "#dc3545")
+                    } else {
+                        ErrorToast('@T("cp.alert.onSave.IncompleteInfo.title")', '@T("cp.alert.onSave.IncompleteInfo.subtitle")');
+                    }
+                },
+                error: function (e) {
+                    ErrorToast();
+                    console.error(e);
+                }
+
+            });
+
+
+        }
+
+
+
+    </script>
+
+
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/suncfusion/listbox/listbox.min.js"></script>
+    <script src="~/js/suncfusion/richtexteditor/richtexteditor.min.js"></script>
+    <script src="~/js/suncfusion/multiselectbox/multiselectbox.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}
