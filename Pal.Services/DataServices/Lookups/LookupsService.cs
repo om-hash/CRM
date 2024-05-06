@@ -47,6 +47,7 @@ namespace Pal.Services.DataServices.Lookups
         private List<LookupsCachingModel> _cachedBlaconieDirections;
         private List<LookupsCachingModel> _cachedProjectFeatures;
         private List<LookupsCachingModel> _cachedCompaniesAsLookup;
+        private List<LookupsCachingModel> _cachedSalesAsLookup;
         //private List<LookupsCachingModel> _cachedRealEstateFeatures;
         //private List<LookupsCachingModel> _cachedProjectsAsLookup;
         //private List<LookupsCachingModel> _cachedRealEstatesAsLookup;
