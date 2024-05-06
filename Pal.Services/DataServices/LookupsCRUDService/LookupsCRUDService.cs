@@ -856,7 +856,7 @@ namespace Pal.Services.DataServices.LookupsCRUDService
 
         #region Company Category 
 
-        public async Task<SysSalesCategoryDTO> CompanyCategoryAdd(SysSalesCategoryDTO model)
+        public async Task<SysCompanyCategoryDTO> CompanyCategoryAdd(SysCompanyCategoryDTO model)
         {
             try
             {
@@ -910,12 +910,12 @@ namespace Pal.Services.DataServices.LookupsCRUDService
                 return false;
             }
         }
-        public async Task<List<SysSalesCategoryDTO>> CompanyCategoryList()
+        public async Task<List<SysCompanyCategoryDTO>> CompanyCategoryList()
         {
             int langId = await _languageService.GetLanguageIdFromRequestAsync();
             try
             {
-                List<SysSalesCategoryDTO> result = await _context.SysCompanyCategories.Select(a => new SysSalesCategoryDTO
+                List<SysCompanyCategoryDTO> result = await _context.SysCompanyCategories.Select(a => new SysCompanyCategoryDTO
                 {
                     Id = a.Id,
                     CompanyCategoryName = a.SysCompanyCategoryTranslates.FirstOrDefault(a => a.LanguageId == langId).CompanyCategoryName,
@@ -934,7 +934,7 @@ namespace Pal.Services.DataServices.LookupsCRUDService
                 return null;
             }
         }
-        public async Task<SysSalesCategoryDTO> CompanyCategoryUpdate(SysSalesCategoryDTO model)
+        public async Task<SysCompanyCategoryDTO> CompanyCategoryUpdate(SysCompanyCategoryDTO model)
         {
             try
             {
@@ -950,7 +950,7 @@ namespace Pal.Services.DataServices.LookupsCRUDService
                 _context.Update(SysCateogry);
                 await _context.SaveChangesAsync();
                 await _logger.LogInfoAsync(new ActivityLog { ActionName = nameof(CompanyCategoryUpdate), ActionType = ActionType.Update, TransReferenceId = model.Id.ToString(), TransType = LogTransType.Lookups });
-                return _mapper.Map<SysSalesCategoryDTO>(SysCateogry);
+                return _mapper.Map<SysCompanyCategoryDTO>(SysCateogry);
             }
             catch (Exception ex)
             {
@@ -1001,7 +1001,7 @@ namespace Pal.Services.DataServices.LookupsCRUDService
             try
             {
                 _cacheService.Delete("GetSysSalesCategoriesCacheKey");
-                if (await _context.Companies.AnyAsync(a => a.SalesCategoryId == id))
+                if (await _context.sales.AnyAsync(a => a.SalesCategoryId == id))
                 {
                     return false;
                 }
@@ -2628,6 +2628,21 @@ namespace Pal.Services.DataServices.LookupsCRUDService
                 _ = _logger.LogErrorAsync(nameof(DecisionDelete), ex);
                 return false;
             }
+        }
+
+        public Task<SysSalesCategoryDTO> CompanyCategoryAdd(SysSalesCategoryDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<List<SysSalesCategoryDTO>> ILookupsCRUDService.CompanyCategoryList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SysSalesCategoryDTO> CompanyCategoryUpdate(SysSalesCategoryDTO model)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

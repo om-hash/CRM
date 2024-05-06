@@ -52,7 +52,9 @@ namespace Pal.Data.Contexts
         public DbSet<SysCountryTranslate> SysCountryTranslates { get; set; }
 
         public DbSet<SysCompanyCategory> SysCompanyCategories { get; set; }
+        public DbSet<SysSalesCategory> SysSalesCategories { get; set; }
         public DbSet<SysCompanyCategoryTranslate> SysCompanyCategoryTranslates { get; set; }
+        public DbSet<SysSalesCategoryTranslate> SysSalesCategoryTranslates { get; set; }
         public DbSet<SysNationality> SysNationalities { get; set; }
         public DbSet<SysNationalityTranslate> SysNationalityTranslates { get; set; }
         public DbSet<SysNeighborhood> SysNeighborhoods { get; set; }
